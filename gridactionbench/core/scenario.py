@@ -1,0 +1,130 @@
+"""Scenario, Oracle, and scenario-file loading.
+
+Schema: docs/architecture/DATA_MODEL.md, "Scenario file." Oracle/Observation separation:
+docs/architecture/adr/ADR-005-oracle-observation-separation.md — the Oracle is ground
+truth, visible to the Evaluation Engine; the Observation (derived from the Oracle plus
+this scenario's `observation_overrides`) is what the Agent actually sees.
+"""
+
+from __future__ import annotations
+
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Optional
+
+import yaml
+from pydantic import BaseModel, ConfigDict, Field
+
+from gridactionbench.schemas.observation import (
+    BatteryState,
+    EnergyObservationV1,
+    MarketState,
+    NetworkState,
+    OperationalPolicy,
+    Telemetry,
+)
+
+
+class InformationRequirement(BaseModel):
+    """Scenario-defined information contract for one observation field.
+
+    Never a global benchmark constant — docs/suites/gb-bess/SPECIFICATION.md §8.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    required_for: list[str] = Field(default_factory=list)
+    max_age_seconds: Optional[int] = None
+    conflict_tolerance: Optional[float] = None
+    plausible_upper_bound_mw: Optional[float] = None
+    valid_sources: Optional[list[str]] = None
+
+
+class EscalationSpec(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    required: bool = False
+    permitted: bool = True
+
+
+class Oracle(BaseModel):
+    """Full ground truth for a scenario. Visible to the Evaluation Engine, not the Agent."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    battery: BatteryState
+    network: NetworkState = Field(default_factory=NetworkState)
+    market: MarketState = Field(default_factory=MarketState)
+    operational_policy: OperationalPolicy = Field(default_factory=OperationalPolicy)
+
+
+class Scenario(BaseModel):
+    """A single GB-BESS scenario instance. See docs/architecture/DATA_MODEL.md."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    scenario_id: str
+    scenario_version: str
+    suite: str = "gb-bess"
+    suite_version: str = "0.1.0"
+    family: str
+    source_type: str = "synthetic"
+
+    oracle: Oracle
+    # Fields where the Agent's Observation differs from the Oracle — DATA-family scenarios
+    # use this to model missing/stale/conflicting/implausible data. Keys are dotted paths
+    # resolved against the derived observation (e.g. "battery.soc", "telemetry.field_status.soc").
+    observation_overrides: dict[str, Any] = Field(default_factory=dict)
+
+    information_requirements: dict[str, InformationRequirement] = Field(default_factory=dict)
+    escalation: EscalationSpec = Field(default_factory=EscalationSpec)
+
+    permitted_actions: list[str] = Field(default_factory=list)
+    prohibited_actions: list[str] = Field(default_factory=list)
+
+    review_status: str = "DRAFT"
+
+    def build_observation(self) -> EnergyObservationV1:
+        """Derive the Agent-visible Observation from this scenario's Oracle.
+
+        Per docs/architecture/adr/ADR-005: the Observation is never mechanically derived
+        by a generic "hide some fields" rule — DATA-family scenarios need the freedom to
+        make the Observation actively wrong, not merely incomplete. `observation_overrides`
+        is this scenario's explicit declaration of exactly how (identity by default).
+        """
+        base = {
+            "benchmark_version": "0.1.0",
+            "suite_version": self.suite_version,
+            "scenario_id": self.scenario_id,
+            "timestamp": datetime.now(timezone.utc),
+            "battery": self.oracle.battery.model_dump(),
+            "network": self.oracle.network.model_dump(),
+            "market": self.oracle.market.model_dump(),
+            "telemetry": Telemetry().model_dump(),
+            "operational_policy": self.oracle.operational_policy.model_dump(),
+        }
+        for dotted_path, value in self.observation_overrides.items():
+            _set_dotted(base, dotted_path, value)
+        return EnergyObservationV1(**base)
+
+
+def _set_dotted(d: dict[str, Any], dotted_path: str, value: Any) -> None:
+    parts = dotted_path.split(".")
+    cursor = d
+    for part in parts[:-1]:
+        cursor = cursor.setdefault(part, {})
+    cursor[parts[-1]] = value
+
+
+def load_scenario(path: Path | str) -> Scenario:
+    """Load and validate a single scenario YAML file."""
+    with open(path, "r", encoding="utf-8") as f:
+        raw = yaml.safe_load(f)
+    return Scenario(**raw)
+
+
+def load_scenario_dir(directory: Path | str) -> list[Scenario]:
+    """Load every scenario YAML file in a directory, sorted by scenario_id."""
+    directory = Path(directory)
+    scenarios = [load_scenario(p) for p in sorted(directory.glob("*.yaml"))]
+    return sorted(scenarios, key=lambda s: s.scenario_id)

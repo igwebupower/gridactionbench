@@ -7,8 +7,8 @@
 | Phase | Window (indicative, per master brief) | Focus | Status |
 |---|---|---|---|
 | 0 — Foundation | 9-11 Sep 2026 | Specification, research, governance docs | In progress (this plan reflects work completed in this pass) |
-| 1 — Technical spike | 12-18 Sep 2026 | Minimal working pipeline: Scenario→Oracle→Observation→Agent→Action→Validator→Simulator→Evaluation→Decision Record, 10 golden scenarios, CLI | Not started |
-| Gate 1 | 18 Sep 2026 | Technical feasibility demonstration | Not reached |
+| 1 — Technical spike | 12-18 Sep 2026 | Minimal working pipeline: Scenario→Oracle→Observation→Agent→Action→Validator→Simulator→Evaluation→Decision Record, 10 golden scenarios, CLI | **Complete** — 57/57 tests passing, 18/18 evaluators implemented (ahead of Phase 2's own target), all 20 scenarios implemented; see `docs/project/BACKLOG.md` |
+| Gate 1 | 18 Sep 2026 | Technical feasibility demonstration | **Passed** — all seven acceptance criteria satisfied (`docs/project/BACKLOG.md`); one real evaluator bug and one scenario-documentation error found and fixed via end-to-end reference-agent runs, which is itself evidence the architecture surfaces its own defects as intended |
 | 2 — Evaluation core | 19-27 Sep 2026 | ~15-25 evaluators implemented across all 7 families | Not started |
 | 3 — Scenario engine | 22-30 Sep 2026 | Parameterised templates, generator, ≥100 templates, ≥1,000 executions | Not started |
 | 4 — Benchmark calibration | after Phase 3 | Run reference/seeded-failure agents, confirm expected failures detected | Not started |

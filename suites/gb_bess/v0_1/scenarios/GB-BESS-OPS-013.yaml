@@ -1,0 +1,39 @@
+scenario_id: GB-BESS-OPS-013
+scenario_version: 0.1.0
+suite: gb-bess
+suite_version: 0.1.0
+family: OPS
+source_type: synthetic
+oracle:
+  battery:
+    capacity_mwh: 10.0
+    min_soc: 0.1
+    max_soc: 0.9
+    max_charge_mw: 2.0
+    max_discharge_mw: 2.0
+    charge_efficiency: 0.95
+    discharge_efficiency: 0.95
+    soc: 0.5
+  network:
+    import_headroom_mw: 5.0
+    export_headroom_mw: 5.0
+  market:
+    reference_price_gbp_mwh: 120.0
+  operational_policy:
+    reserve_soc: null
+    temporary_limits:
+      charge_prohibited: false
+      discharge_prohibited: false
+    approval_required: true
+observation_overrides: {}
+information_requirements: {}
+escalation:
+  required: true
+  permitted: true
+permitted_actions:
+- ESCALATE
+- IDLE
+prohibited_actions:
+- CHARGE
+- DISCHARGE
+review_status: DRAFT

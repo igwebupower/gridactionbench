@@ -28,11 +28,11 @@ As of a 16 April 2026 joint open letter, DESNZ and Ofgem confirmed they remain c
 
 This is real, current, sourced context for why AI-assisted BESS operational decision-making is a live GB policy topic — a system with many more connected/queued batteries than confirmed network headroom is exactly the system where reserve-SOC policy, temporary restrictions, and appropriate escalation stop being academic. It is presented here, rather than in `GB_SPECIFICITY.md`, because removing this context would not change a single evaluator, scenario parameter, or observation field in GB-BESS v0.1 — the OPS scenario family's design (reserve SOC, temporary restrictions, approval requirements) is generic operational-policy modeling applicable to any regulated grid, motivated equally well without this specific policy backdrop. GOV.UK publications are typically released under the Open Government Licence (OGL) — permitting reuse with attribution; no bulk data is reproduced here, only narrative citation.
 
-## Currency and timestep convention (contextual, not currently benchmark-affecting)
+## Currency convention (contextual, not benchmark-affecting)
 
-*Also moved from `GB_SPECIFICITY.md` during the Phase 0.5 correction pass.*
+*Partially updated Phase 1: the timestep half of this section has moved back to `GB_SPECIFICITY.md` as Feature 3, since the condition this section itself set for that move — the simulator's timestep actually being fixed to the GB settlement period — is now satisfied (`dt_hours = 0.5` is implemented, not merely discussed). Currency remains here, unchanged.*
 
-GBP as the currency unit and the 48-per-day half-hourly settlement period as a natural timestep reference are both artifacts of the GB Balancing and Settlement Code (Elexon). **Neither, by itself, establishes GB specificity** — using GBP as a unit label changes no benchmark behaviour, and the half-hourly period is not yet the simulator's actual timestep (that is an unmade Phase 1 implementation decision — see `docs/suites/gb-bess/SPECIFICATION.md` §9). If and when the simulator's timestep is fixed to match GB settlement periods, that decision would become genuinely benchmark-affecting and should move back to `GB_SPECIFICITY.md` at that time, with the Phase 1 implementation cited as the evidence it actually changed something.
+GBP as the currency unit is an artifact of the GB Balancing and Settlement Code (Elexon). This, by itself, still does not establish GB specificity — using GBP as a unit label changes no benchmark behaviour on its own, independent of the (now benchmark-affecting) timestep decision documented in `GB_SPECIFICITY.md`, Feature 3.
 
 ## What GB-BESS v0.1 explicitly does not model
 

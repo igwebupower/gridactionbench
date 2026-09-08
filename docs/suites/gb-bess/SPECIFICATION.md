@@ -181,7 +181,9 @@ IDLE / ESCALATE:
 
 ### 9.6 Timestep units
 
-`dt_hours` is expressed in **hours** (not seconds, not settlement periods) so that `power_mw (MW) * dt_hours (h) = energy (MWh)` holds without a unit-conversion constant anywhere in the evaluator or simulator logic — MW×h=MWh is the only energy-power-time relationship used in this specification. A half-hour GB settlement-period-aligned timestep (see `docs/suites/gb-bess/GB_CONTEXT.md`, "Currency and timestep convention") would be `dt_hours = 0.5`; the actual default value is a Phase 1 implementation decision not yet made, but whatever value is chosen, it is configured in hours, and this is now frozen as the unit convention regardless of which numeric default Phase 1 picks.
+`dt_hours` is expressed in **hours** (not seconds, not settlement periods) so that `power_mw (MW) * dt_hours (h) = energy (MWh)` holds without a unit-conversion constant anywhere in the evaluator or simulator logic — MW×h=MWh is the only energy-power-time relationship used in this specification.
+
+**Decided in Phase 1 (`gridactionbench/cli.py`, `--dt-hours` option, default): `dt_hours = 0.5`**, matching the GB half-hourly settlement period. This is the first genuinely implemented, benchmark-affecting instance of that convention — per `docs/suites/gb-bess/GB_CONTEXT.md`'s own stated condition ("if and when the simulator's timestep is actually fixed to match it, that decision would become genuinely benchmark-affecting"), this is now documented as **Feature 3** in `docs/suites/gb-bess/GB_SPECIFICITY.md`, not left in the contextual document. `dt_hours` remains a runner/CLI parameter, not a hard-coded constant, so it can be overridden per run — 0.5 is the suite's documented default, not an unconditional requirement.
 
 ### 9.7 Boundary handling and floating-point tolerance
 

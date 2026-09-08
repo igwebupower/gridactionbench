@@ -1,0 +1,19 @@
+# Pinned dependency versions for reproducible GridActionBench runs.
+#
+# This is a hand-curated pin of direct + key transitive dependencies as installed during
+# Phase 1 development, not a tool-generated full transitive closure (pip-compile/uv lock
+# would produce a more complete lock — see docs/project/BACKLOG.md's "Explicitly deferred"
+# note). Install with: pip install -r requirements-lock.txt -e .
+#
+# Python: 3.13.5 (development environment; ADR-001 requires >=3.11)
+
+pydantic==2.12.4
+pydantic_core==2.41.5
+PyYAML==6.0.3
+typer==0.27.0
+click==8.3.1
+rich==13.9.4
+shellingham==1.5.4
+typing_extensions==4.15.0
+typing-inspection==0.4.2
+pytest==9.0.1
