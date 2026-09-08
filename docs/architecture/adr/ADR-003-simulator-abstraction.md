@@ -13,5 +13,5 @@ Define a `SimulatorAdapter` interface (`docs/architecture/ARCHITECTURE.md`) with
 - **No abstraction at all — hard-code `SimpleBessSimulator` calls throughout the core** — rejected: would require a breaking rewrite of the runner/evaluator code to ever add a second simulator backend, and provides no near-term benefit large enough to justify skipping a two-method interface.
 
 ## Consequences
-- Positive: matches validated prior-art practice; keeps v0.1 dependency-light and installable in minutes, supporting the Phase 1 timeline; leaves a clean seam for a future PyPSA/PandaPower/PowerMCP/Grid2Op-backed adapter (`docs/research/PRIOR_ART.md` §7) without redesign.
-- Negative: `SimpleBessSimulator`'s physical fidelity is materially lower than PowerAgentBench's real-simulator-backed approach (`docs/research/POWERAGENTBENCH_REVIEW.md` §5) — this must be stated plainly in the Benchmark Card as a scope limitation, not hidden.
+- Positive: matches validated prior-art practice; keeps v0.1 dependency-light and installable in minutes, supporting the Phase 1 timeline; leaves a clean seam for a future PyPSA/PandaPower/Grid2Op-backed adapter (`docs/research/PRIOR_ART.md` §7) without redesign.
+- Negative: `SimpleBessSimulator`'s physical fidelity is materially lower than a real power-flow-simulator-backed approach — this must be stated plainly in the Benchmark Card as a scope limitation, not hidden.

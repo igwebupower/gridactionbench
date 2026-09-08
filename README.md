@@ -21,7 +21,7 @@ gridactionbench run suites/gb_bess/v0_1/scenarios --agent rule-based
 
 Two questions are answered in full, with evidence, in `docs/project/PID.md` §2:
 
-- **Why should GridActionBench exist if PowerAgentBench already exists?** — see `docs/project/PID.md` §2.1 and the full comparison in `docs/research/POWERAGENTBENCH_REVIEW.md`.
+- **What does this benchmark evaluate that isn't already well covered?** — see `docs/project/PID.md` §2.1 and the related-work survey in `docs/research/PRIOR_ART.md`.
 - **What specifically makes GB-BESS a Great Britain benchmark, not just a generic battery benchmark in GBP?** — see `docs/suites/gb-bess/GB_SPECIFICITY.md`.
 
 ## Core idea
@@ -58,13 +58,13 @@ scripts/         one-off utilities (e.g. the scenario-catalogue backfill script)
 | `docs/suites/gb-bess/EVALUATION_SPEC.md` | The evaluator catalogue |
 | `docs/benchmark/CALIBRATION_RESULTS.md` | Real output from 10 agents (3 reference, 7 seeded-failure) against the 20 initial scenarios |
 | `docs/suites/gb-bess/SCENARIO_TEMPLATES.md` | Parameterised scenario generator: 20 templates, 300 generated instances, honest gap to the ≥100/≥1,000 targets |
-| `docs/research/PRIOR_ART.md`, `POWERAGENTBENCH_REVIEW.md` | Prior-art research and differentiation |
+| `docs/research/PRIOR_ART.md` | Prior-art research and differentiation |
 | `docs/architecture/adr/` | Architecture decision records |
 | `GOVERNANCE.md`, `CONTRIBUTING.md` | How to participate |
 
 ## Relationship to other projects
 
-GridActionBench runs entirely independently of Enprompta or any proprietary platform. It acknowledges PowerAgentBench as important prior art (see `docs/research/POWERAGENTBENCH_REVIEW.md`) without forking it. It does not claim DESNZ, Ofgem, NESO, or UK government endorsement. See `docs/project/PID.md` §3.
+GridActionBench runs entirely independently of any proprietary platform. It does not claim DESNZ, Ofgem, NESO, or UK government endorsement. See `docs/project/PID.md` §3.
 
 ## License
 

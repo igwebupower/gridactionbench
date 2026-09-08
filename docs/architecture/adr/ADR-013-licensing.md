@@ -12,7 +12,7 @@ Master brief §58 requires an ADR comparing Apache-2.0 and MIT, with a starting 
 - **Patent grant.** Apache-2.0 includes an explicit patent grant and defensive termination clause, which matters for a benchmark that may be used by commercial entities (energy operators, AI vendors) evaluating their own systems — reduces patent-litigation risk for contributors and users in a way MIT's shorter text does not address.
 - **Commercial reuse.** Both licences permit commercial reuse; no material difference here.
 - **Contribution.** Apache-2.0 is widely recognized and accepted by corporate contributor policies (many companies' OSS-contribution approval processes specifically favor Apache-2.0 for its patent clause), which matters for master brief §59's goal of enabling independent, potentially corporate-affiliated contributors (e.g. DNOs, BESS operators, other AI labs).
-- **Ecosystem compatibility.** MIT-licensed sibling prior-art repositories (PowerMCP, PowerFM, PowerWF) and the MPL-2.0-licensed Grid2Op (`docs/research/PRIOR_ART.md` §8) are compatible with Apache-2.0 consumption (MIT code can be incorporated into an Apache-2.0 project); the reverse is not guaranteed, so choosing Apache-2.0 preserves more future interoperability optionality than choosing MIT would.
+- **Ecosystem compatibility.** The MPL-2.0-licensed Grid2Op (`docs/research/PRIOR_ART.md` §8) is compatible with Apache-2.0 consumption (permissively-licensed code can generally be incorporated into an Apache-2.0 project); the reverse is not guaranteed, so choosing Apache-2.0 preserves more future interoperability optionality than choosing MIT would.
 
 ## Alternatives considered
 - **MIT** — simpler, marginally more permissive text, but no explicit patent grant; rejected given the commercial-and-research dual audience this project expects.
@@ -23,4 +23,4 @@ Master brief §58 requires an ADR comparing Apache-2.0 and MIT, with a starting 
 - Negative: none material — Apache-2.0 is a well-understood, low-risk choice for this project's profile.
 
 ## Attribution requirement if reusing licensed code
-If any future code is incorporated from another project, its licence must be verified and required notices/attributions preserved before merge (master brief §58) — no code has been copied from any reviewed prior-art repository to date (`docs/research/PRIOR_ART.md` §8, `docs/research/POWERAGENTBENCH_REVIEW.md` §14).
+If any future code is incorporated from another project, its licence must be verified and required notices/attributions preserved before merge (master brief §58) — no code has been copied from any reviewed prior-art repository to date (`docs/research/PRIOR_ART.md` §8).

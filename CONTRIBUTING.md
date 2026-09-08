@@ -28,7 +28,7 @@ See `GOVERNANCE.md`, "Changes affecting official benchmark behaviour" — a requ
 
 - Scenario or evaluator changes without a stated rationale and impact assessment.
 - Real datasets without a complete, confirmed-licence provenance record.
-- Code or scenario content copied from another project without independently verified licence compatibility (see `docs/research/PRIOR_ART.md` §8 and `docs/research/POWERAGENTBENCH_REVIEW.md` §14 for why this is treated carefully in this project specifically).
+- Code or scenario content copied from another project without independently verified licence compatibility (see `docs/research/PRIOR_ART.md` §8 for why this is treated carefully in this project specifically).
 - Any change that would give a component the ability to address a real, physical energy asset or operational system — see `docs/architecture/SECURITY.md` and `SECURITY.md` (this file's root-level counterpart).
 
 ## Code of Conduct

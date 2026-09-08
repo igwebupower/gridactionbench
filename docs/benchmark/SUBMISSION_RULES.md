@@ -45,6 +45,6 @@ Requires evaluation against official private holdout infrastructure (not yet bui
 - Omitting UCV counts or any required dimension from `docs/benchmark/SCORING.md`'s reporting format.
 - Mixing Reference and Extended Track results without labeling.
 
-## Relationship to Enprompta
+## Independence
 
-Submission and evaluation infrastructure described here is independent of Enprompta or any proprietary platform; no submission path requires Enprompta account access or tooling (master brief §61, `docs/project/PID.md`).
+Submission and evaluation infrastructure described here is independent of any proprietary platform; no submission path requires access to or tooling from a specific commercial product (`docs/project/PID.md`).

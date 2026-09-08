@@ -4,6 +4,33 @@ All notable changes to GridActionBench are documented here. Versioning follows `
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — Mode B (episode evaluation) implementation
+
+### Added
+- `gridactionbench/core/episode.py`: `EpisodeSpec`, `EpisodeResult`, `run_episode()` — the Mode B runner described but not implemented since `ADR-016` in Phase 0. A thin loop over the existing Mode A single-step pipeline: SOC threads from each step's simulator post-state into the next step's Oracle; every other Oracle field follows a per-step schedule the episode itself defines. No new evaluation code path — every step still goes through the same `run_single_step()` used by Mode A.
+- `gridactionbench/scenarios/gb_bess/episodes.py`: all 6 GB-BESS episodes (`GB-BESS-EP-001` through `EP-006`) from `docs/suites/gb-bess/SCENARIO_CATALOGUE.md`, each with a concrete `check_ep00N()` function implementing that episode's documented `failure_signature` as a testable condition rather than a narrative description.
+- New CLI commands: `gridactionbench run-episode`, printing per-step actions, the *proposed* SOC outcome, the *actual world* SOC (see Fixed, below), and whether the failure signature triggered.
+- `tests/golden/test_episodes.py`: every episode verified bidirectionally — a compliant reference agent (`RuleBasedAgent`) never triggers any failure signature, and a seeded-failure agent whose documented defect matches the episode's design intent reliably does. 105 tests passing (up from 95).
+
+### Fixed
+- **Real bug found immediately by running a genuinely defective agent through an episode, before any test was written for it:** the first version of `run_episode()` carried the simulator's *hypothetical* post-state SOC forward into the next step regardless of whether the action was valid. `IgnoreMinimumSOCAgent` discharging below `min_soc` drove the hypothetical SOC negative, and the next step's Oracle then failed schema validation on a negative SOC. Fixed by gating state advancement on `hard_constraint_valid` (`docs/suites/gb-bess/SPECIFICATION.md` §9.9: "the simulator only ever executes valid actions") — an invalid action now leaves the world state unchanged, and the agent correctly keeps re-attempting (and re-failing) the same invalid action every subsequent step, which is itself the correct behavior for a genuinely stuck defective agent. Now a permanent regression test.
+- Related CLI clarity fix: the episode display was showing only the *hypothetical* proposed SOC per step, which — after the fix above — could differ from the *actual* carried-forward world state whenever an action was rejected. The CLI now shows both explicitly (`proposed_soc=... | world_soc=...`) rather than conflating them.
+
+## [Unreleased] — Neutral framing pass
+
+Per explicit direction: removed named comparisons to PowerAgentBench and all references to Enprompta throughout the documentation, in favor of neutral framing. This is a documentation/framing change only — no benchmark behavior, schema, evaluator, or scenario content changed.
+
+### Removed
+- `docs/research/POWERAGENTBENCH_REVIEW.md` — deleted in full (its entire content was a comparative review of one specific named project).
+- All PowerAgentBench-specific content from `docs/research/PRIOR_ART.md` (previously §1, "The PowerAgent landscape") — the document's remaining sections (Power Systems Agent Benchmark, Grid2Op/RL2Grid, HELM, SWE-bench Verified, MLPerf) are unaffected and keep their original section numbers, so existing cross-references elsewhere in the repo remain valid.
+- All Enprompta references across `docs/project/PID.md`, `README.md`, `GOVERNANCE.md`, `docs/benchmark/BENCHMARK_CARD.md`, `docs/benchmark/SUBMISSION_RULES.md`, `docs/architecture/adr/ADR-009-decision-record-format.md`, `docs/project/RISK_REGISTER.md`. Independence from any single commercial platform remains stated as a governance principle, just without naming a specific product.
+- PowerMCP references (a sibling tool under the same organization as the removed PowerAgentBench comparison) from `docs/architecture/ARCHITECTURE.md`, `docs/architecture/SECURITY.md`, `docs/architecture/adr/ADR-003-simulator-abstraction.md`, `docs/architecture/adr/ADR-013-licensing.md` — Grid2Op remains as the example future `SimulatorAdapter` target in these passages.
+
+### Changed
+- `docs/project/PID.md` §2.1 reframed from "Why should GridActionBench exist if PowerAgentBench already exists?" to "What does this benchmark evaluate that isn't already well covered?", answered on GridActionBench's own terms (narrow single-asset operational-action scope, dependency-light design, formalized UCV/escalation concepts) plus the existing Grid2Op/RL2Grid non-overlap argument, which is unaffected by this pass.
+- `docs/research/BENCHMARK_DESIGN_REVIEW.md`: findings that cited PowerAgentBench by name (agent-interface comparison, simulator-fidelity trade-off, false-safe metric comparison, versioning-rigor comparison, tool-use metrics gap) are restated on their own merits or with generic attribution, without changing the substance of any finding.
+- Historical entries elsewhere in this changelog that predate this pass, and which mention PowerAgentBench or Enprompta, are left as-is — they are an accurate record of what this project did at the time, not a claim about its current state.
+
 ## [Unreleased] — Phase 3 start (scenario engine) + two gap closures
 
 ### Added

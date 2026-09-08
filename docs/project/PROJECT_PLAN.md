@@ -23,7 +23,7 @@
 
 ## Phase 0 exit criteria (this phase)
 
-Per master brief §67's Gate 0 requirement: convincing answers to "why GridActionBench given PowerAgentBench exists" and "what makes GB-BESS genuinely GB-specific" — both delivered in `docs/project/PID.md` §2. Remaining Phase 0 gaps: `docs/research/BENCHMARK_DESIGN_REVIEW.md` and `docs/research/EXPERT_REVIEW_CHECKLIST.md` (tracked in `docs/project/BACKLOG.md`), and the root governance/community files (README, LICENSE, CITATION.cff, CONTRIBUTING, CODE_OF_CONDUCT, GOVERNANCE, SECURITY, CHANGELOG).
+Per master brief §67's Gate 0 requirement: convincing answers to "what does this benchmark evaluate that isn't already well covered" and "what makes GB-BESS genuinely GB-specific" — both delivered in `docs/project/PID.md` §2. Remaining Phase 0 gaps: `docs/research/BENCHMARK_DESIGN_REVIEW.md` and `docs/research/EXPERT_REVIEW_CHECKLIST.md` (tracked in `docs/project/BACKLOG.md`), and the root governance/community files (README, LICENSE, CITATION.cff, CONTRIBUTING, CODE_OF_CONDUCT, GOVERNANCE, SECURITY, CHANGELOG).
 
 ## Critical path dependencies
 

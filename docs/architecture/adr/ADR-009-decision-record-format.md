@@ -10,7 +10,7 @@ JSONL (one JSON object per line), one file per Run, append-only during execution
 
 ## Alternatives considered
 - **A relational database (e.g. SQLite) as the primary Decision Record store** — rejected as the *primary* format: adds a schema-migration burden and a binary artifact that is harder to diff/review in a pull request or archive alongside a published result; a SQLite export remains a reasonable optional convenience layer built *from* the canonical JSONL, not a replacement for it.
-- **A proprietary tracing SDK format (e.g. OpenTelemetry-native spans as the only representation)** — rejected as the sole format: directly contradicts master brief §13's explicit instruction; OTel-compatible export is a reasonable *additional* optional output for teams that already have OTel infrastructure (e.g. Enprompta, per master brief §61's "optional future Enprompta integration"), but JSONL remains canonical and is never a downstream derivative of it.
+- **A proprietary tracing SDK format (e.g. OpenTelemetry-native spans as the only representation)** — rejected as the sole format: directly contradicts master brief §13's explicit instruction; OTel-compatible export is a reasonable *additional* optional output for teams that already have OTel infrastructure, but JSONL remains canonical and is never a downstream derivative of it.
 
 ## Consequences
 - Positive: Decision Records are trivially archivable, diffable at the line level, and consumable by any downstream analysis tool without requiring GridActionBench-specific client libraries.

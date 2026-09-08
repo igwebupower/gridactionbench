@@ -3,7 +3,7 @@
 **Status:** Proposed (Phase 0 — to be confirmed at Phase 1 kickoff)
 
 ## Context
-GridActionBench needs a language/runtime that: (a) is accessible to energy-domain contributors and reviewers, most of whom already work in Python-based power-systems tooling (pandapower, PyPSA, PSS/E scripting); (b) has mature, boring schema-validation and testing tooling, since correctness of evaluator logic matters more than raw performance; (c) matches the ecosystem of the prior art reviewed in `docs/research/PRIOR_ART.md` (PowerAgentBench, the Trashchenkov benchmark, and MLCommons tooling are all Python-based), lowering the barrier to any future interoperability work.
+GridActionBench needs a language/runtime that: (a) is accessible to energy-domain contributors and reviewers, most of whom already work in Python-based power-systems tooling (pandapower, PyPSA, PSS/E scripting); (b) has mature, boring schema-validation and testing tooling, since correctness of evaluator logic matters more than raw performance; (c) matches the ecosystem of the prior art reviewed in `docs/research/PRIOR_ART.md` (the benchmarks and tooling surveyed there are predominantly Python-based), lowering the barrier to any future interoperability work.
 
 ## Decision
 Python 3.11+, using `pydantic` (v2) for schema definition/validation (`EnergyObservationV1`, `AgentActionV1`, Decision Record), `pytest` for the full test strategy (`docs/testing/TEST_STRATEGY.md`), and a standard CLI framework (`typer` or `click`, final choice deferred to Phase 1 implementation) for the CLI entry point (master brief §68).

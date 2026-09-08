@@ -30,7 +30,7 @@ gridactionbench/
 
 ### `SimulatorAdapter`
 
-The simulator boundary is an interface, not a concrete class reference, from day one — see `docs/architecture/adr/ADR-003-simulator-abstraction.md`. `SimpleBessSimulator` is the only implementation shipped in v0.1; the interface exists so a future PyPSA-, PandaPower-, PowerMCP-, or Grid2Op-backed adapter (see `docs/research/PRIOR_ART.md` §7) could be added later without redesigning the benchmark core, not because multiple simulators are needed now.
+The simulator boundary is an interface, not a concrete class reference, from day one — see `docs/architecture/adr/ADR-003-simulator-abstraction.md`. `SimpleBessSimulator` is the only implementation shipped in v0.1; the interface exists so a future PyPSA-, PandaPower-, or Grid2Op-backed adapter (see `docs/research/PRIOR_ART.md` §7) could be added later without redesigning the benchmark core, not because multiple simulators are needed now.
 
 ```text
 SimulatorAdapter:

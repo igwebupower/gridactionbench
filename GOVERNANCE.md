@@ -18,7 +18,7 @@ Anyone submitting code, scenarios, data, documentation, or research to the proje
 
 ## Independence from commercial interests
 
-GridActionBench operates independently of Enprompta or any other proprietary platform (`docs/project/PID.md` §3). No governance role is contingent on affiliation with any specific company, and no design decision may be made to favor a commercial product's roadmap over the benchmark's own research integrity. This is a standing constraint on the Maintainer role specifically, since that role has the most day-to-day influence over the project's direction.
+GridActionBench operates independently of any proprietary platform (`docs/project/PID.md` §3). No governance role is contingent on affiliation with any specific company, and no design decision may be made to favor a commercial product's roadmap over the benchmark's own research integrity. This is a standing constraint on the Maintainer role specifically, since that role has the most day-to-day influence over the project's direction.
 
 ## Changes affecting official benchmark behaviour
 

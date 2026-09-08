@@ -107,7 +107,7 @@ GridActionBench framework: unreleased (Phase 0). GB-BESS suite: v0.1 (draft, unr
 
 ## Governance
 
-See `GOVERNANCE.md` (repository root, once populated) for maintainer, domain reviewer, benchmark reviewer, and contributor roles. GridActionBench operates independently of Enprompta or any proprietary platform; see `docs/project/PID.md`, "Relationship with Enprompta."
+See `GOVERNANCE.md` (repository root, once populated) for maintainer, domain reviewer, benchmark reviewer, and contributor roles. GridActionBench operates independently of any proprietary platform; see `docs/project/PID.md`, "Relationship to other initiatives."
 
 ## Maintainers
 

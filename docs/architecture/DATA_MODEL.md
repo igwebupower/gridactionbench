@@ -67,7 +67,7 @@ This is the format `docs/suites/gb-bess/SCENARIO_CATALOGUE.md`'s 20 initial scen
 
 ## Decision Record
 
-See `docs/benchmark/SPECIFICATION.md` §7 for the full field listing. Serialization: **JSONL**, one record per line, append-only per run — chosen specifically because it is a portable, streaming-friendly, dependency-free format that does not require proprietary tracing infrastructure to produce or consume (master brief §13), and because it matches the logging convention already validated by prior art (`docs/research/PRIOR_ART.md`, PowerAgentBench's own JSONL evidence logs).
+See `docs/benchmark/SPECIFICATION.md` §7 for the full field listing. Serialization: **JSONL**, one record per line, append-only per run — chosen specifically because it is a portable, streaming-friendly, dependency-free format that does not require proprietary tracing infrastructure to produce or consume (master brief §13), and because it matches the logging convention already validated by related work (`docs/research/PRIOR_ART.md`, executable-evaluation benchmarks' own JSONL evidence logs).
 
 ## EvaluationResult (per-evaluator output, embedded in a Decision Record's `evaluation_results`)
 
