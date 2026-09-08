@@ -9,10 +9,16 @@ from __future__ import annotations
 import platform
 import subprocess
 import sys
+from functools import lru_cache
 from pathlib import Path
 
 
+@lru_cache(maxsize=None)
 def capture_git_commit(repo_root: Path | str | None = None) -> str | None:
+    """Memoized: the current commit cannot change mid-process, and a benchmark run may
+    produce thousands of Decision Records (master brief §53's >=1,000-execution target) —
+    shelling out to git once per record was a real, measured performance bottleneck during
+    Phase 3 (spawning a subprocess per generated scenario), not a hypothetical concern."""
     try:
         result = subprocess.run(
             ["git", "rev-parse", "HEAD"],

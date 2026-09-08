@@ -94,6 +94,8 @@ def run_single_step(
         hard_constraint_valid=outcome.hard_constraint_valid,
         ucv=outcome.ucv,
         self_reported_high_confidence_ucv=outcome.self_reported_high_confidence_ucv,
+        objective_value_achieved_gbp=outcome.objective_value.achieved_gbp,
+        objective_value_best_case_gbp=outcome.objective_value.best_case_gbp,
         errors=errors,
         dt_hours=dt_hours,
         random_seed=random_seed,

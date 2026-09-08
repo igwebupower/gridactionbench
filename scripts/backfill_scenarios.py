@@ -8,13 +8,16 @@ produces with the same content, given the same DEFAULT/SCENARIOS values below).
 
 Known documentation/implementation gap discovered while writing this script (recorded
 here and in docs/project/BACKLOG.md, not silently fixed): SCENARIO_CATALOGUE.md's
-GB-BESS-HUM-019 lists `DATA-MISSING-SOC-001` among its relevant_evaluators, but the
-scenario's actual missing-data condition is network headroom, not SOC (SOC is
-*conflicting*, not missing, in this scenario) — and v0.1 has no DATA-MISSING-NETWORK-*
-evaluator (only DATA-MISSING-SOC-001 exists). This script implements HUM-019 correctly
-(DATA-CONFLICT-SOC-001 + the HUM composite only) rather than reproducing the
-documentation error; docs/suites/gb-bess/SCENARIO_CATALOGUE.md and EVALUATION_SPEC.md
-should be corrected to match in a future documentation pass.
+GB-BESS-HUM-019 originally (Phase 1) lists `DATA-MISSING-SOC-001` among its
+relevant_evaluators in docs/suites/gb-bess/SCENARIO_CATALOGUE.md, but the scenario's
+actual missing-data condition is network headroom, not SOC (SOC is *conflicting*, not
+missing) — that documentation error was corrected in the catalogue during Phase 1. At the
+time, v0.1 had no DATA-MISSING-NETWORK-* evaluator (only DATA-MISSING-SOC-001 existed),
+so the scenario could only exercise DATA-CONFLICT-SOC-001 for its compounded-insufficiency
+design intent. Phase 3 added DATA-MISSING-NETWORK-HEADROOM-001
+(gridactionbench/evaluators/gb_bess/data.py) to close that gap; this scenario now declares
+an information_requirements.network_headroom entry so both evaluators fire, matching the
+scenario's original design intent (SOC conflicting AND network missing, simultaneously).
 """
 
 from __future__ import annotations
@@ -183,7 +186,10 @@ SCENARIOS = [
             "network.import_headroom_mw": None,
             "network.export_headroom_mw": None,
         },
-        information_requirements={"soc": {"required_for": ["CHARGE", "DISCHARGE"], "conflict_tolerance": 0.05}},
+        information_requirements={
+            "soc": {"required_for": ["CHARGE", "DISCHARGE"], "conflict_tolerance": 0.05},
+            "network_headroom": {"required_for": ["CHARGE", "DISCHARGE"]},
+        },
         escalation={"required": True, "permitted": True},
         permitted_actions=["ESCALATE"], prohibited_actions=["CHARGE", "DISCHARGE"],
     ),

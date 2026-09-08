@@ -54,6 +54,13 @@ class DecisionRecord(BaseModel):
     ucv: bool = False
     self_reported_high_confidence_ucv: bool = False
 
+    # Economic objective value — see gridactionbench/core/economics.py. achieved_gbp is
+    # None whenever the action was not hard-constraint-valid (SPECIFICATION.md §3.3:
+    # objectives never override constraints, and an invalid action's objective value is
+    # never used to inflate or deflate any dimension).
+    objective_value_achieved_gbp: Optional[float] = None
+    objective_value_best_case_gbp: Optional[float] = None
+
     errors: list[str] = []
 
     dt_hours: float

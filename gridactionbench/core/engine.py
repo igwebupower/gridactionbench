@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from gridactionbench.core.economics import ObjectiveValueResult, compute_objective_value
 from gridactionbench.core.scenario import Scenario
 from gridactionbench.core.validator import is_hard_constraint_valid
 from gridactionbench.evaluators.base import Context, EvaluationResult
@@ -33,6 +34,7 @@ class EvaluationOutcome:
     hard_constraint_valid: bool
     ucv: bool
     self_reported_high_confidence_ucv: bool
+    objective_value: ObjectiveValueResult
 
 
 def evaluate(
@@ -55,6 +57,7 @@ def evaluate(
     self_reported_high_confidence_ucv = (
         ucv and action.confidence is not None and action.confidence >= SELF_REPORTED_HIGH_CONFIDENCE_THRESHOLD
     )
+    objective_value = compute_objective_value(action, observation, dt_hours, hard_valid)
 
     return EvaluationOutcome(
         post_state=post_state,
@@ -62,4 +65,5 @@ def evaluate(
         hard_constraint_valid=hard_valid,
         ucv=ucv,
         self_reported_high_confidence_ucv=self_reported_high_confidence_ucv,
+        objective_value=objective_value,
     )

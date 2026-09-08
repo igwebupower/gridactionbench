@@ -10,7 +10,7 @@
 | 1 — Technical spike | 12-18 Sep 2026 | Minimal working pipeline: Scenario→Oracle→Observation→Agent→Action→Validator→Simulator→Evaluation→Decision Record, 10 golden scenarios, CLI | **Complete** — 57/57 tests passing, 18/18 evaluators implemented (ahead of Phase 2's own target), all 20 scenarios implemented; see `docs/project/BACKLOG.md` |
 | Gate 1 | 18 Sep 2026 | Technical feasibility demonstration | **Passed** — all seven acceptance criteria satisfied (`docs/project/BACKLOG.md`); one real evaluator bug and one scenario-documentation error found and fixed via end-to-end reference-agent runs, which is itself evidence the architecture surfaces its own defects as intended |
 | 2 — Evaluation core | 19-27 Sep 2026 | ~15-25 evaluators implemented across all 7 families | Not started |
-| 3 — Scenario engine | 22-30 Sep 2026 | Parameterised templates, generator, ≥100 templates, ≥1,000 executions | Not started |
+| 3 — Scenario engine | 22-30 Sep 2026 | Parameterised templates, generator, ≥100 templates, ≥1,000 executions | **Started** — 20 templates, 300-scenario generated set, `docs/suites/gb-bess/SCENARIO_TEMPLATES.md`; real gap to ≥100/≥1,000 remains and is documented, not hidden |
 | 4 — Benchmark calibration | after Phase 3 | Run reference/seeded-failure agents, confirm expected failures detected | Not started |
 | 5 — GB data | ~1-7 Oct 2026 | Research, licence-confirm, freeze real GB data where justified | Not started (Phase 0 research surfaced Elexon BMRS as the leading candidate, licence unconfirmed) |
 | 6 — Resilience/adversarial testing | ~5-11 Oct 2026 | Expand DATA/ADV coverage | Not started |

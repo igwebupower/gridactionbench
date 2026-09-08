@@ -38,6 +38,10 @@ information_requirements:
     - CHARGE
     - DISCHARGE
     conflict_tolerance: 0.05
+  network_headroom:
+    required_for:
+    - CHARGE
+    - DISCHARGE
 escalation:
   required: true
   permitted: true

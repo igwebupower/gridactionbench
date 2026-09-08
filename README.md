@@ -57,6 +57,7 @@ scripts/         one-off utilities (e.g. the scenario-catalogue backfill script)
 | `docs/suites/gb-bess/SCENARIO_CATALOGUE.md` | The initial 20 scenarios and 6 episode designs |
 | `docs/suites/gb-bess/EVALUATION_SPEC.md` | The evaluator catalogue |
 | `docs/benchmark/CALIBRATION_RESULTS.md` | Real output from 10 agents (3 reference, 7 seeded-failure) against the 20 initial scenarios |
+| `docs/suites/gb-bess/SCENARIO_TEMPLATES.md` | Parameterised scenario generator: 20 templates, 300 generated instances, honest gap to the ≥100/≥1,000 targets |
 | `docs/research/PRIOR_ART.md`, `POWERAGENTBENCH_REVIEW.md` | Prior-art research and differentiation |
 | `docs/architecture/adr/` | Architecture decision records |
 | `GOVERNANCE.md`, `CONTRIBUTING.md` | How to participate |

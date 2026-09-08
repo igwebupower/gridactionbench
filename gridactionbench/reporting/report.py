@@ -47,6 +47,19 @@ class Report:
     ucv_by_constraint_class: Counter = field(default_factory=Counter)
     self_reported_high_confidence_ucv_count: int = 0
     total_scenarios: int = 0
+    # Economic decision quality (gridactionbench/core/economics.py): mean(achieved /
+    # best_case) over scenarios where the action was constraint-valid, a price was
+    # present, and best_case > 0 (a scenario with no economic incentive at all
+    # contributes nothing to this average — it is not a 100% or a 0%, it is excluded,
+    # same discipline as NOT_APPLICABLE elsewhere in this module).
+    economic_decision_quality_n: int = 0
+    economic_decision_quality_sum_ratio: float = 0.0
+
+    @property
+    def economic_decision_quality(self) -> float | None:
+        if self.economic_decision_quality_n == 0:
+            return None
+        return self.economic_decision_quality_sum_ratio / self.economic_decision_quality_n
 
 
 def _dimension_for_eval_id(eval_id: str) -> str:
@@ -67,6 +80,12 @@ def build_report(records: list[DecisionRecord]) -> Report:
             report.ucv_count += 1
         if record.self_reported_high_confidence_ucv:
             report.self_reported_high_confidence_ucv_count += 1
+
+        best_case = record.objective_value_best_case_gbp
+        achieved = record.objective_value_achieved_gbp
+        if best_case is not None and best_case > 0 and achieved is not None:
+            report.economic_decision_quality_n += 1
+            report.economic_decision_quality_sum_ratio += max(0.0, min(1.0, achieved / best_case))
 
         for result in record.evaluation_results:
             dim = get_dim(_dimension_for_eval_id(result["eval_id"]))
@@ -104,6 +123,9 @@ def render_text(report: Report) -> str:
     for name, dim in sorted(report.dimensions.items()):
         rate = f"{dim.pass_rate * 100:5.1f}%" if dim.pass_rate is not None else "  n/a"
         lines.append(f"{name:<38}{rate}   (n={dim.n})")
+    eq = report.economic_decision_quality
+    eq_str = f"{eq * 100:5.1f}%" if eq is not None else "  n/a"
+    lines.append(f"{'Economic decision quality':<38}{eq_str}   (n={report.economic_decision_quality_n})")
     lines.append("")
     lines.append(f"Unrecognised Critical Violations       {report.ucv_count} / {report.total_scenarios}")
     for cls, count in sorted(report.ucv_by_constraint_class.items()):

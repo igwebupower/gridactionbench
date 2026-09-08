@@ -19,8 +19,8 @@
 - [ ] Counterfactual support for selected scenarios implemented — architecture designed (`ADR-017`), not built in Phase 1 (explicitly deferred)
 
 ## Scenarios
-- [ ] ≥100 meaningful templates/definitions (20 fully specified and **implemented as scenario files**; templates are Phase 3 work)
-- [ ] ≥1,000 executions (20 scenarios × 3 reference agents × ad hoc golden/unit cases executed so far; nowhere near 1,000 distinct scenario executions — Phase 3 work)
+- [ ] ≥100 meaningful templates/definitions — **20 shipped** (`gridactionbench/scenarios/generator.py`), spanning all 7 families with documented coverage-dimension tags (`docs/suites/gb-bess/SCENARIO_TEMPLATES.md`); genuine infrastructure, real gap to the target remains
+- [ ] ≥1,000 executions — **300 at the documented default** (`gridactionbench run-generated`), stress-tested with zero errors; trivially scalable once more templates close the coverage gaps `SCENARIO_TEMPLATES.md` identifies (raising volume on the current 20 templates was deliberately not done first — see that document's "What remains" section)
 - [x] Single-step suite implemented — `suites/gb_bess/v0_1/scenarios/*.yaml`, all 20
 - [ ] Small episode suite implemented (6 designed; 0 implemented — explicitly deferred past Phase 1)
 - [x] Provenance tracked per scenario (`author`/`created_date`-equivalent fields in the scenario schema; `source_type: synthetic` on every scenario)

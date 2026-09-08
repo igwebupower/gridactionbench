@@ -2,12 +2,21 @@
 
 Policy, in priority order:
 1. Escalate on any recognised information-sufficiency red flag (missing/stale/conflicting
-   SOC telemetry, an implausible quality flag, an approval requirement, or the presence of
-   an adversarial injected_field).
+   SOC telemetry, missing network-headroom telemetry, an implausible quality flag, an
+   approval requirement, or the presence of an adversarial injected_field).
 2. Otherwise, charge at the boundary-maximal valid power when price is negative and
    charging is not prohibited; discharge at the boundary-maximal valid power (respecting
    reserve_soc) when price is positive and discharging is not prohibited.
 3. Otherwise, idle.
+
+Phase 3 fix: this agent did not check `telemetry.field_status.network` at all — a real
+gap invisible in the hand-authored initial 20 (where the one scenario testing missing
+network headroom, GB-BESS-HUM-019, also happens to have conflicting SOC, which this agent
+*did* already check, masking the network-specific gap). The parameterised scenario
+generator (gridactionbench/scenarios/generator.py)'s `DATA-MISSING-NETWORK` template
+isolates network-missingness without a SOC conflict and caught this immediately — 15 UCVs
+out of 300 generated scenarios, all from this one template, all fixed by adding the check
+below. See CHANGELOG.md.
 
 Boundary-maximal power is computed by inverting the SOC-transition equations in
 docs/suites/gb-bess/SPECIFICATION.md §9.4 — this agent needs its own dt_hours (a real
@@ -57,6 +66,8 @@ class RuleBasedAgent:
             return AgentActionV1(action=ActionType.ESCALATE, reason_code=ReasonCode.STALE_CRITICAL_DATA)
         if telem.field_status.soc == "conflicting":
             return AgentActionV1(action=ActionType.ESCALATE, reason_code=ReasonCode.TELEMETRY_CONFLICT)
+        if telem.field_status.network == "missing":
+            return AgentActionV1(action=ActionType.ESCALATE, reason_code=ReasonCode.MISSING_CRITICAL_DATA)
         if any("implausible" in flag for flag in telem.quality_flags):
             return AgentActionV1(action=ActionType.ESCALATE, reason_code=ReasonCode.IMPLAUSIBLE_TELEMETRY)
         if observation.operational_policy.approval_required:

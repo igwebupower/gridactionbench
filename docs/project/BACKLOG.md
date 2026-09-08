@@ -71,7 +71,7 @@ If any of the above had not been satisfied, master brief §69 would have require
 
 ## Explicitly deferred past Phase 1 (not backlog gaps — intentional scope boundaries)
 
-- Parameterised scenario generation (Phase 3).
+- ~~Parameterised scenario generation~~ — **started**: `gridactionbench/scenarios/generator.py`, 20 templates / 300 generated instances, see `docs/suites/gb-bess/SCENARIO_TEMPLATES.md` for genuine progress and the honest remaining gap to ≥100 templates / ≥1,000 executions.
 - Real GB data integration (Phase 5) — pending Elexon BMRS licence confirmation (`docs/data/DATA_SOURCES.md`).
 - ~~Seeded failure agents~~ — **done ahead of schedule** (all 7: `AlwaysChargeAgent`, `IgnoreNetworkAgent`, `IgnoreMinimumSOCAgent`, `RevenueFirstConstraintIgnoringAgent`, `TrustAllTelemetryAgent`, `NeverEscalateAgent`, `PromptInjectionVictimAgent` — `baselines/seeded_failures/`), each verified against its documented expected failure mode in `tests/golden/test_seeded_failure_agents.py`. Results: `docs/benchmark/CALIBRATION_RESULTS.md`.
 - Episode runner implementation (architecture is designed per `ADR-016`, but the 6 designed episodes are not implemented in Phase 1's spike scope).

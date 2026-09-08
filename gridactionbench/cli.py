@@ -21,6 +21,7 @@ from gridactionbench.core.decision_record import JsonlWriter
 from gridactionbench.core.scenario import load_scenario_dir
 from gridactionbench.reporting.report import build_report, render_text
 from gridactionbench.runners.single_step import run_single_step
+from gridactionbench.scenarios.generator import TEMPLATES, coverage_report, generate
 
 app = typer.Typer(help="GridActionBench CLI")
 
@@ -72,6 +73,50 @@ def list_scenarios(scenario_dir: Path = typer.Argument(...)) -> None:
     """List every scenario in SCENARIO_DIR."""
     for scenario in load_scenario_dir(scenario_dir):
         typer.echo(f"{scenario.scenario_id}  [{scenario.family}]  review_status={scenario.review_status}")
+
+
+@app.command("run-generated")
+def run_generated(
+    agent: str = typer.Option("rule-based", help=f"One of: {', '.join(AGENTS)}"),
+    dt_hours: float = typer.Option(0.5, help="Simulator timestep in hours (SPECIFICATION.md §9.6)"),
+    n_per_template: int = typer.Option(15, help="Instances generated per template"),
+    seed: int = typer.Option(42, help="Generator seed — deterministic given (n_per_template, seed)"),
+    output: Optional[Path] = typer.Option(None, help="JSONL output path for Decision Records"),
+) -> None:
+    """Run AGENT against the parameterised generated scenario set
+    (gridactionbench/scenarios/generator.py) and print a per-dimension report."""
+    if agent not in AGENTS:
+        typer.echo(f"Unknown agent '{agent}'. Choose from: {', '.join(AGENTS)}")
+        raise typer.Exit(code=1)
+
+    scenarios = generate(n_per_template=n_per_template, seed=seed)
+    agent_instance = AGENTS[agent](dt_hours)
+
+    records = []
+    writer = JsonlWriter(output) if output else None
+    for scenario in scenarios:
+        record = run_single_step(scenario, agent_instance, dt_hours)
+        records.append(record)
+        if writer:
+            writer.write(record)
+
+    report = build_report(records)
+    typer.echo(
+        f"Agent: {agent}  |  Templates: {len(TEMPLATES)}  |  Scenarios: {len(records)}  |  dt_hours: {dt_hours}  |  seed: {seed}"
+    )
+    typer.echo("")
+    typer.echo(render_text(report))
+
+
+@app.command("coverage")
+def coverage() -> None:
+    """Print the scenario-template coverage report (master brief §53's coverage dimensions)."""
+    report = coverage_report()
+    typer.echo(f"{len(TEMPLATES)} templates across {len({t.family for t in TEMPLATES})} families\n")
+    for dimension, tags in sorted(report.items()):
+        typer.echo(f"{dimension}:")
+        for tag, count in sorted(tags.items(), key=lambda kv: -kv[1]):
+            typer.echo(f"  {tag:<20s} {count}")
 
 
 if __name__ == "__main__":
