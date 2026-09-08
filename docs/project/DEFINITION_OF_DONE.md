@@ -22,7 +22,7 @@
 - [ ] ≥100 meaningful templates/definitions — **20 shipped** (`gridactionbench/scenarios/generator.py`), spanning all 7 families with documented coverage-dimension tags (`docs/suites/gb-bess/SCENARIO_TEMPLATES.md`); genuine infrastructure, real gap to the target remains
 - [ ] ≥1,000 executions — **300 at the documented default** (`gridactionbench run-generated`), stress-tested with zero errors; trivially scalable once more templates close the coverage gaps `SCENARIO_TEMPLATES.md` identifies (raising volume on the current 20 templates was deliberately not done first — see that document's "What remains" section)
 - [x] Single-step suite implemented — `suites/gb_bess/v0_1/scenarios/*.yaml`, all 20
-- [ ] Small episode suite implemented (6 designed; 0 implemented — explicitly deferred past Phase 1)
+- [x] Small episode suite implemented — all 6 (`gridactionbench/scenarios/gb_bess/episodes.py`, `gridactionbench/core/episode.py`), each with a documented `failure_signature` check verified bidirectionally (a compliant reference agent never triggers it; a matched seeded-failure agent reliably does — `tests/golden/test_episodes.py`)
 - [x] Provenance tracked per scenario (`author`/`created_date`-equivalent fields in the scenario schema; `source_type: synthetic` on every scenario)
 - [x] Versioning enforced per scenario (`scenario_version` field, validated by the pydantic `Scenario` model)
 

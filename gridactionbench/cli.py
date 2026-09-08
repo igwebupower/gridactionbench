@@ -18,10 +18,12 @@ from baselines.seeded_failures.prompt_injection_victim import PromptInjectionVic
 from baselines.seeded_failures.revenue_first_constraint_ignoring import RevenueFirstConstraintIgnoringAgent
 from baselines.seeded_failures.trust_all_telemetry import TrustAllTelemetryAgent
 from gridactionbench.core.decision_record import JsonlWriter
+from gridactionbench.core.episode import run_episode
 from gridactionbench.core.scenario import load_scenario_dir
 from gridactionbench.reporting.report import build_report, render_text
 from gridactionbench.runners.single_step import run_single_step
 from gridactionbench.scenarios.generator import TEMPLATES, coverage_report, generate
+from gridactionbench.scenarios.gb_bess.episodes import EPISODES
 
 app = typer.Typer(help="GridActionBench CLI")
 
@@ -117,6 +119,42 @@ def coverage() -> None:
         typer.echo(f"{dimension}:")
         for tag, count in sorted(tags.items(), key=lambda kv: -kv[1]):
             typer.echo(f"  {tag:<20s} {count}")
+
+
+@app.command("run-episode")
+def run_episode_cmd(
+    episode_id: str = typer.Argument(..., help=f"One of: {', '.join(EPISODES)}"),
+    agent: str = typer.Option("rule-based", help=f"One of: {', '.join(AGENTS)}"),
+    dt_hours: float = typer.Option(0.5, help="Simulator timestep in hours (SPECIFICATION.md §9.6)"),
+) -> None:
+    """Run AGENT through EPISODE_ID (Mode B — docs/architecture/adr/ADR-016) and report
+    the per-step actions, resulting SOC trajectory, and whether the episode's documented
+    failure_signature triggered (docs/suites/gb-bess/SCENARIO_CATALOGUE.md)."""
+    if episode_id not in EPISODES:
+        typer.echo(f"Unknown episode '{episode_id}'. Choose from: {', '.join(EPISODES)}")
+        raise typer.Exit(code=1)
+    if agent not in AGENTS:
+        typer.echo(f"Unknown agent '{agent}'. Choose from: {', '.join(AGENTS)}")
+        raise typer.Exit(code=1)
+
+    spec, check = EPISODES[episode_id]
+    agent_instance = AGENTS[agent](dt_hours)
+    result = run_episode(spec, agent_instance, dt_hours)
+
+    typer.echo(f"Episode: {episode_id} ({spec.description})  |  Agent: {agent}  |  Steps: {spec.steps}\n")
+    for i, record in enumerate(result.step_records):
+        action = record.parsed_action.action.value if record.parsed_action else "ERROR"
+        power = f" {record.parsed_action.power_mw:.3f}MW" if record.parsed_action and record.parsed_action.power_mw else ""
+        proposed = record.simulator_post_state["resulting_soc"] if record.simulator_post_state else None
+        proposed_str = f"{proposed:.3f}" if proposed is not None else "n/a"
+        world_soc = result.world_soc_after_step[i]
+        rejected = " (REJECTED - invalid, world state unchanged)" if proposed is not None and not record.hard_constraint_valid else ""
+        ucv_flag = "  [UCV]" if record.ucv else ""
+        typer.echo(f"  step {i}: {action}{power:<10s} -> proposed_soc={proposed_str}{rejected}  |  world_soc={world_soc:.3f}{ucv_flag}")
+
+    signature = check(result)
+    typer.echo(f"\nfailure_signature triggered: {signature.triggered}  ({signature.detail})")
+    typer.echo(f"UCVs across episode: {result.ucv_count} / {spec.steps}")
 
 
 if __name__ == "__main__":
