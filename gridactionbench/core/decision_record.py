@@ -7,7 +7,7 @@ Serialization: JSONL, one record per line, append-only per run.
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
 

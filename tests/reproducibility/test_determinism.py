@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from gridactionbench.agents.rule_based import RuleBasedAgent
+from baselines.rule_based.agent import RuleBasedAgent
 from gridactionbench.core.scenario import load_scenario_dir
 from gridactionbench.runners.single_step import run_single_step
 
@@ -22,7 +22,7 @@ def test_rule_based_agent_is_deterministic_across_repeated_runs():
     agent = RuleBasedAgent(dt_hours=DT_HOURS)
     for scenario in scenarios:
         records = [run_single_step(scenario, agent, DT_HOURS, run_id="fixed") for _ in range(3)]
-        actions = [r.parsed_action.model_dump(exclude={"confidence"}) for r in records]
+        actions = [r.parsed_action.model_dump() for r in records]
         assert all(a == actions[0] for a in actions), f"{scenario.scenario_id}: action not deterministic"
         results = [[e["result"] for e in r.evaluation_results] for r in records]
         assert all(r == results[0] for r in results), f"{scenario.scenario_id}: evaluation not deterministic"

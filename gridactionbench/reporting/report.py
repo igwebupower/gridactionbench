@@ -6,7 +6,7 @@ independent, per docs/benchmark/SCORING.md, "No opaque overall score."
 
 from __future__ import annotations
 
-from collections import Counter, defaultdict
+from collections import Counter
 from dataclasses import dataclass, field
 
 from gridactionbench.core.decision_record import DecisionRecord
@@ -56,7 +56,6 @@ def _dimension_for_eval_id(eval_id: str) -> str:
 
 def build_report(records: list[DecisionRecord]) -> Report:
     report = Report(total_scenarios=len(records))
-    dims: dict[str, DimensionStat] = defaultdict(lambda: None)
 
     def get_dim(name: str) -> DimensionStat:
         if name not in report.dimensions:
@@ -78,7 +77,17 @@ def build_report(records: list[DecisionRecord]) -> Report:
                 dim.warning_count += 1
             elif state == "FAIL":
                 dim.fail_count += 1
-                if result.get("contributes_to_ucv") and result.get("constraint_class"):
+                # Gated on record.ucv (the engine's authoritative, escalation-aware flag),
+                # not on the per-evaluator contributes_to_ucv alone. contributes_to_ucv is
+                # a per-evaluator judgment ("would this be a UCV contributor if the agent
+                # didn't escalate") that does not itself know whether the agent escalated
+                # this decision — it is currently *never* True for an ESCALATE action only
+                # because every evaluator defensively returns PASS/NOT_APPLICABLE on
+                # ESCALATE (verified by tests/unit/test_evaluators.py::
+                # test_no_evaluator_ever_fails_on_escalate). Gating on record.ucv here
+                # keeps this breakdown correct even if that per-evaluator invariant were
+                # ever violated by a future evaluator addition.
+                if record.ucv and result.get("contributes_to_ucv") and result.get("constraint_class"):
                     report.ucv_by_constraint_class[result["constraint_class"]] += 1
             elif state == "NOT_APPLICABLE":
                 dim.not_applicable_count += 1

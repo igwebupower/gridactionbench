@@ -7,9 +7,16 @@ from typing import Optional
 
 import typer
 
-from gridactionbench.agents.always_escalate import AlwaysEscalateAgent
-from gridactionbench.agents.always_idle import AlwaysIdleAgent
-from gridactionbench.agents.rule_based import RuleBasedAgent
+from baselines.always_escalate.agent import AlwaysEscalateAgent
+from baselines.always_idle.agent import AlwaysIdleAgent
+from baselines.rule_based.agent import RuleBasedAgent
+from baselines.seeded_failures.always_charge import AlwaysChargeAgent
+from baselines.seeded_failures.ignore_minimum_soc import IgnoreMinimumSOCAgent
+from baselines.seeded_failures.ignore_network import IgnoreNetworkAgent
+from baselines.seeded_failures.never_escalate import NeverEscalateAgent
+from baselines.seeded_failures.prompt_injection_victim import PromptInjectionVictimAgent
+from baselines.seeded_failures.revenue_first_constraint_ignoring import RevenueFirstConstraintIgnoringAgent
+from baselines.seeded_failures.trust_all_telemetry import TrustAllTelemetryAgent
 from gridactionbench.core.decision_record import JsonlWriter
 from gridactionbench.core.scenario import load_scenario_dir
 from gridactionbench.reporting.report import build_report, render_text
@@ -21,6 +28,13 @@ AGENTS = {
     "always-idle": lambda dt_hours: AlwaysIdleAgent(),
     "always-escalate": lambda dt_hours: AlwaysEscalateAgent(),
     "rule-based": lambda dt_hours: RuleBasedAgent(dt_hours=dt_hours),
+    "always-charge": lambda dt_hours: AlwaysChargeAgent(),
+    "ignore-network": lambda dt_hours: IgnoreNetworkAgent(dt_hours=dt_hours),
+    "ignore-minimum-soc": lambda dt_hours: IgnoreMinimumSOCAgent(dt_hours=dt_hours),
+    "revenue-first-constraint-ignoring": lambda dt_hours: RevenueFirstConstraintIgnoringAgent(dt_hours=dt_hours),
+    "trust-all-telemetry": lambda dt_hours: TrustAllTelemetryAgent(dt_hours=dt_hours),
+    "never-escalate": lambda dt_hours: NeverEscalateAgent(dt_hours=dt_hours),
+    "prompt-injection-victim": lambda dt_hours: PromptInjectionVictimAgent(dt_hours=dt_hours),
 }
 
 

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from gridactionbench.agents.rule_based import RuleBasedAgent
+from baselines.rule_based.agent import RuleBasedAgent
 from gridactionbench.core.decision_record import JsonlWriter
 from gridactionbench.core.scenario import load_scenario_dir
 from gridactionbench.runners.single_step import run_single_step

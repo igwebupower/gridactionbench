@@ -23,10 +23,12 @@
 6. [DONE] Evaluator interface + first 6 evaluators (PHY family, all 6) — gridactionbench/evaluators/base.py, gb_bess/phy.py
    -> depends on (2), (4)
 
-7. [DONE] AgentAdapter interface + AlwaysIdleAgent + AlwaysEscalateAgent — gridactionbench/agents/
+7. [DONE] AgentAdapter interface — gridactionbench/agents/base.py; AlwaysIdleAgent + AlwaysEscalateAgent
+   — baselines/always_idle/agent.py, baselines/always_escalate/agent.py (moved from gridactionbench/agents/
+   during a Phase 1.5 quality pass to match ADR-002's documented package architecture — see CHANGELOG.md)
    -> depends on (2)
 
-8. [DONE] RuleBasedAgent (transparent deterministic controller) — gridactionbench/agents/rule_based.py
+8. [DONE] RuleBasedAgent (transparent deterministic controller) — baselines/rule_based/agent.py
    -> depends on (2), (3), (6)
 
 9. [DONE] Runner (single-step pipeline) — gridactionbench/runners/single_step.py, core/engine.py
@@ -71,7 +73,7 @@ If any of the above had not been satisfied, master brief §69 would have require
 
 - Parameterised scenario generation (Phase 3).
 - Real GB data integration (Phase 5) — pending Elexon BMRS licence confirmation (`docs/data/DATA_SOURCES.md`).
-- Seeded failure agents beyond what's needed for Phase 4 calibration design (full set: `AlwaysChargeAgent`, `IgnoreNetworkAgent`, `IgnoreMinimumSOCAgent`, `RevenueFirstConstraintIgnoringAgent`, `TrustAllTelemetryAgent`, `NeverEscalateAgent`, `PromptInjectionVictimAgent` — implement in Phase 2/4, not Phase 1).
+- ~~Seeded failure agents~~ — **done ahead of schedule** (all 7: `AlwaysChargeAgent`, `IgnoreNetworkAgent`, `IgnoreMinimumSOCAgent`, `RevenueFirstConstraintIgnoringAgent`, `TrustAllTelemetryAgent`, `NeverEscalateAgent`, `PromptInjectionVictimAgent` — `baselines/seeded_failures/`), each verified against its documented expected failure mode in `tests/golden/test_seeded_failure_agents.py`. Results: `docs/benchmark/CALIBRATION_RESULTS.md`.
 - Episode runner implementation (architecture is designed per `ADR-016`, but the 6 designed episodes are not implemented in Phase 1's spike scope).
 - Counterfactual evaluation implementation (architecture designed per `ADR-017`; not required for Gate 1).
 - Private evaluation infrastructure / holdout generators (Phase 3+, separate repository, not started).

@@ -30,8 +30,8 @@
 - [x] AlwaysIdleAgent implemented and run — 6/20 scenarios produce a UCV, as expected of a known-defective baseline
 - [x] AlwaysEscalateAgent implemented and run — 0 UCVs, but only 85.7% escalation appropriateness (correctly fails `GB-BESS-HUM-020`'s unnecessary-escalation check — master brief §22 satisfied empirically, not just by design)
 - [x] RuleBasedAgent implemented and run — 0 UCVs, 100% on every populated dimension across the 20 scenarios
-- [ ] Seeded failure agents implemented and run (full documented set — `AlwaysChargeAgent`, `IgnoreNetworkAgent`, etc. — deferred to Phase 2/4, per `docs/project/BACKLOG.md`)
-- [x] Known failures correctly detected for the three implemented reference agents — see `tests/golden/test_golden_scenarios.py`'s three `test_calibration_*` tests; a full documented calibration *report* (as opposed to passing tests) is still Phase 4 work
+- [x] Seeded failure agents implemented and run — all 7 (`AlwaysChargeAgent`, `IgnoreNetworkAgent`, `IgnoreMinimumSOCAgent`, `RevenueFirstConstraintIgnoringAgent`, `TrustAllTelemetryAgent`, `NeverEscalateAgent`, `PromptInjectionVictimAgent`) — `baselines/seeded_failures/`
+- [x] Known failures correctly detected — `tests/golden/test_golden_scenarios.py` (3 reference-agent calibration tests) and `tests/golden/test_seeded_failure_agents.py` (7 seeded-agent tests, each asserting the specific documented evaluator failure + UCV); documented calibration report: `docs/benchmark/CALIBRATION_RESULTS.md`. Marked informal/preview — full Phase 4 sign-off still requires Phase 3's larger scenario set and Phase 7 external review, per that report's own "Limitations" section.
 
 ## Agent research
 - [ ] ≥2 LLM configurations evaluated, after calibration is satisfactory (not before — master brief §28)

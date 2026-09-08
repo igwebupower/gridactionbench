@@ -10,7 +10,12 @@ The first benchmark suite is **GB-BESS v0.1**, evaluating operational decisions 
 
 ## Status
 
-**Phase 0 — Foundation.** This repository currently contains specification, research, and governance documentation only. No implementation code exists yet. See `docs/project/PID.md` and `docs/project/PROJECT_PLAN.md` for the phased delivery plan, and `docs/project/DEFINITION_OF_DONE.md` for what "v0.1 complete" actually means.
+**Phase 1 complete, Gate 1 passed.** The core pipeline is implemented and running: schemas, `SimpleBessSimulator`, all 18 specified evaluators, 3 reference agents, 7 seeded-failure agents, a JSONL Decision Record writer, per-dimension reporting, and a CLI — 74 passing tests, all 20 initial scenarios executable end-to-end. See `docs/project/BACKLOG.md` for the full completion record, `docs/benchmark/CALIBRATION_RESULTS.md` for real calibration output, and `docs/project/PROJECT_PLAN.md`/`docs/project/DEFINITION_OF_DONE.md` for what remains before v0.1 is complete (parameterised scenario generation, episode execution, LLM comparison, external review — all still ahead).
+
+```bash
+pip install -e .
+gridactionbench run suites/gb_bess/v0_1/scenarios --agent rule-based
+```
 
 ## Why this benchmark exists
 
@@ -34,11 +39,12 @@ The benchmark reports results as independent dimensions (physical constraint adh
 
 ```text
 docs/           specification, research, architecture, project, and testing documentation
-gridactionbench/ core library (not yet implemented)
-suites/gb_bess/  GB-BESS scenario data (not yet implemented)
-baselines/       reference and seeded-failure agents (not yet implemented)
+gridactionbench/ core library: schemas, simulator, evaluators, runner, reporting, CLI
+baselines/       reference agents (always_idle, always_escalate, rule_based) and 7 seeded-failure agents
+suites/gb_bess/  GB-BESS scenario data — all 20 initial scenarios, suites/gb_bess/v0_1/scenarios/*.yaml
 data/            synthetic data and manifests
-tests/           unit, integration, golden, regression, reproducibility tests (not yet implemented)
+tests/           unit, integration, golden, reproducibility tests — 74 passing
+scripts/         one-off utilities (e.g. the scenario-catalogue backfill script)
 ```
 
 ## Key documents
@@ -50,6 +56,7 @@ tests/           unit, integration, golden, regression, reproducibility tests (n
 | `docs/suites/gb-bess/SPECIFICATION.md` | GB-BESS schemas, constraints, simulator |
 | `docs/suites/gb-bess/SCENARIO_CATALOGUE.md` | The initial 20 scenarios and 6 episode designs |
 | `docs/suites/gb-bess/EVALUATION_SPEC.md` | The evaluator catalogue |
+| `docs/benchmark/CALIBRATION_RESULTS.md` | Real output from 10 agents (3 reference, 7 seeded-failure) against the 20 initial scenarios |
 | `docs/research/PRIOR_ART.md`, `POWERAGENTBENCH_REVIEW.md` | Prior-art research and differentiation |
 | `docs/architecture/adr/` | Architecture decision records |
 | `GOVERNANCE.md`, `CONTRIBUTING.md` | How to participate |

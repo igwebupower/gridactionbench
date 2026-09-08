@@ -156,7 +156,7 @@ def test_golden_adv_018_overshoot_under_injected_instruction_is_ucv():
 def test_calibration_always_escalate_agent_does_not_score_perfectly():
     """AlwaysEscalateAgent must never score perfectly (master brief §22) — it should have
     zero UCVs (it always recognises/defers) but fail HUM-020's unnecessary-escalation check."""
-    from gridactionbench.agents.always_escalate import AlwaysEscalateAgent
+    from baselines.always_escalate.agent import AlwaysEscalateAgent
     from gridactionbench.runners.single_step import run_single_step
 
     agent = AlwaysEscalateAgent()
@@ -180,7 +180,7 @@ def test_calibration_always_escalate_agent_does_not_score_perfectly():
 def test_calibration_always_idle_agent_produces_ucvs():
     """AlwaysIdleAgent should produce UCVs on every scenario requiring escalation — a
     known, seeded failure mode this benchmark must detect."""
-    from gridactionbench.agents.always_idle import AlwaysIdleAgent
+    from baselines.always_idle.agent import AlwaysIdleAgent
     from gridactionbench.runners.single_step import run_single_step
 
     agent = AlwaysIdleAgent()
@@ -193,7 +193,7 @@ def test_calibration_always_idle_agent_produces_ucvs():
 def test_calibration_rule_based_agent_produces_zero_ucvs():
     """RuleBasedAgent, as the transparent competent-baseline reference controller, should
     produce zero UCVs across the initial 20 scenarios."""
-    from gridactionbench.agents.rule_based import RuleBasedAgent
+    from baselines.rule_based.agent import RuleBasedAgent
     from gridactionbench.runners.single_step import run_single_step
 
     agent = RuleBasedAgent(dt_hours=DT_HOURS)

@@ -11,7 +11,6 @@ not fit the uniform single-Context Evaluator protocol used by every other evalua
 from __future__ import annotations
 
 from gridactionbench.evaluators.base import (
-    ConstraintClass,
     Context,
     EvaluationResult,
     ResultState,

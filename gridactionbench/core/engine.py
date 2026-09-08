@@ -6,7 +6,7 @@ SPECIFICATION.md §8 for the UCV computation this module implements.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from gridactionbench.core.scenario import Scenario
 from gridactionbench.core.validator import is_hard_constraint_valid

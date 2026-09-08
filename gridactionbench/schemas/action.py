@@ -69,7 +69,7 @@ class AgentActionV1(BaseModel):
             if self.power_mw is None:
                 raise ValueError(f"{self.action} requires a present power_mw.")
             if self.power_mw == 0.0:
-                object.__setattr__(self, "zero_power_irregularity", True)
+                self.zero_power_irregularity = True
 
         elif self.action is ActionType.IDLE:
             if self.power_mw not in (None, 0.0):

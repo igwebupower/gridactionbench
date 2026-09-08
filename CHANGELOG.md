@@ -4,6 +4,21 @@ All notable changes to GridActionBench are documented here. Versioning follows `
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — Phase 1.5 (quality audit + seeded failure agents)
+
+Prompted by an explicit request to quality-check the Phase 1 spike before continuing. Found and fixed real issues rather than re-confirming existing tests; then implemented all 7 seeded failure agents from master brief §27, ahead of their originally planned Phase 2/4 slot.
+
+### Fixed (found by auditing test coverage and cross-checking against ADR-002, not by re-running existing tests)
+- **5 of 16 evaluator classes had zero test coverage of their FAIL branch** (`PhyDischargeLimit001`, `PhyEnergyAvailable001`, `PhyCapacityAvailable001`, `DataImplausibleHeadroom001`, `OpsTempDischargeProhibition001` — the last of which no scenario in the initial 20 exercises at all). Added direct unit tests for all 5, plus tests for the previously-untested SOC `WARNING` band on `PHY-SOC-MAX-001`/`PHY-SOC-MIN-001`.
+- **Fragile, undocumented design assumption in `gridactionbench/reporting/report.py`**: the UCV-by-`constraint_class` breakdown counted any per-evaluator `contributes_to_ucv=True` result, which is correct only because every evaluator happens to defensively return `PASS`/`NOT_APPLICABLE` on `ESCALATE` — a fact that was true but nowhere enforced or tested. Made the breakdown gate on the engine's authoritative `record.ucv` flag instead (correct regardless of that assumption), and added `tests/unit/test_evaluators.py::test_no_evaluator_ever_fails_on_escalate` to make the assumption an explicit, checked invariant rather than an implicit one a future evaluator addition could silently violate.
+- **Architecture inconsistency**: `docs/architecture/adr/ADR-002-package-architecture.md` documents concrete reference-agent implementations as belonging under top-level `baselines/`, matching the master brief's required repo structure (§65) — Phase 1 had instead put them in `gridactionbench/agents/`. Moved `AlwaysIdleAgent`, `AlwaysEscalateAgent`, `RuleBasedAgent` to `baselines/{always_idle,always_escalate,rule_based}/agent.py`; `gridactionbench/agents/base.py` (the `AgentAdapter` interface) correctly stays in the core package. Updated all import sites (`cli.py`, three test files) and `pyproject.toml`'s package discovery.
+- Minor cleanup: unnecessary `object.__setattr__` in `AgentActionV1` (the model isn't frozen), unused imports (`timezone`, `field`, `ConstraintClass`) in three modules, an unnecessary `confidence` exclusion in a reproducibility test.
+
+### Added
+- `baselines/seeded_failures/`: all 7 seeded failure agents from master brief §27 — `AlwaysChargeAgent`, `IgnoreNetworkAgent`, `IgnoreMinimumSOCAgent`, `RevenueFirstConstraintIgnoringAgent` (per the master brief's own suggested rename), `TrustAllTelemetryAgent`, `NeverEscalateAgent`, `PromptInjectionVictimAgent` — each with a documented expected failure mode, wired into the CLI's agent registry.
+- `tests/golden/test_seeded_failure_agents.py` — verifies each seeded agent actually exhibits its documented failure mode on the specific scenario designed to trip it, plus a sweep asserting every seeded agent produces at least one UCV somewhere across the 20 scenarios. 74 tests passing overall (up from 66).
+- `docs/benchmark/CALIBRATION_RESULTS.md` — real, reproducible calibration output from all 10 agents (3 reference + 7 seeded) against the 20 initial scenarios, explicitly marked as an informal Phase 4 preview (small scenario sample, no external review yet) rather than a final sign-off.
+
 ## [Unreleased] — Phase 1 (technical spike)
 
 ### Added
