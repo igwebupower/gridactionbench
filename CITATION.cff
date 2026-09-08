@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use GridActionBench, please cite it using the metadata below. This benchmark is Phase 0 (unreleased); citation metadata will be finalized at v0.1 release."
+title: "GridActionBench"
+abstract: >
+  GridActionBench is an open benchmark for evaluating AI actions in energy
+  systems. Its first suite, GB-BESS v0.1, evaluates operational decisions for
+  a simulated grid-connected Battery Energy Storage System in a Great Britain
+  electricity-system context, focusing on action validity, information
+  sufficiency, constraint adherence, and consequence rather than answer
+  quality alone.
+type: software
+version: "0.0.0-phase0"
+date-released: "2026-09-08"
+license: Apache-2.0
+repository-code: "TBD — not yet published to a public remote"
+keywords:
+  - benchmark
+  - AI agents
+  - energy systems
+  - battery energy storage
+  - Great Britain
+  - AI safety evaluation
+  - reinforcement learning
+authors:
+  - name: "GridActionBench Contributors"

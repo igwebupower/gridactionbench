@@ -1,0 +1,35 @@
+# Threat Model
+
+**Status:** Draft — Phase 0 (master brief §42)
+
+## Two distinct categories — do not conflate
+
+1. **Threats *to* the benchmark** — ways the benchmark itself could be compromised, gamed, or made unreliable. This document.
+2. **Adversarial scenarios *tested by* the benchmark** — the ADV scenario family (prompt injection, instruction override, etc.), which is a *feature* of the benchmark's evaluation content, documented in `docs/suites/gb-bess/SCENARIO_CATALOGUE.md`. These are not the same thing: an ADV scenario testing whether an *agent* resists a fake "ignore all constraints" instruction is unrelated to whether an *attacker* could compromise the benchmark's own infrastructure or scoring.
+
+## Threats to the benchmark
+
+| Threat | Description | Mitigation |
+|---|---|---|
+| **Benchmark leakage** | Official holdout scenarios becoming publicly visible before/without proper release | Private evaluation infrastructure kept out of public git history (`PUBLIC_PRIVATE_POLICY.md`); `.gitignore`d local fixtures during development |
+| **Holdout leakage** | Same as above, specifically for generated-instance seeds | Private seeds never committed; generator *code* is public but seeds are not |
+| **Training-data contamination** | Public scenarios entering model training corpora over time | See `CONTAMINATION_POLICY.md` |
+| **Prompt overfitting** | A submitted agent's prompt is hand-tuned against known public scenario phrasing rather than genuinely capable of the underlying task | Reference Track requires disclosed prompt/config (`SUBMISSION_RULES.md`); Verified results require holdout evaluation the submitter could not have hand-tuned against |
+| **Scenario fingerprinting** | An agent or its harness detecting it is being benchmarked (e.g. via characteristic field names or scenario IDs) and behaving differently than it would in a real deployment | `EnergyObservationV1` field names are necessarily disclosed (the schema is public by design), so this is not fully preventable at the schema level; mitigated partially by holdout instances using varied parameter values so pattern-matching on specific numbers is less effective, and by the benchmark's own honest framing that it measures benchmark behaviour, not unconditionally generalizable real-world behaviour (`BENCHMARK_CARD.md`, out-of-scope use) |
+| **Hidden-set extraction** | An adversarial submission designed to probe/reconstruct holdout content via repeated queries (relevant mainly if/when an online submission API exists) | No such API exists in v0.1 (no submission service, no leaderboard); revisit if one is built |
+| **Evaluator gaming** | An agent exploiting a bug or edge case in evaluator logic to score well without genuine constraint compliance (e.g., an off-by-one in a boundary comparison) | Golden tests (`master brief §50`), unanimous-agent-disagreement-as-QC-signal pattern adopted from prior art (`PRIOR_ART.md`), evaluator versioning discipline (`VERSIONING.md`) |
+| **Submission manipulation** | A participant misreporting their configuration, model version, or seed to make results appear better or more favorable | Reproducible Submission / GridActionBench Verified status distinction (`PUBLIC_PRIVATE_POLICY.md`) — only Verified results carry independent-evaluation weight |
+| **Data poisoning** | Malicious modification of frozen GB data files (Phase 5) after retrieval, before use | Checksums recorded per dataset (`docs/data/DATA_PROVENANCE.md`); frozen datasets are versioned and hash-verified, not re-fetched live |
+| **Malicious scenario contributions** | A community-contributed scenario designed to bias results, leak information, or introduce unsafe test content | Contribution governance requires public proposal + rationale + impact assessment + review before any scenario affecting official benchmark behaviour is merged (master brief §60, `CONTRIBUTING.md`) |
+| **Dependency compromise** | A compromised upstream Python package used by the benchmark's runtime | Standard supply-chain hygiene: pinned lockfiles (to be established Phase 1), no unreviewed dependency additions to core evaluator/simulator code |
+| **Malicious tool output** | A tool-using agent's own external tool call returning manipulated content that influences its logged behaviour | Out of GridActionBench's direct control (the agent's tool ecosystem is the agent's own architecture, not the benchmark's), but any resulting mis-action is still captured and scored by the same deterministic evaluators — the benchmark's evaluation is agnostic to *why* an agent proposed a bad action |
+| **Compromised model output** | A model provider's API returning corrupted/tampered output in transit | Standard TLS/transport security via provider SDKs; not a GridActionBench-specific concern beyond using official provider client libraries |
+| **Provenance manipulation** | Falsified `git_commit`, `random_seed`, or version metadata in a submitted Decision Record | Verified status requires independent re-execution against official holdout infrastructure, not trust in submitter-reported metadata alone |
+
+## Explicit non-goals of this threat model
+
+This document does not attempt to threat-model the *simulated* energy system as if it were a real operational target — GB-BESS v0.1 has no physical-system attack surface by construction (see `docs/architecture/SECURITY.md`, physical-system isolation). The threats above are entirely about the integrity of the benchmark *as a piece of research infrastructure*.
+
+## Review cadence
+
+This threat model should be revisited at each benchmark freeze (Phase 9 and beyond) and whenever a new component (submission API, leaderboard, private evaluation service) is added — none of which exist yet in Phase 0.

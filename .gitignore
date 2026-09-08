@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+dist/
+build/
+
+# Environment / secrets
+.env
+.env.*
+*.key
+*.pem
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+
+# Private evaluation fixtures — never committed (see docs/benchmark/PUBLIC_PRIVATE_POLICY.md)
+fixtures/private_dev_only/**
+!fixtures/private_dev_only/.gitkeep
+
+# Local run artifacts
+*.jsonl.local
+/runs/
+/reports/local/
