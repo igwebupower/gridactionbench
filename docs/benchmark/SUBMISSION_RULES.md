@@ -1,6 +1,6 @@
 # Submission Rules
 
-**Status:** Draft — Phase 0. No submission service exists yet; this document specifies the intended protocol for when Reference/Extended Track results are published, informed by MLPerf's Closed/Open division precedent (see `docs/research/PRIOR_ART.md` §4).
+**Status:** Draft — Phase 0. No submission service exists yet; this document specifies the intended protocol for when Reference/Extended Track results are published, informed by MLPerf's Closed/Open division precedent (see `docs/research/PRIOR_ART.md` §5).
 
 ## Reference Track
 

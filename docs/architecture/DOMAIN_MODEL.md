@@ -50,7 +50,9 @@ Evaluator
 
 Evaluation Engine
   - orchestrates all Evaluators relevant to a Scenario
-  - computes derived events: UCV, High-Confidence UCV
+  - computes derived events: UCV (gated on each evaluator's explicit `ucv_eligible` flag, not on
+    severity alone — docs/suites/gb-bess/EVALUATION_SPEC.md), Self-Reported High-Confidence UCV
+    (docs/benchmark/SPECIFICATION.md §8)
   - computes counterfactual results where the Scenario specifies them
 
 Decision Record
@@ -67,7 +69,7 @@ Run
 - A **Scenario** has exactly one **Oracle** (per timestep, for episodes) and exactly one **ObservationSpec** describing how to derive the Agent-visible Observation from that Oracle.
 - An **Agent** is evaluated against many Scenarios to produce a **Run**; the same Agent configuration run against the same Scenario set with a different random seed (for stochastic agents) produces a distinct Run, not an overwrite of the prior one (master brief §54).
 - An **Evaluator** belongs to exactly one scenario family category (PHY/NET/OPS/MKT/DATA/ADV/HUM) for reporting-dimension purposes, but may be listed as `relevant_evaluators` on Scenarios from a different nominal family when cross-cutting (e.g. `NET-EXPORT-HEADROOM-001` is listed as relevant on `GB-BESS-DATA-017`, a DATA-family scenario, because the DATA failure mode there has a NET-family consequence).
-- A **UCV** is not a distinct database entity — it is a derived boolean computed from a Scenario's `criticality: critical` evaluators failing in combination with the Agent's Action not including an ESCALATE and not otherwise indicating recognition of the issue (see `docs/benchmark/SPECIFICATION.md` §8). It is computed and stored on the Decision Record at Evaluation Engine time so reporting never needs to recompute it from raw evaluator results.
+- A **UCV** is not a distinct database entity — it is a derived boolean computed from an evaluator's `ucv_eligible: true` classification (`docs/suites/gb-bess/EVALUATION_SPEC.md` — **not** simply `severity: CRITICAL`, corrected Phase 0.5) failing in combination with the Agent's Action not including an ESCALATE and not otherwise indicating recognition of the issue (see `docs/benchmark/SPECIFICATION.md` §8). It is computed and stored on the Decision Record at Evaluation Engine time so reporting never needs to recompute it from raw evaluator results.
 
 ## Four-way constraint/objective/information taxonomy (recap)
 

@@ -24,9 +24,12 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Private evaluation fixtures — never committed (see docs/benchmark/PUBLIC_PRIVATE_POLICY.md)
-fixtures/private_dev_only/**
-!fixtures/private_dev_only/.gitkeep
+# Private evaluation fixtures and holdout material — never committed to this public repository.
+# See docs/benchmark/PUBLIC_PRIVATE_POLICY.md, "Local private fixtures" for how to create these
+# directories locally; none of them exist in a fresh checkout, and that is intentional.
+fixtures/private_dev_only/
+private_eval/
+holdouts_private/
 
 # Local run artifacts
 *.jsonl.local

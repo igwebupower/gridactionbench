@@ -118,7 +118,7 @@ This is a reasonable, conventional layout; GridActionBench's own required struct
 ## 11. Patterns to adapt
 
 1. Multi-simulator-backend architecture (PyPSA/PandaPower/MATPOWER/PSS-E) — adapt down to a single `SimpleBessSimulator` for v0.1, but preserve the *interface* idea (`SimulatorAdapter`) so a PyPSA- or PowerMCP-backed adapter could be added later without redesigning the benchmark core (see `ADR-003-simulator-abstraction.md`).
-2. Severity-weighted false-safe metric — adapt into GridActionBench's UCV / High-Confidence UCV design (master brief §7), which is narrower in scope (a boolean-ish critical-violation-plus-non-escalation event) but should borrow the *severity weighting* idea when the metric matures past v0.1's simpler true/false count.
+2. Severity-weighted false-safe metric — adapt into GridActionBench's UCV / Self-Reported High-Confidence UCV design (master brief §7), which is narrower in scope (a `ucv_eligible`-gated critical-violation-plus-non-escalation event — see `docs/suites/gb-bess/EVALUATION_SPEC.md`'s classification model, added Phase 0.5) but should borrow the *severity weighting* idea when the metric matures past v0.1's simpler true/false count.
 
 ## 12. Patterns not relevant to GridActionBench
 

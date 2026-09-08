@@ -1,6 +1,6 @@
 # Public / Private Architecture Policy
 
-**Status:** Draft — Phase 0. This document exists to satisfy master brief §37-39: do not arbitrarily choose a public/private split percentage; research and justify the design.
+**Status:** Revised — Phase 0.5. "Private evaluation infrastructure" rewritten: the `fixtures/private_dev_only/` placeholder that was previously tracked in git (a `.gitkeep` only) has been removed from version control entirely — it was a public artifact marking the existence of a "private" directory, which defeats the point. This document now specifies how a developer creates the directory locally instead. This document exists to satisfy master brief §37-39: do not arbitrarily choose a public/private split percentage; research and justify the design.
 
 ## What must stay public (master brief §37)
 
@@ -29,7 +29,25 @@ An arbitrary public/private percentage answers the wrong question. The right que
 
 ## Private evaluation infrastructure
 
-Per master brief §66, official holdouts are not committed to the public repository's git history. For GB-BESS v0.1 development, this project uses **local, `.gitignore`d fixtures** under `fixtures/private_dev_only/` (already excluded — see `.gitignore`) for any private-instance development work, and documents (here) the eventual intended architecture: a separate `gridactionbench-evaluation-private` repository holding `holdouts/`, `scenario_generators/` (private-seed configuration only — the generator *code* itself remains public), `adversarial_mutations/`, `evaluation_seeds/`, `submission_validation/`, and `official_run_configs/`. This separate repository does not exist yet as of Phase 0 and is out of scope for the technical spike (Phase 1); it is planned infrastructure, not a current claim.
+Per master brief §66, official holdouts are not committed to the public repository's git history — not even as an empty placeholder. `.gitignore` excludes `fixtures/private_dev_only/`, `private_eval/`, and `holdouts_private/` entirely (no exception for a `.gitkeep` or any other tracked marker), so none of these directories exist in a fresh checkout and no private scenario can accidentally enter public git history through them.
+
+### Local private fixtures — how a developer creates one
+
+These directories are never committed, so there is nothing to check out — a developer who needs one creates it locally:
+
+```bash
+mkdir -p fixtures/private_dev_only
+```
+
+Anything placed under `fixtures/private_dev_only/`, `private_eval/`, or `holdouts_private/` (each git-ignored — see `.gitignore`) stays local to that developer's checkout. This is for **interim private-instance development only** (e.g., trying out a holdout-generator design locally before Phase 3 infrastructure exists) — it is explicitly not a substitute for the separate private-evaluation repository described below, and nothing placed here should be treated as an official holdout; there is no mechanism for these local directories to be shared, synchronized, or treated as authoritative across contributors.
+
+### Eventual private-repository architecture
+
+The eventual intended architecture is a separate `gridactionbench-evaluation-private` repository holding `holdouts/`, `scenario_generators/` (private-seed configuration only — the generator *code* itself remains public), `adversarial_mutations/`, `evaluation_seeds/`, `submission_validation/`, and `official_run_configs/`. This separate repository does not exist yet as of Phase 0 and is out of scope for the technical spike (Phase 1); it is planned infrastructure, not a current claim.
+
+### Safeguard against accidental commits
+
+Because none of `fixtures/private_dev_only/`, `private_eval/`, or `holdouts_private/` are ever tracked (no `.gitkeep` exception, unlike the Phase 0 draft), `git status`/`git add -A` will never surface files under these paths for staging — a contributor cannot accidentally `git add` a private scenario file that lives there. Contributors should still run `git status` before committing (standard practice, restated here because it is the specific safeguard this section depends on) rather than relying on `.gitignore` as the sole line of defense.
 
 ## Result status categories (master brief §40)
 

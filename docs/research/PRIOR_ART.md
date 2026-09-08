@@ -41,7 +41,38 @@ Sources:
 
 ---
 
-## 2. HELM (Holistic Evaluation of Language Models)
+## 2. Grid2Op and RL2Grid
+
+**Status:** Added Phase 0.5 (2026-09-08) — this section was missing from the Phase 0 draft and is added per explicit review feedback that sequential grid-control RL environments are directly relevant prior art this project had not yet examined.
+
+**Sources:**
+- [Grid2Op (github.com/rte-france/Grid2Op)](https://github.com/rte-france/Grid2Op) — RTE France (Réseau de Transport d'Électricité). License: Mozilla Public License 2.0. Access date 2026-09-08.
+- [Grid2Op project page, LF Energy](https://lfenergy.org/projects/grid2op/) — hosted under the Linux Foundation Energy umbrella. Access date 2026-09-08 (page metadata only retrievable in this pass; substantive content not confirmed beyond the GitHub repository).
+- [RL2Grid: Benchmarking Reinforcement Learning in Power Grid Operations (arXiv:2503.23101)](https://arxiv.org/abs/2503.23101) — Marchesini, Donnot, et al. Submitted 2025-03-29, revised 2025-06-20. License: CC BY 4.0. Repository: [github.com/emarche/RL2Grid](https://github.com/emarche/RL2Grid).
+
+**What they are:** Grid2Op is a Gymnasium-compatible reinforcement-learning environment framework, built by RTE France, for sequential power-grid operation — topology switching, redispatching, curtailment, and load-shedding, under full or approximated AC power-flow dynamics, stochastic renewable generation, and contingency events (line disconnections, maintenance, weather-driven overloads). It underpins RTE's "Learning to Run a Power Network" (L2RPN) competition series. RL2Grid is a benchmark suite built on top of Grid2Op that standardizes tasks, state/action spaces, and reward structures across that environment, adds expert-informed heuristics and constrained-MDP safety formulations (load-shedding and thermal-overload constraints), and reports baselines across DQN, PPO, SAC, TD3, and Lagrangian PPO.
+
+**How this differs from GridActionBench, and why the difference is not manufactured:**
+
+Grid2Op/RL2Grid and GridActionBench solve genuinely different problems, not merely differently-branded versions of the same one:
+
+1. **Optimization target.** Grid2Op/RL2Grid train and evaluate policies to *maximize long-horizon operational reward* (survival time, cost, overload avoidance) via reinforcement learning over many episodes of interaction — the environment is a training and evaluation substrate for policy *learning*. GridActionBench does not train anything; it evaluates whatever decision-making system (already trained, hand-coded, or prompted) is handed to it against fixed, versioned scenarios, scored on constraint adherence, information sufficiency, and escalation — not reward maximization. An agent that never touches Grid2Op's reward signal (e.g. a rule-based controller, or an LLM given a single scenario) is a first-class, expected GridActionBench participant; it would be an unusual fit for an RL benchmark built around a Gym `reward()` signal.
+2. **Action space and asset scope.** Grid2Op's action space is grid-topology-centric (switch lines, redispatch generators, curtail renewables) across a whole synthetic network; GridActionBench: GB-BESS's action space is four actions (CHARGE/DISCHARGE/IDLE/ESCALATE) for one battery asset. This is a strict subset in ambition, not a competing full-grid model.
+3. **What "escalation" and "information sufficiency" mean.** Grid2Op/RL2Grid have no analogue to GridActionBench's ESCALATE action or its DATA/HUM scenario families (stale/missing/conflicting telemetry, appropriate vs. unnecessary escalation) — an RL policy in Grid2Op always acts on whatever observation the environment hands it; there is no first-class "the agent should recognise it doesn't have enough information and refuse to act" concept built into the environment or its reward structure. This is the single clearest non-overlapping area between the two projects and is central to GridActionBench's own research questions (master brief §22).
+4. **Adversarial and instruction-following behaviour.** GridActionBench's ADV family (prompt injection, instruction override) has no Grid2Op/RL2Grid analogue — these are RL environments, not natural-language-instructable agents, so "does an adversarial instruction cause an inappropriate action" is not a question their action interface can even pose.
+5. **Where the overlap is real, and should not be understated.** Both projects test sequential decision-making under physical/network constraints, both use a versioned, reproducible environment/task structure, and both explicitly measure constraint violation (Grid2Op/RL2Grid via the constrained-MDP safety formulation; GridActionBench via deterministic evaluators). GridActionBench's Mode B (episode evaluation, master brief §4) is a structurally similar idea to a Grid2Op episode, at much smaller scale (5-10 steps vs. RL2Grid's long-horizon episodes) and without a reward-maximization objective. If GridActionBench's episode suite grows substantially in a future version, the overlap with Grid2Op/RL2Grid's territory would grow too, and this document's differentiation claim should be re-examined at that point rather than assumed to hold indefinitely.
+
+**Patterns to adopt or adapt:**
+- Grid2Op's Gymnasium-interface convention (`Environment` class with a standard `step`/`reset` API) is a reasonable reference point for GridActionBench's own `SimulatorAdapter`/runner interface (`docs/architecture/ARCHITECTURE.md`) if a future episode-heavy suite wants interoperability with the broader Gym ecosystem — not adopted in v0.1, since GridActionBench's evaluation loop is not itself an RL training loop and does not need Gym-style `reward()` semantics, but worth tracking as a compatibility option.
+- RL2Grid's constrained-MDP framing (safety as an explicit constraint on the optimization, not just a post-hoc check) is conceptually adjacent to GridActionBench's "objectives never override constraints" rule (`docs/benchmark/SPECIFICATION.md` §3.3) — independently arrived at, not adopted from RL2Grid, but worth noting as convergent validation.
+
+**Licensing implications:** Grid2Op is MPL 2.0 — compatible with Apache-2.0 consumption in the same way the MIT-licensed PowerMCP/PowerFM/PowerWF repositories are (`docs/architecture/adr/ADR-013-licensing.md`), should a future `SimulatorAdapter` ever wrap it. RL2Grid's paper is CC BY 4.0 (a content licence, not directly applicable to its code, which should be checked separately in its own repository if ever reused). No code from either project has been copied into GridActionBench.
+
+**Interoperability opportunity, not a v0.1 commitment:** a future `SimulatorAdapter` wrapping Grid2Op could, in principle, let GridActionBench evaluate BESS-specific operational actions within a larger simulated network context (e.g., a BESS asset embedded in a Grid2Op environment, with GridActionBench's evaluators applied to just that asset's actions) — this would be a significant undertaking, is not planned for v0.1, and is noted here only as a long-term option alongside the PowerMCP option already tracked in `docs/architecture/adr/ADR-003-simulator-abstraction.md`.
+
+---
+
+## 3. HELM (Holistic Evaluation of Language Models)
 
 **Source:** [Stanford CRFM, HELM (arXiv:2211.09110)](https://arxiv.org/abs/2211.09110); [github.com/stanford-crfm/helm](https://github.com/stanford-crfm/helm); [crfm.stanford.edu/helm](https://crfm.stanford.edu/helm/). Access date 2026-09-08.
 
@@ -54,7 +85,7 @@ HELM's relevance to GridActionBench is architectural, not domain-specific — Gr
 
 ---
 
-## 3. SWE-bench Verified
+## 4. SWE-bench Verified
 
 **Source:** [OpenAI, "Introducing SWE-bench Verified"](https://openai.com/index/introducing-swe-bench-verified/); [swebench.com/verified.html](https://www.swebench.com/verified.html). Access date 2026-09-08.
 
@@ -66,7 +97,7 @@ SWE-bench Verified is a 500-instance, **human-annotator-filtered** subset of SWE
 
 ---
 
-## 4. MLPerf (MLCommons)
+## 5. MLPerf (MLCommons)
 
 **Source:** [MLCommons, MLPerf Inference Submission Guidelines](https://github.com/mlcommons/inference/blob/master/Submission_Guidelines.md); [MLPerf Training (arXiv:1910.01500)](https://arxiv.org/pdf/1910.01500). Access date 2026-09-08.
 
@@ -80,7 +111,7 @@ MLPerf's relevance is governance and comparability methodology, not task content
 
 ---
 
-## 5. Summary table — patterns adopted / adapted / rejected
+## 6. Summary table — patterns adopted / adapted / rejected
 
 | Pattern | Source | Disposition | Where it lands in GridActionBench |
 |---|---|---|---|
@@ -90,6 +121,8 @@ MLPerf's relevance is governance and comparability methodology, not task content
 | Public case data + hidden evaluator recomputation split | PowerAgentBench-SS | **Adopt** | Core architecture; `PUBLIC_PRIVATE_POLICY.md` |
 | Evidence-backed recall / false-safe rate / severity regret metric family | PowerAgentBench (full suite) | **Adapt** | UCV metric design, `EVALUATION_SPEC.md` |
 | Real power-system simulator grounding (PyPSA/PandaPower/PSS-E) | PowerAgentBench | **Reject for v0.1** | Explicitly deferred — `SimpleBessSimulator` only (master brief §29–30); noted as a future `SimulatorAdapter` target |
+| Gymnasium-style environment interface convention | Grid2Op | **Not adopted for v0.1** | GridActionBench's evaluation loop is not a reward-maximizing RL training loop; tracked as a future compatibility option only |
+| Constrained-MDP safety-as-explicit-constraint framing | RL2Grid | **Convergent, not adopted from** | Independently present in `docs/benchmark/SPECIFICATION.md` §3.3 ("objectives never override constraints") |
 | Multi-metric, non-aggregated reporting | HELM | **Adopt** | `SCORING.md` (§25 prohibition on opaque score) |
 | Explicit, stated benchmark incompleteness | HELM | **Adopt** | `BENCHMARK_CARD.md` |
 | Human-reviewed "Verified" subset before scale | SWE-bench Verified | **Adopt** | Scenario review ladder (§48) |
@@ -99,24 +132,38 @@ MLPerf's relevance is governance and comparability methodology, not task content
 | Agent-disagreement-as-evaluator-QC signal | Trashchenkov PSAB | **Adopt** | Phase 4 calibration methodology |
 | Hardware/throughput submission machinery | MLPerf | **Reject** | Not applicable |
 | General-purpose LM scenario taxonomy | HELM | **Reject** | Domain-native taxonomy (PHY/NET/OPS/MKT/DATA/ADV/HUM) used instead |
+| Reward-maximization RL training/evaluation loop | Grid2Op/RL2Grid | **Reject** | GridActionBench evaluates given decision-makers against fixed scenarios; it does not train policies or define a reward function |
 
-## 6. Interoperability opportunities (not commitments for v0.1)
+### 6.1 Six-way differentiation, stated plainly
+
+- **PowerAgentBench** → agentic power-system engineering/workflow competence (grid-wide contingency screening, dynamic model repair), using real power-flow/dynamic simulators.
+- **Grid2Op / RL2Grid** → sequential grid-control reinforcement-learning environments and training/evaluation benchmarks, reward-maximization-oriented, grid-topology-centric action space.
+- **HELM** → general-purpose language-model capability evaluation methodology (multi-metric, non-aggregated reporting), not energy-domain.
+- **SWE-bench Verified** → human-curated code-fix correctness benchmark; contributes a calibration/curation methodology lesson, not domain content.
+- **MLPerf** → hardware/software performance benchmarking governance (Closed/Open division, versioned rulesets); contributes a submission-track methodology lesson, not domain content.
+- **GridActionBench** → architecture-neutral evaluation of *operational actions* — constraint adherence, information sufficiency, escalation, adversarial behaviour, and consequence — for any decision-making system (not just RL policies, not just LLM agents), initially instantiated in a GB-BESS single-asset context. No overlap with PowerAgentBench (workflow scope), Grid2Op/RL2Grid (reward-maximization/training scope), HELM (general LM capability), SWE-bench Verified (code-fix domain), or MLPerf (hardware performance) is claimed beyond genuine methodological convergence, documented above and in `docs/research/POWERAGENTBENCH_REVIEW.md` §16, where material overlap exists (episode-mode vs. Grid2Op episodes; deterministic-evaluation vs. Trashchenkov PSAB; track separation vs. MLPerf).
+
+## 7. Interoperability opportunities (not commitments for v0.1)
 
 - **PowerMCP** (MIT-licensed MCP servers for PowerWorld/PSSE/OpenDSS) is a plausible future `SimulatorAdapter` target if GridActionBench ever needs power-flow fidelity beyond `SimpleBessSimulator` — noted in `docs/architecture/adr/ADR-003-simulator-abstraction.md` as a candidate, not built in v0.1.
+- **Grid2Op** (MPL 2.0) is a plausible future `SimulatorAdapter` target if GridActionBench ever wants to evaluate a BESS asset embedded within a larger simulated network context — see §2, above. Not built in v0.1.
 - Both PowerAgentBench and the Trashchenkov benchmark publish JSON task/solution/result schemas; GridActionBench's own `EnergyObservationV1`/`AgentActionV1`/Decision Record schemas are independently designed for the BESS operational-action domain but should remain loosely translatable to/from these where a future cross-benchmark harness might want to run all three side by side. No shared-schema commitment is made for v0.1.
 
-## 7. Licensing implications
+## 8. Licensing implications
 
-- PowerMCP, PowerFM, PowerWF are MIT-licensed — compatible with GridActionBench's own Apache-2.0 direction (see `docs/architecture/adr/ADR-013-licensing.md`); no code has been copied from any of these repositories into GridActionBench.
+- PowerMCP, PowerFM, PowerWF are MIT-licensed, and Grid2Op is MPL 2.0 — both compatible with GridActionBench's own Apache-2.0 direction (see `docs/architecture/adr/ADR-013-licensing.md`); no code has been copied from any of these repositories into GridActionBench.
 - PowerAgentBench's own license was not stated in the reviewed material (`Not stated in provided content`, per the repository fetch) — treat as **all rights reserved / unknown** until explicitly verified; do not copy code or scenario data from it under any circumstance until a license is confirmed.
 - The Trashchenkov benchmark's arXiv paper carries an arXiv perpetual non-exclusive distribution license (paper text only); no explicit repository code license was found in the reviewed excerpt — same caution applies.
+- RL2Grid's paper is CC BY 4.0; its repository's code licence was not independently checked in this pass and should be verified separately before any reuse.
 - No code, scenario data, or evaluator logic from any reviewed project has been reused in GridActionBench. All GridActionBench implementation work is original.
 
-## 8. Research gaps / TODOs
+## 9. Research gaps / TODOs
 
 ```text
 RESEARCH TODO — NETWORK ACCESS REQUIRED (if revisited offline)
 - Confirm PowerAgentBench's actual repository LICENSE file (not found in reviewed excerpt).
 - Confirm whether PowerMCP's simulator adapters could satisfy a future GridActionBench SimulatorAdapter interface without modification, or would require a wrapper.
 - PowerAgent (singular, without "Bench") and PowerSkills were named in the master brief; reviewed here only via the Power-Agent org page summary, not fetched in full — revisit if PowerSkills' agent-instruction design becomes relevant to AgentActionV1 design.
+- Confirm RL2Grid's repository code licence directly (only the paper's CC BY 4.0 licence was confirmed in this pass).
+- The LF Energy project page for Grid2Op (lfenergy.org/projects/grid2op/) could not be substantively fetched in this pass (metadata only) — the GitHub repository was used as the primary source instead; revisit if LF Energy governance details become relevant.
 ```

@@ -1,6 +1,6 @@
 # Test Strategy
 
-**Status:** Draft — Phase 0 specification; implementation begins Phase 1 (master brief §68 lists "10 golden scenarios" and a CLI as spike deliverables).
+**Status:** Revised — Phase 0.5. Adds an explicit physical-invariants subsection (energy conservation, efficiency direction, timestep conversion, boundaries, zero-power) under Property/Invariant tests, grounded in the frozen simulator conventions in `docs/suites/gb-bess/SPECIFICATION.md` §9. Implementation begins Phase 1 (master brief §68 lists "10 golden scenarios" and a CLI as spike deliverables).
 
 ## Test categories (master brief §56)
 
@@ -23,6 +23,16 @@ At minimum, per master brief §56:
 - Irrelevant scenario metadata (e.g. `author`, `created_date`) cannot alter any evaluator's physical/operational verdict.
 - Every evaluator result carries its `eval_id` and `version` (never silently omitted).
 - `scenario_id` is preserved unchanged from Scenario through to Decision Record.
+
+#### Physical invariants (added this pass, grounded in `docs/suites/gb-bess/SPECIFICATION.md` §9's frozen conventions)
+
+- **Energy-conservation / state-transition invariant** — for each deterministic simulation step, the change in stored battery energy must equal the defined charge/discharge energy transformation within the `epsilon = 1e-6` numerical tolerance fixed in §9.7: `resulting_soc * capacity_mwh - pre_state.soc * capacity_mwh == energy_stored_delta_mwh` (CHARGE) or `== -energy_drawn_from_battery_mwh` (DISCHARGE), computed per §9.4's canonical equations. This is the single most important invariant test in the suite — it is what confirms the simulator actually implements the conventions this specification freezes, not merely that it produces *some* deterministic number.
+- **SOC transition correctness** — `resulting_soc` matches the closed-form equation in §9.4 exactly (within tolerance) for CHARGE, DISCHARGE, IDLE, and ESCALATE, checked against hand-computed expected values, not just checked for being in-bounds.
+- **Efficiency direction** — a round-trip test (CHARGE `power_mw` for `dt_hours`, then immediately DISCHARGE at the same `power_mw` for the same `dt_hours`) must return the battery to a **lower** SOC than it started at whenever `charge_efficiency < 1.0` or `discharge_efficiency < 1.0` — i.e., round-trip losses are strictly lossy, never energy-neutral or energy-gaining. A test asserting the opposite direction (round-trip *gains* energy) would indicate the efficiency terms are inverted (multiplying where the spec says divide, or vice versa) — exactly the class of sign/direction bug §9.3 was written to prevent.
+- **Timestep conversion** — for a fixed `power_mw`, halving `dt_hours` must exactly halve `energy_stored_delta_mwh`/`energy_drawn_from_battery_mwh` (linearity in time), and the MW×h=MWh unit relationship (§9.6) holds with no hidden conversion constant.
+- **Maximum/minimum boundaries** — `resulting_soc` never exceeds `max_soc` or falls below `min_soc` for any action that passed the Action Validator (restated from the pre-existing invariant above, now additionally cross-checked against the exact §9.4 equations rather than only checked for being in-bounds).
+- **Zero-power behaviour** — `CHARGE(0)`/`DISCHARGE(0)` produce `resulting_soc == pre_state.soc` exactly (not merely approximately), consistent with §9.8, and are flagged as a schema irregularity in the Decision Record without being treated as `schema_valid: false`.
+- **Deterministic reproducibility** — restated here as a physical-invariant test, not just a reproducibility-test-category concern (see below): the same `(pre_state, action, seed)` triple, run any number of times, produces bit-identical `resulting_soc`.
 
 ### Reproducibility tests
 A fresh environment (clean checkout, pinned dependency install) reproduces a previously published Run's results within defined tolerance (exact match for deterministic agents; distributional match within a documented statistical tolerance for stochastic agents). This is the test category that directly operationalizes master brief §54's reproducibility metadata requirements — if the reproducibility test cannot pass using only the metadata a Decision Record captures, the Decision Record schema is missing something and must be revised.

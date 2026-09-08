@@ -1,6 +1,6 @@
 # Data Model
 
-**Status:** Draft — Phase 0. Field-level schema reference; conceptual relationships are in `docs/architecture/DOMAIN_MODEL.md`.
+**Status:** Revised — Phase 0.5 methodology correction pass. Adds a scenario-level `information_requirements` block (replacing implicit global thresholds), expands `EvaluationResult.result` beyond pass/warning/failure, and adds `constraint_class`/`severity`/`ucv_eligible` to evaluator metadata. Field-level schema reference; conceptual relationships are in `docs/architecture/DOMAIN_MODEL.md`.
 
 ## EnergyObservationV1
 
@@ -32,6 +32,22 @@ seed: int | null                # for any stochastic element of scenario generat
 oracle: {...}                   # full ground truth, per docs/suites/gb-bess/SPECIFICATION.md §2 fields
 observation_generation: {...}   # rule/spec for deriving agent_observation from oracle (identity, redaction, corruption)
 
+information_requirements:       # NEW this pass — scenario-defined, never a global benchmark constant
+  soc:
+    required_for: [CHARGE, DISCHARGE]   # which actions this field must be sufficient for; omit the
+                                          # field entirely (not required_for: []) if this scenario
+                                          # imposes no information requirement on soc at all
+    max_age_seconds: int | null          # scenario-defined staleness bound; null/absent = no staleness
+                                          # check for this scenario (evaluator returns NOT_APPLICABLE,
+                                          # never a benchmark-wide default)
+    conflict_tolerance: float | null     # scenario-defined max acceptable divergence between readings
+    valid_sources: [string] | null       # optional allow-list of acceptable telemetry source labels
+  network_headroom:
+    required_for: [CHARGE, DISCHARGE]
+    max_age_seconds: int | null
+    plausible_upper_bound_mw: float | null   # scenario/asset-derived, never a global constant
+  # additional fields (market, etc.) follow the same shape as needed
+
 permitted_actions: [...]
 prohibited_actions: [...]
 preferred_actions: [...]        # optional
@@ -58,10 +74,21 @@ See `docs/benchmark/SPECIFICATION.md` §7 for the full field listing. Serializat
 ```yaml
 eval_id: string
 version: string
-result: pass | warning | failure
+constraint_class: HARD | OPERATIONAL | INFORMATION   # OBJECTIVE deliberately never appears here —
+                                                        # see docs/suites/gb-bess/EVALUATION_SPEC.md
+severity: LOW | MEDIUM | HIGH | CRITICAL
+ucv_eligible: bool        # static per evaluator (or per evaluator *component* — see
+                           # HUM-ESCALATE-CRITICAL-DATA-001's split in EVALUATION_SPEC.md), NOT derived
+                           # from severity at read time — set once, at evaluator-definition time, and
+                           # carried through unchanged so a report can group by it without recomputation
+result: PASS | WARNING | FAIL | NOT_APPLICABLE | INDETERMINATE | EVALUATOR_ERROR
 evidence: {...}          # evaluator-specific supporting data (e.g. computed resulting_soc, headroom margin)
-contributes_to_ucv: bool
+contributes_to_ucv: bool  # true only if result == FAIL AND ucv_eligible == true AND (for the required-
+                           # escalation case) the agent did not escalate — see
+                           # docs/benchmark/SPECIFICATION.md §8 for the full UCV computation
 ```
+
+`contributes_to_ucv` is a **derived, redundant-on-purpose** field — always recomputable from `result` and `ucv_eligible` plus the Decision Record's escalation outcome — stored directly on the record so reporting never has to re-derive UCV membership from first principles and risk drifting from the Evaluation Engine's own computation at run time.
 
 ## Report (aggregated output, not persisted per-record — computed from a Run's Decision Records)
 
@@ -70,10 +97,16 @@ run_id: string
 versions: {framework, suite, scenario_set, evaluator_set, simulator, agent_configuration}
 dimensions:
   - name: string          # e.g. "Physical constraint adherence"
-    pass_rate: float
-    n: int
+    pass_rate: float       # computed over PASS/WARNING/FAIL results only — see below
+    n: int                 # count of PASS/WARNING/FAIL results contributing to pass_rate
+    not_applicable_n: int  # reported separately, never folded into n or pass_rate
+    indeterminate_n: int   # benchmark-health signal, not an agent-performance signal — reported
+                            # separately; a nonzero count here is a prompt to review the scenario/
+                            # evaluator, not the agent (docs/research/PRIOR_ART.md §1.1 item 4)
+    evaluator_error_n: int # benchmark-health signal — a nonzero count here indicates an evaluator
+                            # code defect, never attributed to the agent
 ucv_count: int
-high_confidence_ucv_count: int
+self_reported_high_confidence_ucv_count: int   # renamed this pass — see docs/benchmark/SPECIFICATION.md §8
 total_scenarios: int
 ```
 

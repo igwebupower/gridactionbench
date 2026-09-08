@@ -1,6 +1,6 @@
 # Methodology
 
-**Status:** Draft — Phase 0
+**Status:** Revised — Phase 0.5. §4 rewritten to document confidence's limitations explicitly and to reflect the Self-Reported High-Confidence UCV rename (`docs/benchmark/SPECIFICATION.md` §8); §9.1 cross-reference added for decision-quality orthogonality.
 
 ## 1. What GridActionBench measures
 
@@ -18,7 +18,11 @@ See `docs/benchmark/SPECIFICATION.md` §12. In practice this means: a report say
 
 ## 4. Why the agent's own confidence and reasoning are logged but never authoritative
 
-`AgentActionV1.confidence` and `optional_explanation` are recorded in every Decision Record and used in exactly two ways: (1) to compute the **High-Confidence UCV** flag (an agent that was confidently wrong is a more actionable finding than one that was uncertainly wrong), and (2) as qualitative evidence for human review. They are never parsed to determine whether a hard or operational constraint passed — that determination is made entirely from the parsed `action` + `power_mw` against simulator/oracle state (master brief §12, §23).
+**Revised this pass — confidence's limitations are now stated explicitly, not implied.** `AgentActionV1.confidence` is a **self-reported, uncalibrated number**: nothing in this benchmark verifies that an agent's stated confidence corresponds to its actual reliability, and no evidence has been collected (as of Phase 0.5) establishing that any evaluated agent's confidence is calibrated at all. This limitation is why the corresponding metric is named **Self-Reported High-Confidence UCV**, not "High-Confidence UCV" — the qualifier is load-bearing, not decorative, and must be preserved in every report, chart, and narrative that cites the metric. It would be a methodological error to write or imply "the agent was 96% likely to be correct" from this field; the only defensible claim is "the agent emitted a confidence value of 0.96 alongside an action that turned out to violate a critical constraint."
+
+`AgentActionV1.confidence` and `optional_explanation` are recorded in every Decision Record and used in exactly two ways: (1) to compute the **Self-Reported High-Confidence UCV** flag (an agent that stated high confidence while wrong is a more actionable finding than one that stated low confidence while wrong — actionable as a *reported pattern*, not as evidence of calibration), and (2) as qualitative evidence for human review. They are never parsed to determine whether a hard or operational constraint passed — that determination is made entirely from the parsed `action` + `power_mw` against simulator/oracle state (master brief §12, §23). Confidence is retained as metadata on every Decision Record, including passing ones, specifically so a future, separate calibration study (comparing stated confidence against actual outcome across many decisions) remains possible without this benchmark itself asserting a calibration claim it has not verified.
+
+See `docs/benchmark/SPECIFICATION.md` §8 for the full UCV/Self-Reported High-Confidence UCV definition, and §9.1 for the related, independent point that a constraint-valid decision's *quality* (including whether an agent's caution level was appropriate) is evaluated separately from constraint validity itself.
 
 ## 5. Counterfactual methodology
 

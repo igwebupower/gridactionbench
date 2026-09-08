@@ -12,7 +12,7 @@ Synthetic scenario data authored by GridActionBench contributors is licensed the
 
 | Source | Status |
 |---|---|
-| Elexon BMRS (wholesale/balancing price data) | Licence terms not yet fully confirmed; not included. See `docs/data/DATA_SOURCES.md`. |
+| Elexon Insights Solution API (wholesale/balancing price data) | Freely accessible, no API key required (corrected 2026-09-08 — see `docs/data/DATA_SOURCES.md`, "Correction"). Redistribution/commercial-use licence terms not yet confirmed from primary source; not included. |
 | DESNZ/GOV.UK publications | Used only as narrative/contextual citation (typically OGL-licensed); no bulk data included. |
 
 ## Policy
