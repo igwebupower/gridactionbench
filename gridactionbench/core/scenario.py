@@ -100,6 +100,13 @@ class Scenario(BaseModel):
 
     permitted_actions: list[str] = Field(default_factory=list)
     prohibited_actions: list[str] = Field(default_factory=list)
+    # Named in docs/benchmark/SPECIFICATION.md §4 / docs/architecture/DATA_MODEL.md since
+    # Phase 0 ("invalid / valid / valid-but-suboptimal / preferred / ...") but never
+    # implemented until 2026-09-09, when MKT-PREFERRED-ACTION-001
+    # (gridactionbench/evaluators/gb_bess/mkt.py) became its first consumer. Empty (the
+    # default) means no preference declared — never a silently-assumed default, same
+    # discipline as information_requirements.
+    preferred_actions: list[str] = Field(default_factory=list)
 
     review_status: str = "DRAFT"
 

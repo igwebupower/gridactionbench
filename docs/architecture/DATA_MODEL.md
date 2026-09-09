@@ -50,7 +50,9 @@ information_requirements:       # NEW this pass — scenario-defined, never a gl
 
 permitted_actions: [...]
 prohibited_actions: [...]
-preferred_actions: [...]        # optional
+preferred_actions: [...]        # optional — implemented 2026-09-09 (was named here since Phase 0
+                                 # but had no code or evaluator behind it until MKT-PREFERRED-ACTION-001,
+                                 # docs/suites/gb-bess/EVALUATION_SPEC.md)
 
 escalation:
   required: bool

@@ -103,6 +103,8 @@ escalation:
 
 Where power ranges matter, permitted ranges are represented explicitly (e.g., `permitted: {action: CHARGE, power_mw: {minimum: 0.0, maximum: 1.0}}`). Evaluation therefore distinguishes: invalid / valid / valid-but-suboptimal / preferred / escalation-required / escalation-permitted / unnecessary-escalation — not a binary correct/incorrect classification.
 
+**`preferred_actions` implemented — 2026-09-09** (`docs/project/GAP_ANALYSIS.md`, `gridactionbench/core/scenario.py`): named in this section since Phase 0 but not backed by code or checked by any evaluator until `MKT-PREFERRED-ACTION-001` (`docs/suites/gb-bess/EVALUATION_SPEC.md`, "MKT"). Checking it is a scenario-*declared*-fact check, not a computed economic judgment, so it does not conflict with §3.3's rule that objectives never produce a pass/fail verdict — `ucv_eligible: false` on that evaluator regardless.
+
 ## 5. Scenario Oracle
 
 Every scenario has a Scenario Oracle containing ground truth, which the agent does not necessarily see in full:
@@ -221,7 +223,7 @@ EVALUATOR_ERROR  — the evaluator itself raised an exception — a code defect,
                     the agent or the scenario
 ```
 
-These map to four categorically different situations that reporting must never conflate: **agent failure** (`FAIL`), **insufficient benchmark ground truth** (`INDETERMINATE`), **evaluator failure** (`EVALUATOR_ERROR`), and **evaluator not applicable** (`NOT_APPLICABLE`). `docs/benchmark/SCORING.md`'s per-dimension pass rate is computed only over `PASS`/`WARNING`/`FAIL` results; `NOT_APPLICABLE` is excluded from the denominator entirely; `INDETERMINATE` and `EVALUATOR_ERROR` are reported as separate benchmark-health counts, never as agent performance. See `docs/suites/gb-bess/EVALUATION_SPEC.md` for how each of the 18 specified evaluators uses these states, and `docs/architecture/DATA_MODEL.md` for the `EvaluationResult` schema this enum belongs to.
+These map to four categorically different situations that reporting must never conflate: **agent failure** (`FAIL`), **insufficient benchmark ground truth** (`INDETERMINATE`), **evaluator failure** (`EVALUATOR_ERROR`), and **evaluator not applicable** (`NOT_APPLICABLE`). `docs/benchmark/SCORING.md`'s per-dimension pass rate is computed only over `PASS`/`WARNING`/`FAIL` results; `NOT_APPLICABLE` is excluded from the denominator entirely; `INDETERMINATE` and `EVALUATOR_ERROR` are reported as separate benchmark-health counts, never as agent performance. See `docs/suites/gb-bess/EVALUATION_SPEC.md` for how each of the 19 specified evaluators uses these states, and `docs/architecture/DATA_MODEL.md` for the `EvaluationResult` schema this enum belongs to.
 
 ## 12. Terminology discipline
 

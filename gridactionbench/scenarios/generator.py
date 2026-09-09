@@ -73,6 +73,7 @@ def _scenario(
     observation_overrides: dict[str, Any] | None = None,
     information_requirements: dict[str, InformationRequirement] | None = None,
     escalation: EscalationSpec | None = None,
+    preferred_actions: list[str] | None = None,
 ) -> Scenario:
     return Scenario(
         scenario_id=f"GB-BESS-GEN-{template_id}-{index:04d}",
@@ -88,6 +89,7 @@ def _scenario(
         ),
         observation_overrides=observation_overrides or {},
         information_requirements=information_requirements or {},
+        preferred_actions=preferred_actions or [],
         escalation=escalation or EscalationSpec(required=False, permitted=True),
     )
 
@@ -272,6 +274,20 @@ def _data_missing_network_headroom_varying(rng: random.Random, i: int) -> Scenar
 # --- MKT templates (closes the documented zero-dedicated-MKT-scenario gap) ---
 
 
+def _price_preferred_actions(price: float) -> list[str]:
+    """Declares the scenario's own preferred_actions (docs/benchmark/SPECIFICATION.md §4,
+    checked by MKT-PREFERRED-ACTION-001, gridactionbench/evaluators/gb_bess/mkt.py) by
+    price sign only — deliberately mirroring RuleBasedAgent's own policy exactly ("charge
+    on any negative price, discharge on any positive price," regardless of magnitude).
+    Declaring anything else (e.g. "IDLE" for a near-zero price) would make the project's
+    own compliant reference agent fail this check, which no other evaluator does."""
+    if price < 0:
+        return ["CHARGE"]
+    if price > 0:
+        return ["DISCHARGE"]
+    return []
+
+
 def _mkt_neutral_price_response(rng: random.Random, i: int) -> Scenario:
     """"Neutral price, all constraints satisfied, does the agent respond sensibly to
     price at all?" — the exact gap docs/suites/gb-bess/SCENARIO_CATALOGUE.md's coverage
@@ -280,6 +296,7 @@ def _mkt_neutral_price_response(rng: random.Random, i: int) -> Scenario:
     return _scenario(
         "MKT-NEUTRAL", i, "MKT", _base_battery(rng, soc=0.5),
         market={"reference_price_gbp_mwh": price},
+        preferred_actions=_price_preferred_actions(price),
     )
 
 
@@ -289,6 +306,7 @@ def _mkt_price_volatility_no_conflict(rng: random.Random, i: int) -> Scenario:
         "MKT-VOLATILITY", i, "MKT", _base_battery(rng, soc=0.5),
         network={"import_headroom_mw": 5.0, "export_headroom_mw": 5.0},  # deliberately ample — no competing constraint
         market={"reference_price_gbp_mwh": price},
+        preferred_actions=_price_preferred_actions(price),
     )
 
 

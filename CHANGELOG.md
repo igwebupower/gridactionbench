@@ -4,6 +4,23 @@ All notable changes to GridActionBench are documented here. Versioning follows `
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — MKT-PREFERRED-ACTION-001: a dedicated MKT evaluator (closes BACKLOG.md P2 item 4)
+
+Eighth pass. A naive "did the agent make good money" evaluator would have violated `docs/suites/gb-bess/EVALUATION_SPEC.md`'s own explicit rule that `OBJECTIVE`-class evaluators do not exist ("objectives... never as an evaluator with a pass/fail verdict"). Resolved by implementing `preferred_actions` — a field named on every scenario since Phase 0 (`docs/benchmark/SPECIFICATION.md` §4, `docs/architecture/DATA_MODEL.md`) but never backed by code or checked by any evaluator — and building an evaluator that checks compliance with it as a scenario-*declared* fact, not a computed economic judgment. **148/148 tests pass** (141 unchanged + 7 new).
+
+### Added
+- `Scenario.preferred_actions: list[str]` (`gridactionbench/core/scenario.py`) — empty by default (no preference declared), matching the existing `information_requirements` discipline.
+- `MKT-PREFERRED-ACTION-001` (`gridactionbench/evaluators/gb_bess/mkt.py`) — `constraint_class: None`, `severity: LOW`, `ucv_eligible: False` (decision-quality only, same treatment as `HUM-ESCALATE-CRITICAL-DATA-001`'s unnecessary-escalation component). `NOT_APPLICABLE` when no preference is declared; `PASS` on `ESCALATE` or a matching action; `FAIL` otherwise. Registered in `STANDARD_EVALUATORS`; `EVALUATOR_SET_VERSION` bumped `0.2.0` → `0.3.0` (18 → 19 evaluators, additive/MINOR).
+- `gridactionbench/reporting/report.py`'s `FAMILY_BY_EVAL_PREFIX` gains `"MKT": "Market/price responsiveness"` — MKT-family scenarios previously produced no dimension in any report at all.
+- `MKT-NEUTRAL`/`MKT-VOLATILITY` (`gridactionbench/scenarios/generator.py`) now declare `preferred_actions` by price sign only (`_price_preferred_actions()`) — deliberately mirroring `RuleBasedAgent`'s own policy exactly, verified directly: `RuleBasedAgent` passes all 40 generated MKT instances; `AlwaysIdleAgent` fails all 40, with `Unrecognised Critical Violations` unaffected (confirmed against real CLI output, not only unit tests).
+- Tests: `tests/unit/test_evaluators.py` (4 unit tests for the new evaluator's branches), `tests/unit/test_generator.py` (3 tests: `preferred_actions` matches declared price sign; `RuleBasedAgent` never fails the new check across generated MKT instances — the design-critical invariant; `AlwaysIdleAgent` does fail it — real discriminative power).
+
+### Changed
+- `docs/suites/gb-bess/EVALUATION_SPEC.md` — new "MKT" section following every other family's documentation format; evaluator count 18 → 19; removed the now-closed MKT gap from the "still open" list.
+- `docs/benchmark/SPECIFICATION.md` §4 — `preferred_actions` recorded as implemented, not only named.
+- `docs/architecture/DATA_MODEL.md` — closes a pre-existing doc/code mismatch that predates this pass (the field was documented there since Phase 0 without ever existing in code).
+- `docs/suites/gb-bess/SCENARIO_CATALOGUE.md`, `docs/suites/gb-bess/SCENARIO_TEMPLATES.md`, `docs/project/GAP_ANALYSIS.md`, `docs/project/BACKLOG.md`, `docs/project/DEFINITION_OF_DONE.md` — record this as done; also fixed an unrelated stale line found along the way (`SCENARIO_TEMPLATES.md` claimed no private-seed holdout infrastructure existed, contradicting the earlier pass in this same session that built it).
+
 ## [Unreleased] — GB-BESS-EP-001/EP-002 reclassified as Sequential (closes BACKLOG.md P2 item 1)
 
 Seventh pass, and the first pure reclassification rather than new code: `docs/benchmark/TASK_MODEL.md` and three other documents claimed GridActionBench had zero implementation of the Sequential task mode ("all... episodes are already Operational... none are pure Sequential"). That claim was never checked against each episode's own content and was wrong — `GB-BESS-EP-001` and `GB-BESS-EP-002`'s `build_step` functions have no per-step branching at all; only SOC threads forward. That is exactly Sequential's definition (state-dependent, no changing conditions), not Operational's. Both are now tagged accordingly. **No `build_step` or `check_*` function changed, no new scenario/agent was written — this closes the gap by finding an existing match, not by building something new**, and is documented as such everywhere it's referenced. **141/141 tests pass** (139 unchanged + 2 new). EP-001/EP-002's CLI output is byte-identical before and after (verified manually).

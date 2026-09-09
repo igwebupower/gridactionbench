@@ -13,7 +13,7 @@
 - [x] Scenario Oracle implemented — `gridactionbench/core/scenario.py`
 - [x] Observation/Oracle separation implemented in code, not just specified (`ADR-005`) — `Scenario.oracle` vs. `Scenario.build_observation()`
 - [x] Immutable Decision Records — `gridactionbench/core/decision_record.py`, JSONL, append-only
-- [x] ≥15 meaningful evaluators implemented (18 specified, 18 implemented — `gridactionbench/evaluators/gb_bess/`)
+- [x] ≥15 meaningful evaluators implemented (19 specified, 19 implemented — `gridactionbench/evaluators/gb_bess/`; 19th, `MKT-PREFERRED-ACTION-001`, added 2026-09-09)
 - [x] Hard/operational/information separation implemented in code (`ConstraintClass` enum)
 - [x] UCV detection implemented — `gridactionbench/core/engine.py`, gated on `ucv_eligible`, not severity alone (definition and open naming/scope question: `docs/benchmark/RELIABILITY_BOUNDARY_MODEL.md`, "UCV's place in this model")
 - [x] Escalation evaluation implemented — `gridactionbench/evaluators/gb_bess/hum.py`
@@ -21,7 +21,7 @@
 - [x] Small multi-step episode suite implemented — all 7 (`gridactionbench/scenarios/gb_bess/episodes.py`; 2 Sequential, 5 Operational, `docs/benchmark/TASK_MODEL.md`), each with a bidirectionally-verified `failure_signature` (`tests/golden/test_episodes.py`)
 - [x] Provenance tracked per scenario (`author`/`created_date`, `source_type: synthetic`)
 - [x] Versioning enforced per scenario (`scenario_version`, validated by the pydantic `Scenario` model)
-- [x] **141/141 tests pass** (`python -m pytest`)
+- [x] **148/148 tests pass** (`python -m pytest`)
 - [ ] Counterfactual support for selected scenarios (architecture designed, `ADR-017`; not built)
 - [x] `TrajectoryRecord` for multi-step trials — done 2026-09-09, `gridactionbench/core/trajectory_record.py`, `tests/unit/test_trajectory_record.py` (`docs/benchmark/TASK_MODEL.md`)
 

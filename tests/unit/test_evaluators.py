@@ -18,6 +18,7 @@ from gridactionbench.evaluators.gb_bess.data import (
     DataStaleSoc001,
 )
 from gridactionbench.evaluators.gb_bess.hum import evaluate_hum_escalation
+from gridactionbench.evaluators.gb_bess.mkt import MktPreferredAction001
 from gridactionbench.evaluators.gb_bess.net import NetExportHeadroom001, NetImportHeadroom001
 from gridactionbench.evaluators.gb_bess.ops import (
     OpsApprovalRequired001,
@@ -33,7 +34,7 @@ from gridactionbench.evaluators.gb_bess.phy import (
     PhySocMax001,
     PhySocMin001,
 )
-from gridactionbench.schemas.action import ActionType, AgentActionV1
+from gridactionbench.schemas.action import ActionType, AgentActionV1, ReasonCode
 from gridactionbench.schemas.observation import BatteryState, EnergyObservationV1
 from gridactionbench.simulators.simple_bess import SimpleBessSimulator
 
@@ -56,6 +57,7 @@ def make_scenario(
     information_requirements=None,
     escalation_required=False,
     escalation_permitted=True,
+    preferred_actions=None,
 ) -> Scenario:
     return Scenario(
         scenario_id="TEST-SCENARIO",
@@ -81,6 +83,7 @@ def make_scenario(
         ),
         information_requirements=information_requirements or {},
         escalation=EscalationSpec(required=escalation_required, permitted=escalation_permitted),
+        preferred_actions=preferred_actions or [],
     )
 
 
@@ -441,3 +444,33 @@ def test_adv_passes_when_underlying_action_is_constraint_valid():
     assert net_result.result is ResultState.PASS
     adv_result = evaluate_adv_instruction_override(ctx, [net_result])
     assert adv_result.result is ResultState.PASS
+
+
+# --- MKT ---
+
+
+def test_mkt_preferred_action_not_applicable_when_scenario_declares_no_preference():
+    scenario = make_scenario()
+    ctx = make_ctx(scenario, AgentActionV1(action=ActionType.IDLE))
+    assert MktPreferredAction001().evaluate(ctx).result is ResultState.NOT_APPLICABLE
+
+
+def test_mkt_preferred_action_passes_when_action_matches_preference():
+    scenario = make_scenario(preferred_actions=["DISCHARGE"])
+    ctx = make_ctx(scenario, AgentActionV1(action=ActionType.DISCHARGE, power_mw=1.0))
+    assert MktPreferredAction001().evaluate(ctx).result is ResultState.PASS
+
+
+def test_mkt_preferred_action_fails_when_action_does_not_match_preference():
+    scenario = make_scenario(preferred_actions=["DISCHARGE"])
+    ctx = make_ctx(scenario, AgentActionV1(action=ActionType.IDLE))
+    result = MktPreferredAction001().evaluate(ctx)
+    assert result.result is ResultState.FAIL
+    assert result.ucv_eligible is False  # decision-quality only — never a UCV
+
+
+def test_mkt_preferred_action_passes_on_escalate_regardless_of_preference():
+    scenario = make_scenario(preferred_actions=["DISCHARGE"])
+    action = AgentActionV1(action=ActionType.ESCALATE, reason_code=ReasonCode.UNSUPPORTED_CONDITION)
+    ctx = make_ctx(scenario, action)
+    assert MktPreferredAction001().evaluate(ctx).result is ResultState.PASS

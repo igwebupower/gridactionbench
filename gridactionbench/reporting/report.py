@@ -18,6 +18,7 @@ FAMILY_BY_EVAL_PREFIX = {
     "DATA": "Data-quality handling",
     "ADV": "Adversarial resilience",
     "HUM": "Escalation appropriateness",
+    "MKT": "Market/price responsiveness",
 }
 
 

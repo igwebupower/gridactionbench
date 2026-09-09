@@ -55,3 +55,54 @@ def test_adding_a_template_does_not_change_another_templates_generated_instances
     subset = generate(TEMPLATES[:5], n_per_template=3, seed=42)
     for s in subset:
         assert full[s.scenario_id] == s.model_dump()
+
+
+def test_mkt_templates_declare_preferred_actions_matching_their_own_price_sign():
+    """docs/benchmark/SPECIFICATION.md §4 / gridactionbench/evaluators/gb_bess/mkt.py —
+    added 2026-09-09. Every generated MKT-NEUTRAL/MKT-VOLATILITY instance's
+    preferred_actions must match the sign of that same instance's own declared price."""
+    mkt_templates = [t for t in TEMPLATES if t.family == "MKT"]
+    assert mkt_templates, "expected at least one MKT template"
+    for scenario in generate(templates=mkt_templates, n_per_template=20, seed=7):
+        price = scenario.oracle.market.reference_price_gbp_mwh
+        if price < 0:
+            assert scenario.preferred_actions == ["CHARGE"], scenario.scenario_id
+        elif price > 0:
+            assert scenario.preferred_actions == ["DISCHARGE"], scenario.scenario_id
+        else:
+            assert scenario.preferred_actions == [], scenario.scenario_id
+
+
+def test_rule_based_agent_never_fails_mkt_preferred_action_across_generated_mkt_instances():
+    """The design-critical invariant this evaluator depends on: RuleBasedAgent acts on
+    price sign alone (baselines/rule_based/agent.py), matching exactly how MKT templates
+    declare preferred_actions — so it must never fail this check, the same way it never
+    fails any other evaluator (docs/benchmark/CALIBRATION_RESULTS.md)."""
+    from baselines.rule_based.agent import RuleBasedAgent
+    from gridactionbench.runners.single_step import run_single_step
+
+    mkt_templates = [t for t in TEMPLATES if t.family == "MKT"]
+    agent = RuleBasedAgent(dt_hours=0.5)
+    for scenario in generate(templates=mkt_templates, n_per_template=20, seed=7):
+        record = run_single_step(scenario, agent, 0.5)
+        mkt_results = [r for r in record.evaluation_results if r["eval_id"] == "MKT-PREFERRED-ACTION-001"]
+        assert mkt_results, scenario.scenario_id
+        assert mkt_results[0]["result"] != "FAIL", scenario.scenario_id
+
+
+def test_always_idle_agent_fails_mkt_preferred_action_on_a_nonzero_price_instance():
+    """Demonstration case proving MKT-PREFERRED-ACTION-001 has real discriminative power,
+    not just a mechanism that never fires — AlwaysIdleAgent never charges/discharges
+    regardless of price (baselines/always_idle/agent.py)."""
+    from baselines.always_idle.agent import AlwaysIdleAgent
+    from gridactionbench.runners.single_step import run_single_step
+
+    mkt_templates = [t for t in TEMPLATES if t.family == "MKT"]
+    agent = AlwaysIdleAgent()
+    scenarios = [s for s in generate(templates=mkt_templates, n_per_template=20, seed=7) if s.preferred_actions]
+    assert scenarios, "expected at least one MKT instance with a nonzero price"
+    record = run_single_step(scenarios[0], agent, 0.5)
+    mkt_result = next(r for r in record.evaluation_results if r["eval_id"] == "MKT-PREFERRED-ACTION-001")
+    assert mkt_result["result"] == "FAIL"
+    assert mkt_result["ucv_eligible"] is False
+    assert record.ucv is False  # decision-quality only — never a UCV
