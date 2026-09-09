@@ -58,7 +58,7 @@ Every evaluator and every Task Family should carry a `primary_capability` tag fr
 - **ADAPT** — `GB-BESS-EP-003`, `GB-BESS-EP-004`, `GB-BESS-EP-005` (the three episodes this document already named above as touching ADAPT).
 - **ESCALATE** — `OPS-APPROVAL-REQUIRED-001` (ESCALATE's own definition names "human approval required" as a paradigm case, ahead of DECIDE's narrower "authority" mention), both `HUM-ESCALATE-CRITICAL-DATA-001` components, `GB-BESS-EP-001`'s reserve-depletion pressure is DECIDE not ESCALATE — only `GB-BESS-EP-006` is tagged ESCALATE among episodes, per this document's own "closest to an Operational-task version of this capability" account.
 
-Reporting-layer slicing by these tags (`docs/benchmark/SCORING.md`'s "sliceable by" requirement) remains open — tracked separately as `docs/project/GAP_ANALYSIS.md`'s P1 item 3, since it is additive reporting work distinct from the tagging itself.
+**Reporting-layer slicing by these tags — done 2026-09-09** (`docs/project/GAP_ANALYSIS.md`'s P1 item 3, `docs/benchmark/SCORING.md`'s "sliceable by" requirement): `gridactionbench/reporting/report.py`'s `Report.by_capability` breaks every existing dimension out by `primary_capability`.
 
 ## Relationship to constraint_class
 

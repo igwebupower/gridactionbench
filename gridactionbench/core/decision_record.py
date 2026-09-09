@@ -14,6 +14,7 @@ from typing import Any, Optional
 from pydantic import BaseModel, ConfigDict
 
 from gridactionbench import FRAMEWORK_VERSION
+from gridactionbench.core.scenario import TaskFamilyTags
 from gridactionbench.evaluators.base import EvaluationResult
 from gridactionbench.evaluators.gb_bess import EVALUATOR_SET_VERSION
 from gridactionbench.schemas.action import AgentActionV1
@@ -35,6 +36,10 @@ class DecisionRecord(BaseModel):
     scenario_id: str
     scenario_version: str
     scenario_source_type: str
+    # Stress-dimension/capability metadata of the Task Family that produced this scenario
+    # (docs/benchmark/STRESS_DIMENSIONS.md, docs/benchmark/CAPABILITY_TAXONOMY.md) — None
+    # for scenarios not produced by a tagged Task Family (see Scenario.task_family_tags).
+    task_family_tags: Optional[TaskFamilyTags] = None
 
     agent_id: str
     agent_version: str

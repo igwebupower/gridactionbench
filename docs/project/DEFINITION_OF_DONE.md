@@ -21,7 +21,7 @@
 - [x] Small episode (Operational) suite implemented — all 6 (`gridactionbench/scenarios/gb_bess/episodes.py`), each with a bidirectionally-verified `failure_signature` (`tests/golden/test_episodes.py`)
 - [x] Provenance tracked per scenario (`author`/`created_date`, `source_type: synthetic`)
 - [x] Versioning enforced per scenario (`scenario_version`, validated by the pydantic `Scenario` model)
-- [x] **111/111 tests pass** (`python -m pytest`)
+- [x] **118/118 tests pass** (`python -m pytest`)
 - [ ] Counterfactual support for selected scenarios (architecture designed, `ADR-017`; not built)
 - [ ] `TrajectoryRecord` for multi-step trials (`docs/benchmark/TASK_MODEL.md`; `EpisodeResult` carries the needed data informally — additive schema work, `docs/project/GAP_ANALYSIS.md` P1)
 
@@ -40,7 +40,7 @@
 - [x] Discrimination shown among the 10 reference/seeded-failure agents (`docs/benchmark/VALIDATION_FRAMEWORK.md`, "Discrimination")
 - [ ] Discrimination shown among genuinely capable agent architectures (LLM, optimisation, RL) — none evaluated yet; ceiling-effect risk flagged in `docs/research/BENCHMARK_DESIGN_REVIEW.md` remains untested
 - [ ] Construct-validation review completed by an external party (register exists — `docs/project/ASSUMPTIONS.md` — no item has completed external review)
-- [x] Capability tagging (`docs/benchmark/CAPABILITY_TAXONOMY.md`) and stress-dimension tagging (`docs/benchmark/STRESS_DIMENSIONS.md`) applied to existing evaluators/Task Families — done 2026-09-09, `tests/unit/test_capability_tags.py`; reporting-layer slicing on these tags remains open (`docs/project/GAP_ANALYSIS.md`)
+- [x] Capability tagging (`docs/benchmark/CAPABILITY_TAXONOMY.md`) and stress-dimension tagging (`docs/benchmark/STRESS_DIMENSIONS.md`) applied to existing evaluators/Task Families, with reporting-layer slicing (`Report.by_capability`, `ucv_by_u_class`/`ucv_by_complexity_rung`/`ucv_by_autonomy_burden`) — done 2026-09-09, `tests/unit/test_capability_tags.py`, `tests/unit/test_report.py`
 
 **Gate 2 status: partially satisfied.** Strong sensitivity and baseline-level discrimination evidence exists; construct validity against genuinely capable agents and external reviewers remains open, consistent with the strict calibration-before-comparison phase ordering this project has maintained throughout.
 

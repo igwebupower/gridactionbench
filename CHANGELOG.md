@@ -4,6 +4,22 @@ All notable changes to GridActionBench are documented here. Versioning follows `
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — Reporting-layer slicing by capability and stress dimension (closes BACKLOG.md P1 item 3)
+
+Second implementation pass following the tagging work below. **118/118 tests pass** (111 unchanged + 7 new in `tests/unit/test_report.py`).
+
+### Added
+- `TaskFamilyTags` model and `Scenario.task_family_tags: Optional[TaskFamilyTags]` — `gridactionbench/core/scenario.py`. Populated post-hoc by `generate()` (`gridactionbench/scenarios/generator.py`) and `run_episode()` (`gridactionbench/core/episode.py`) from the originating `ScenarioTemplate`/`EpisodeSpec` — never inside a `build`/`build_step` function, so neither changed. `None` for the 20 hand-authored v0.1 scenarios, which predate this tagging scheme and are not retroactively tagged.
+- `DecisionRecord.task_family_tags` — `gridactionbench/core/decision_record.py`, populated from `scenario.task_family_tags` in both `run_single_step()` construction sites (`gridactionbench/runners/single_step.py`).
+- `Report.by_capability` (`gridactionbench/reporting/report.py`) — every existing dimension broken out by each evaluation result's own `primary_capability`, needing no new propagation since evaluators already carried this tag (previous pass).
+- `Report.ucv_by_u_class`/`ucv_by_complexity_rung`/`ucv_by_autonomy_burden` — mirror the pre-existing `ucv_by_constraint_class` pattern, populated only for records whose scenario carries `task_family_tags`; a scenario declaring more than one `u_class` (e.g. `HUM-REQUIRED`'s U2+U4) counts toward every class it declares.
+- `render_text()` — renders the "By capability" section and the three new stress-dimension UCV breakdown lines.
+- `tests/unit/test_report.py` — the reporting layer had no unit tests before this pass; covers the new slicing plus the pre-existing dimension/UCV tallying it was built alongside.
+
+### Changed
+- `docs/benchmark/CAPABILITY_TAXONOMY.md`, `docs/benchmark/STRESS_DIMENSIONS.md`, `docs/benchmark/SCORING.md` — record this reporting-layer work as done, not pending.
+- `docs/project/GAP_ANALYSIS.md`, `docs/project/BACKLOG.md`, `docs/project/RISK_REGISTER.md` (R-19, now closed), `docs/project/DEFINITION_OF_DONE.md` — updated to reflect P1 item 3's completion.
+
 ## [Unreleased] — Capability and stress-dimension tagging (closes BACKLOG.md P1 items 1-2)
 
 The first implementation work following the strategic realignment below — evaluator set and Task Family schemas are additively extended, no `evaluate()` body, `build` function, or `check_*` function is modified. **111/111 tests pass** (105 unchanged + 6 new in `tests/unit/test_capability_tags.py`).

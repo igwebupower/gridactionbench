@@ -47,6 +47,22 @@ class Report:
     ucv_by_constraint_class: Counter = field(default_factory=Counter)
     self_reported_high_confidence_ucv_count: int = 0
     total_scenarios: int = 0
+    # docs/benchmark/STRESS_DIMENSIONS.md, "How C/U/H metadata should be used once
+    # tagged": slicing, not scoring — these never feed a pass/fail verdict, only a
+    # breakdown of the same PASS/WARNING/FAIL/UCV counts already computed above.
+    # by_capability mirrors `dimensions` above but keyed by each evaluation_result's own
+    # `primary_capability` (docs/benchmark/CAPABILITY_TAXONOMY.md) instead of family
+    # prefix — needs no Task Family propagation, since every evaluation_result already
+    # carries this tag directly.
+    by_capability: dict[str, DimensionStat] = field(default_factory=dict)
+    # These three are scenario/Task-Family-level (docs/project/GAP_ANALYSIS.md P1 item 3)
+    # — populated only for records whose scenario carries `task_family_tags`
+    # (Scenario.task_family_tags is None for the 20 hand-authored v0.1 scenarios, which
+    # predate this tagging scheme). u_classes is a tuple, so a scenario tagged with more
+    # than one U-class (e.g. HUM-REQUIRED's U2+U4) counts toward every class it declares.
+    ucv_by_u_class: Counter = field(default_factory=Counter)
+    ucv_by_complexity_rung: Counter = field(default_factory=Counter)
+    ucv_by_autonomy_burden: Counter = field(default_factory=Counter)
     # Economic decision quality (gridactionbench/core/economics.py): mean(achieved /
     # best_case) over scenarios where the action was constraint-valid, a price was
     # present, and best_case > 0 (a scenario with no economic incentive at all
@@ -67,6 +83,21 @@ def _dimension_for_eval_id(eval_id: str) -> str:
     return FAMILY_BY_EVAL_PREFIX.get(prefix, prefix)
 
 
+def _tally(dim: DimensionStat, state: str) -> None:
+    if state == "PASS":
+        dim.pass_count += 1
+    elif state == "WARNING":
+        dim.warning_count += 1
+    elif state == "FAIL":
+        dim.fail_count += 1
+    elif state == "NOT_APPLICABLE":
+        dim.not_applicable_count += 1
+    elif state == "INDETERMINATE":
+        dim.indeterminate_count += 1
+    elif state == "EVALUATOR_ERROR":
+        dim.evaluator_error_count += 1
+
+
 def build_report(records: list[DecisionRecord]) -> Report:
     report = Report(total_scenarios=len(records))
 
@@ -74,6 +105,11 @@ def build_report(records: list[DecisionRecord]) -> Report:
         if name not in report.dimensions:
             report.dimensions[name] = DimensionStat(name=name)
         return report.dimensions[name]
+
+    def get_capability_dim(name: str) -> DimensionStat:
+        if name not in report.by_capability:
+            report.by_capability[name] = DimensionStat(name=name)
+        return report.by_capability[name]
 
     for record in records:
         if record.ucv:
@@ -88,14 +124,11 @@ def build_report(records: list[DecisionRecord]) -> Report:
             report.economic_decision_quality_sum_ratio += max(0.0, min(1.0, achieved / best_case))
 
         for result in record.evaluation_results:
-            dim = get_dim(_dimension_for_eval_id(result["eval_id"]))
             state = result["result"]
-            if state == "PASS":
-                dim.pass_count += 1
-            elif state == "WARNING":
-                dim.warning_count += 1
-            elif state == "FAIL":
-                dim.fail_count += 1
+            _tally(get_dim(_dimension_for_eval_id(result["eval_id"])), state)
+            if result.get("primary_capability"):
+                _tally(get_capability_dim(result["primary_capability"]), state)
+            if state == "FAIL":
                 # Gated on record.ucv (the engine's authoritative, escalation-aware flag),
                 # not on the per-evaluator contributes_to_ucv alone. contributes_to_ucv is
                 # a per-evaluator judgment ("would this be a UCV contributor if the agent
@@ -108,12 +141,17 @@ def build_report(records: list[DecisionRecord]) -> Report:
                 # ever violated by a future evaluator addition.
                 if record.ucv and result.get("contributes_to_ucv") and result.get("constraint_class"):
                     report.ucv_by_constraint_class[result["constraint_class"]] += 1
-            elif state == "NOT_APPLICABLE":
-                dim.not_applicable_count += 1
-            elif state == "INDETERMINATE":
-                dim.indeterminate_count += 1
-            elif state == "EVALUATOR_ERROR":
-                dim.evaluator_error_count += 1
+
+        # Scenario/Task-Family-level slicing (docs/benchmark/STRESS_DIMENSIONS.md) —
+        # None for scenarios not produced by a tagged ScenarioTemplate/EpisodeSpec
+        # (Scenario.task_family_tags), so this silently contributes nothing for those,
+        # the same discipline economic_decision_quality already uses above.
+        if record.ucv and record.task_family_tags is not None:
+            tags = record.task_family_tags
+            for u_class in tags.u_classes:
+                report.ucv_by_u_class[u_class] += 1
+            report.ucv_by_complexity_rung[tags.complexity_rung] += 1
+            report.ucv_by_autonomy_burden[tags.autonomy_burden] += 1
 
     return report
 
@@ -126,10 +164,24 @@ def render_text(report: Report) -> str:
     eq = report.economic_decision_quality
     eq_str = f"{eq * 100:5.1f}%" if eq is not None else "  n/a"
     lines.append(f"{'Economic decision quality':<38}{eq_str}   (n={report.economic_decision_quality_n})")
+
+    if report.by_capability:
+        lines.append("")
+        lines.append("By capability (docs/benchmark/CAPABILITY_TAXONOMY.md):")
+        for name, dim in sorted(report.by_capability.items()):
+            rate = f"{dim.pass_rate * 100:5.1f}%" if dim.pass_rate is not None else "  n/a"
+            lines.append(f"  {name:<36}{rate}   (n={dim.n})")
+
     lines.append("")
     lines.append(f"Unrecognised Critical Violations       {report.ucv_count} / {report.total_scenarios}")
     for cls, count in sorted(report.ucv_by_constraint_class.items()):
         lines.append(f"  by constraint_class: {cls} {count}")
+    for u_class, count in sorted(report.ucv_by_u_class.items()):
+        lines.append(f"  by u_class: {u_class} {count}")
+    for rung, count in sorted(report.ucv_by_complexity_rung.items()):
+        lines.append(f"  by complexity_rung: {rung} {count}")
+    for burden, count in sorted(report.ucv_by_autonomy_burden.items()):
+        lines.append(f"  by autonomy_burden: {burden} {count}")
     lines.append(
         f"Self-Reported High-Confidence UCVs     {report.self_reported_high_confidence_ucv_count} / {report.total_scenarios}"
     )

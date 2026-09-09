@@ -47,6 +47,24 @@ class EscalationSpec(BaseModel):
     permitted: bool = True
 
 
+class TaskFamilyTags(BaseModel):
+    """Stress-dimension (`docs/benchmark/STRESS_DIMENSIONS.md`) and capability
+    (`docs/benchmark/CAPABILITY_TAXONOMY.md`) metadata inherited from the
+    `ScenarioTemplate`/`EpisodeSpec` that produced this scenario — declared by whoever
+    designs the Task Family, never measured from results (STRESS_DIMENSIONS.md, "How
+    C/U/H metadata should be used once tagged"). `Scenario.task_family_tags` is `None` for
+    scenarios not produced by a tagged Task Family — the 20 hand-authored v0.1 scenarios
+    predate this scheme and are not retroactively tagged (`docs/project/GAP_ANALYSIS.md`
+    scoped this to `ScenarioTemplate`/`EpisodeSpec` specifically, not every scenario)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    primary_capability: str
+    complexity_rung: str
+    u_classes: tuple[str, ...]
+    autonomy_burden: str
+
+
 class Oracle(BaseModel):
     """Full ground truth for a scenario. Visible to the Evaluation Engine, not the Agent."""
 
@@ -83,6 +101,12 @@ class Scenario(BaseModel):
     prohibited_actions: list[str] = Field(default_factory=list)
 
     review_status: str = "DRAFT"
+
+    # See TaskFamilyTags above. Populated post-hoc by generate() (gridactionbench/
+    # scenarios/generator.py) and run_episode() (gridactionbench/core/episode.py) —
+    # never by a ScenarioTemplate's build function or an EpisodeSpec's build_step
+    # function directly, so neither needed to change (docs/project/GAP_ANALYSIS.md).
+    task_family_tags: Optional[TaskFamilyTags] = None
 
     def build_observation(self) -> EnergyObservationV1:
         """Derive the Agent-visible Observation from this scenario's Oracle.

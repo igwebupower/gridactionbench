@@ -16,7 +16,7 @@ from typing import Callable
 
 from gridactionbench.agents.base import AgentAdapter
 from gridactionbench.core.decision_record import DecisionRecord
-from gridactionbench.core.scenario import Scenario
+from gridactionbench.core.scenario import Scenario, TaskFamilyTags
 from gridactionbench.evaluators.base import Capability
 from gridactionbench.runners.single_step import run_single_step
 
@@ -72,8 +72,16 @@ def run_episode(episode: EpisodeSpec, agent: AgentAdapter, dt_hours: float, run_
     soc = episode.initial_soc
     step_records: list[DecisionRecord] = []
     world_soc_after_step: list[float] = []
+    tags = TaskFamilyTags(
+        primary_capability=episode.primary_capability.value,
+        complexity_rung=episode.complexity_rung,
+        u_classes=episode.u_classes,
+        autonomy_burden=episode.autonomy_burden,
+    )
     for step in range(episode.steps):
-        scenario = episode.build_step(step, soc)
+        # Tags are attached post-hoc, never inside build_step itself (docs/project/
+        # GAP_ANALYSIS.md: "no change to existing ... build functions").
+        scenario = episode.build_step(step, soc).model_copy(update={"task_family_tags": tags})
         record = run_single_step(
             scenario, agent, dt_hours, run_id=f"{run_id or episode.episode_id}:step{step}"
         )

@@ -24,7 +24,7 @@ import random
 from dataclasses import dataclass, field
 from typing import Any, Callable
 
-from gridactionbench.core.scenario import EscalationSpec, InformationRequirement, Oracle, Scenario
+from gridactionbench.core.scenario import EscalationSpec, InformationRequirement, Oracle, Scenario, TaskFamilyTags
 from gridactionbench.evaluators.base import Capability
 
 Generator = Callable[[random.Random], Scenario]
@@ -386,8 +386,16 @@ def generate(templates: list[ScenarioTemplate] = TEMPLATES, n_per_template: int 
     scenarios: list[Scenario] = []
     for template in templates:
         rng = random.Random(f"{seed}:{template.template_id}")
+        tags = TaskFamilyTags(
+            primary_capability=template.primary_capability.value,
+            complexity_rung=template.complexity_rung,
+            u_classes=template.u_classes,
+            autonomy_burden=template.autonomy_burden,
+        )
         for i in range(n_per_template):
-            scenarios.append(template.build(rng, i))
+            # Tags are attached post-hoc, never inside a template's own build function
+            # (docs/project/GAP_ANALYSIS.md: "no change to existing ... build functions").
+            scenarios.append(template.build(rng, i).model_copy(update={"task_family_tags": tags}))
     return scenarios
 
 
