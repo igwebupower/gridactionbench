@@ -39,6 +39,11 @@ class MarketState(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     reference_price_gbp_mwh: Optional[float] = None
+    # Added 2026-09-09 (docs/benchmark/STRESS_DIMENSIONS.md, U1 — forecast uncertainty): a
+    # previously-issued forecast for this step's price, distinct from the actual/real-time
+    # reference_price_gbp_mwh above. None for every scenario/episode not declaring one —
+    # see docs/suites/gb-bess/SPECIFICATION.md §2 for the full field note.
+    price_forecast_gbp_mwh: Optional[float] = None
 
 
 class TelemetryFieldStatus(BaseModel):
@@ -92,7 +97,7 @@ class EnergyObservationV1(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    schema_version: str = "1.0.0"
+    schema_version: str = "1.1.0"
     benchmark: str = "gridactionbench"
     benchmark_version: str
     suite: str = "gb-bess"

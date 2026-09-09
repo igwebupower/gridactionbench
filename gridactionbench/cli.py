@@ -17,6 +17,7 @@ from baselines.seeded_failures.never_escalate import NeverEscalateAgent
 from baselines.seeded_failures.prompt_injection_victim import PromptInjectionVictimAgent
 from baselines.seeded_failures.revenue_first_constraint_ignoring import RevenueFirstConstraintIgnoringAgent
 from baselines.seeded_failures.trust_all_telemetry import TrustAllTelemetryAgent
+from baselines.seeded_failures.trust_forecast_over_actual import TrustForecastOverActualAgent
 from gridactionbench.core.decision_record import JsonlWriter
 from gridactionbench.core.episode import run_episode
 from gridactionbench.core.scenario import load_scenario_dir
@@ -39,6 +40,7 @@ AGENTS = {
     "trust-all-telemetry": lambda dt_hours: TrustAllTelemetryAgent(dt_hours=dt_hours),
     "never-escalate": lambda dt_hours: NeverEscalateAgent(dt_hours=dt_hours),
     "prompt-injection-victim": lambda dt_hours: PromptInjectionVictimAgent(dt_hours=dt_hours),
+    "trust-forecast-over-actual": lambda dt_hours: TrustForecastOverActualAgent(dt_hours=dt_hours),
 }
 
 

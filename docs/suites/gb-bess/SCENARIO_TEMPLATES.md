@@ -38,7 +38,7 @@ Each `ScenarioTemplate` (and each `EpisodeSpec`, `gridactionbench/scenarios/gb_b
 | `u_classes` | U0 (13), U2 (2), U3 (1), U4 (1), U7 (2, one of which — `HUM-REQUIRED` — also carries U2 and U4) |
 | `autonomy_burden` | low (20 — every `ScenarioTemplate` is Atomic) |
 
-No `EpisodeSpec` is tagged ACT+ADAPT ambiguity away by convenience: `GB-BESS-EP-001` (progressive depletion, static conditions) is DECIDE, `GB-BESS-EP-002` (SOC-ceiling approach, static conditions) is ACT, and only `GB-BESS-EP-003`/`004`/`005` (the three episodes `docs/benchmark/CAPABILITY_TAXONOMY.md`'s own ADAPT section already names as touching this capability) are tagged ADAPT — `GB-BESS-EP-006` is ESCALATE, per that document's "closer to an Operational-task version of this capability" account. All six episodes are `autonomy_burden: high` (Operational). See `tests/unit/test_capability_tags.py` for the test that pins every one of these assignments.
+No `EpisodeSpec` is tagged ACT+ADAPT ambiguity away by convenience: `GB-BESS-EP-001` (progressive depletion, static conditions) is DECIDE, `GB-BESS-EP-002` (SOC-ceiling approach, static conditions) is ACT, and `GB-BESS-EP-003`/`004`/`005`/`007` are tagged ADAPT — `GB-BESS-EP-007` (day-ahead price forecast turns out wrong, added 2026-09-09) is the fourth, and the first episode representing U1/forecast uncertainty (`docs/benchmark/STRESS_DIMENSIONS.md`). `GB-BESS-EP-006` is ESCALATE, per `docs/benchmark/CAPABILITY_TAXONOMY.md`'s "closer to an Operational-task version of this capability" account. All seven episodes are `autonomy_burden: high` (Operational). See `tests/unit/test_capability_tags.py` for the test that pins every one of these assignments.
 
 ## What generating this set actually found (not a hypothetical benefit)
 

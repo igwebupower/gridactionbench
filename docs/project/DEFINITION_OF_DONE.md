@@ -21,7 +21,7 @@
 - [x] Small episode (Operational) suite implemented — all 6 (`gridactionbench/scenarios/gb_bess/episodes.py`), each with a bidirectionally-verified `failure_signature` (`tests/golden/test_episodes.py`)
 - [x] Provenance tracked per scenario (`author`/`created_date`, `source_type: synthetic`)
 - [x] Versioning enforced per scenario (`scenario_version`, validated by the pydantic `Scenario` model)
-- [x] **126/126 tests pass** (`python -m pytest`)
+- [x] **127/127 tests pass** (`python -m pytest`)
 - [ ] Counterfactual support for selected scenarios (architecture designed, `ADR-017`; not built)
 - [x] `TrajectoryRecord` for multi-step trials — done 2026-09-09, `gridactionbench/core/trajectory_record.py`, `tests/unit/test_trajectory_record.py` (`docs/benchmark/TASK_MODEL.md`)
 
@@ -34,7 +34,7 @@
 - [x] `AlwaysIdleAgent` implemented and run — 6/20 scenarios produce a UCV, as expected of a known-defective baseline
 - [x] `AlwaysEscalateAgent` implemented and run — 0 UCVs, but only 85.7% escalation appropriateness (correctly fails `GB-BESS-HUM-020`'s unnecessary-escalation check)
 - [x] `RuleBasedAgent` implemented and run — 0 UCVs, 100% on every populated dimension; 57.1% economic decision quality after the best-case-boundary-value fix
-- [x] All 7 seeded-failure agents implemented and run, each verified against its documented expected failure mode (`tests/golden/test_seeded_failure_agents.py`)
+- [x] All 8 seeded-failure agents implemented and run, each verified against its documented expected failure mode — 7 via `tests/golden/test_seeded_failure_agents.py`'s 20-scenario sweep, the 8th (`TrustForecastOverActualAgent`, added 2026-09-09) via its matching episode in `tests/golden/test_episodes.py`, since its defect has no surface on any scenario predating the forecast field
 - [x] A real defect *found by the benchmark itself* during calibration, not merely by inspection: the parameterised generator surfaced `RuleBasedAgent`'s missing `telemetry.field_status.network` check — direct sensitivity evidence, not a hypothetical (`docs/suites/gb-bess/SCENARIO_TEMPLATES.md`)
 - [x] Documented calibration report — `docs/benchmark/CALIBRATION_RESULTS.md`, explicitly marked an informal preview pending Gate 5
 - [x] Discrimination shown among the 10 reference/seeded-failure agents (`docs/benchmark/VALIDATION_FRAMEWORK.md`, "Discrimination")
@@ -49,12 +49,12 @@
 *Validated Atomic → Sequential → Operational task progressions exist; ADAPT is genuinely exercised.*
 
 - [x] Atomic task family implemented and validated — 20 hand-authored + 300 generated instances
-- [x] Operational task family implemented and validated — 6 episodes, each bidirectionally verified
+- [x] Operational task family implemented and validated — 7 episodes, each bidirectionally verified
 - [ ] Sequential task family (the middle rung: state-dependent, non-changing conditions) — not implemented; a real, named gap (`docs/benchmark/TASK_MODEL.md`), not an oversight discovered late
-- [ ] ADAPT genuinely exercised — thin: 3 of 6 episodes touch policy/telemetry change; none test a wrong forecast, a failed tool call, or physical deviation from expectation (`docs/benchmark/CAPABILITY_TAXONOMY.md`)
+- [ ] ADAPT genuinely exercised — improved but still partial: 4 of 7 episodes now touch it, including `GB-BESS-EP-007`'s forecast-turns-out-wrong case added 2026-09-09; a failed tool call and physical deviation from expectation remain untested (`docs/benchmark/CAPABILITY_TAXONOMY.md`)
 - [x] Cross-mode comparison (does good Atomic performance predict Operational reliability, for the same agent) — done 2026-09-09, `docs/benchmark/CROSS_MODE_COMPARISON.md`; answer is no, not reliably, verified concretely for two agents
 
-**Gate 3 status: not satisfied.** This is a genuine, named gap, not a target left over from an abandoned raw-count goal — the redesign specifically calls out ADAPT as underrepresented relative to intended scope, and this gate exists so that fact stays visible rather than being smoothed over by the Atomic suite's relative maturity. The cross-mode comparison above is evidence *for* this gap mattering, not evidence it is closed: it found that a 6-episode Operational suite gives uneven exposure to different agent defects, which is a direct consequence of the same thin Operational task-family coverage this gate already tracks.
+**Gate 3 status: not satisfied.** This is a genuine, named gap, not a target left over from an abandoned raw-count goal — the redesign specifically calls out ADAPT as underrepresented relative to intended scope, and this gate exists so that fact stays visible rather than being smoothed over by the Atomic suite's relative maturity. The cross-mode comparison above is evidence *for* this gap mattering, not evidence it is closed: it found that the (then-6-episode) Operational suite gives uneven exposure to different agent defects, which is a direct consequence of the same thin Operational task-family coverage this gate already tracks. `GB-BESS-EP-007` (added 2026-09-09) closes the forecast-was-wrong half of the ADAPT gap concretely, but Sequential task mode is still entirely unimplemented and tool-failure/physical-deviation ADAPT content is still untested — the gate remains not satisfied on its own stated terms.
 
 **On scenario/instance counts specifically:** the earlier "≥100 templates / ≥1,000 executions" targets are retired as release criteria. Coverage and validity of what exists — not raw volume — is the standard from this point forward, per the redesign's explicit instruction. The current 20 templates / 300 generated instances (`docs/suites/gb-bess/SCENARIO_TEMPLATES.md`) are evaluated against Gates 2 and 3 above, not against a numeric target.
 

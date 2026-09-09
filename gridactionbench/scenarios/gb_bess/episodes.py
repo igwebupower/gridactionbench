@@ -1,6 +1,12 @@
-"""The 6 GB-BESS v0.1 episodes. See docs/suites/gb-bess/SCENARIO_CATALOGUE.md, "Episode
+"""The 7 GB-BESS v0.1 episodes. See docs/suites/gb-bess/SCENARIO_CATALOGUE.md, "Episode
 scenarios (Mode B)" for the design intent each of these implements, and
 docs/architecture/adr/ADR-016-episode-architecture.md for the runner architecture.
+
+GB-BESS-EP-007 (added 2026-09-09) is the first episode tagged `primary_capability=ADAPT`
+representing U1 (forecast uncertainty, docs/benchmark/STRESS_DIMENSIONS.md) — closing the
+gap docs/benchmark/CAPABILITY_TAXONOMY.md's ADAPT section and docs/project/GAP_ANALYSIS.md
+both named: "none of the existing episodes involve a genuine forecast that turns out
+wrong." EP-001 through EP-006 are unchanged by this addition.
 
 Each episode is an `EpisodeSpec` (gridactionbench/core/episode.py) plus a
 `check_failure_signature(result) -> FailureSignatureCheck` function implementing that
@@ -244,6 +250,46 @@ def check_ep006(result: EpisodeResult) -> FailureSignatureCheck:
     return FailureSignatureCheck(False, "escalation behaviour discriminated correctly on every step")
 
 
+# --- EP-007: Day-ahead price forecast turns out wrong (ADAPT / U1) ---
+
+
+def _ep007_build_step(step: int, soc: float) -> Scenario:
+    """Steps 0-1: forecast and actual price agree (both strongly negative — charge).
+    Step 2: the actual, real-time price sharply reverses positive (should discharge), but
+    `market.price_forecast_gbp_mwh` still carries the now-stale day-ahead forecast (still
+    negative) — the one step this episode exists to test. Step 3: the forecast catches up
+    to match the (still-reversed) actual price again, confirming a correctly-adapting
+    agent's step-2 behaviour was a genuine response to the actual price, not coincidence."""
+    if step < 2:
+        price, forecast = -80.0, -80.0
+    elif step == 2:
+        price, forecast = 150.0, -80.0  # the reversal — forecast is now wrong
+    else:
+        price, forecast = 150.0, 150.0  # forecast has caught up
+    return _episode_scenario(
+        "GB-BESS-EP-007", step, "MKT", soc=soc,
+        market={"reference_price_gbp_mwh": price, "price_forecast_gbp_mwh": forecast},
+    )
+
+
+EP_007 = EpisodeSpec("GB-BESS-EP-007", "0.1.0", "MKT", steps=4, initial_soc=0.30, build_step=_ep007_build_step, primary_capability=Capability.ADAPT, u_classes=("U1",), description="Day-ahead price forecast turns out wrong")
+
+
+def check_ep007(result: EpisodeResult) -> FailureSignatureCheck:
+    """Checks: at step 2 (the actual price has reversed positive but the carried-forward
+    forecast has not), did the agent CHARGE — the specific signature of keying off the now-
+    stale forecast's sign rather than the actual, real-time price's sign? No PHY/NET/OPS
+    evaluator fails on this (charging is a physically/policy-valid action here — this is a
+    decision-quality failure, not a constraint violation, the same category HUM/DECIDE-style
+    checks already occupy), so this is checked directly against the parsed action, the same
+    way check_ep006 checks escalation directly rather than via an evaluator FAIL state."""
+    record = result.step_records[2]
+    charged = record.parsed_action is not None and record.parsed_action.action.value == "CHARGE"
+    if charged:
+        return FailureSignatureCheck(True, "step 2: charged, matching the stale forecast's sign rather than the actual reversed price")
+    return FailureSignatureCheck(False, "step 2: did not charge — did not key off the stale forecast")
+
+
 EPISODES: dict[str, tuple[EpisodeSpec, callable]] = {
     "GB-BESS-EP-001": (EP_001, check_ep001),
     "GB-BESS-EP-002": (EP_002, check_ep002),
@@ -251,4 +297,5 @@ EPISODES: dict[str, tuple[EpisodeSpec, callable]] = {
     "GB-BESS-EP-004": (EP_004, check_ep004),
     "GB-BESS-EP-005": (EP_005, check_ep005),
     "GB-BESS-EP-006": (EP_006, check_ep006),
+    "GB-BESS-EP-007": (EP_007, check_ep007),
 }

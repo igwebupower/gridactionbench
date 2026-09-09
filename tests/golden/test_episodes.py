@@ -1,4 +1,4 @@
-"""Calibration tests for the 6 GB-BESS episodes (Mode B). See docs/suites/gb-bess/
+"""Calibration tests for the 7 GB-BESS episodes (Mode B). See docs/suites/gb-bess/
 SCENARIO_CATALOGUE.md, "Episode scenarios," and docs/architecture/adr/
 ADR-016-episode-architecture.md.
 
@@ -20,6 +20,7 @@ from baselines.seeded_failures.ignore_network import IgnoreNetworkAgent
 from baselines.seeded_failures.never_escalate import NeverEscalateAgent
 from baselines.seeded_failures.revenue_first_constraint_ignoring import RevenueFirstConstraintIgnoringAgent
 from baselines.seeded_failures.trust_all_telemetry import TrustAllTelemetryAgent
+from baselines.seeded_failures.trust_forecast_over_actual import TrustForecastOverActualAgent
 from gridactionbench.core.episode import run_episode
 from gridactionbench.schemas.action import ActionType
 from gridactionbench.scenarios.gb_bess.episodes import EPISODES
@@ -86,6 +87,12 @@ def test_ep006_repeated_escalation_also_triggers_for_always_escalate_agent():
     exactly as much a failure as never escalating, per master brief §22."""
     spec, check = EPISODES["GB-BESS-EP-006"]
     result = run_episode(spec, AlwaysEscalateAgent(), DT_HOURS)
+    assert check(result).triggered
+
+
+def test_ep007_forecast_reversal_triggers_for_trust_forecast_over_actual_agent():
+    spec, check = EPISODES["GB-BESS-EP-007"]
+    result = run_episode(spec, TrustForecastOverActualAgent(dt_hours=DT_HOURS), DT_HOURS)
     assert check(result).triggered
 
 

@@ -14,7 +14,7 @@ A single BESS asset connected at distribution level, capable of charging from an
 ## 2. EnergyObservationV1 (agent-visible schema)
 
 ```yaml
-schema_version: "1.0.0"
+schema_version: "1.1.0"   # bumped 2026-09-09: additive optional field, market.price_forecast_gbp_mwh — MINOR per docs/benchmark/VERSIONING.md
 
 benchmark: gridactionbench
 benchmark_version: "0.1.0"      # framework version at run time
@@ -40,6 +40,16 @@ network:
 
 market:
   reference_price_gbp_mwh: float | null
+  # Added 2026-09-09 (docs/benchmark/STRESS_DIMENSIONS.md, U1 — forecast uncertainty): a
+  # previously-issued forecast for this step's price, distinct from the actual/real-time
+  # reference_price_gbp_mwh above. null on every scenario/episode that does not declare
+  # one — this field does not retroactively apply to any existing scenario. See
+  # docs/suites/gb-bess/SCENARIO_CATALOGUE.md, "GB-BESS-EP-007," for the one Task Family
+  # that currently populates it, and docs/benchmark/CAPABILITY_TAXONOMY.md's ADAPT section
+  # for why this models forecast-turned-out-wrong rather than a second, merely conflicting
+  # observation of the *current* price (docs/suites/gb-bess/EVALUATION_SPEC.md's
+  # DATA-CONFLICT-SOC-001 already covers that latter, PERCEIVE-capability case for SOC).
+  price_forecast_gbp_mwh: float | null
 
 telemetry:
   field_status: {soc: str, network: str, market: str}   # e.g. "fresh" | "stale" | "missing" | "conflicting"

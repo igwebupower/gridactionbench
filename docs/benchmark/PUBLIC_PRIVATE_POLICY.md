@@ -21,7 +21,7 @@ An arbitrary public/private percentage answers the wrong question. The right que
 
 ## GridActionBench's policy for GB-BESS v0.1
 
-1. **The initial 20 scenarios and 6 episodes (`SCENARIO_CATALOGUE.md`) are public development scenarios.** They exist to make the benchmark's design legible and are never treated as official held-out evaluation instances.
+1. **The initial 20 scenarios and 7 episodes (`SCENARIO_CATALOGUE.md`) are public development scenarios.** They exist to make the benchmark's design legible and are never treated as official held-out evaluation instances.
 2. **Parameterised scenario templates (Phase 3, target ≥100 templates) are published openly**, including the generation logic/ranges, as required by master brief §37 ("representative scenario generators" is explicitly a public component).
 3. **Official evaluation instances are drawn from the published templates using a private seed**, held in a separate, not-publicly-committed location (see "Private evaluation infrastructure," below) — mirroring the Trashchenkov generator pattern rather than a fixed split ratio.
 4. **Acceptance criteria for a generated instance to be usable as an official holdout** (adapted from the same prior art): the reference/`RuleBasedAgent` must produce a scoreable, non-degenerate outcome on it; the relevant evaluator(s) must confirm the instance's ground truth is internally consistent (e.g., a scenario's `oracle` values must not make every action simultaneously invalid, unless that is the specific point of the scenario, e.g. HUM-019); and no minor perturbation of the instance's parameters should flip its correct-action classification in an unintended way (a basic sensitivity check, not a formal proof).

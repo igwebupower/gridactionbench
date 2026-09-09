@@ -4,6 +4,22 @@ All notable changes to GridActionBench are documented here. Versioning follows `
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — GB-BESS-EP-007: a day-ahead price forecast turns out wrong (partially closes BACKLOG.md P1 item 5)
+
+Fifth pass following the tagging/reporting/TrajectoryRecord/cross-mode work below. Closes the U1 (forecast uncertainty) half of the ADAPT-capability gap `docs/benchmark/CAPABILITY_TAXONOMY.md` and `docs/project/GAP_ANALYSIS.md` both named; tool failure (U5) and physical-deviation-from-expectation remain open. **127/127 tests pass** (126 unchanged + 1 new golden episode test).
+
+### Added
+- `market.price_forecast_gbp_mwh` (`gridactionbench/schemas/observation.py`, `MarketState`) — a previously-issued forecast for this step's price, distinct from the actual/real-time `reference_price_gbp_mwh`. `schema_version` bumped `1.0.0` → `1.1.0` (additive/MINOR, `docs/benchmark/VERSIONING.md`).
+- `GB-BESS-EP-007` (`gridactionbench/scenarios/gb_bess/episodes.py`) — 4 steps: the forecast and actual price agree for two steps (both strongly negative), then the actual price sharply reverses positive while the forecast stays stale, then the forecast catches up. `check_ep007` verifies the agent's step-2 action reflects the actual price, not the stale forecast — a decision-quality check against the parsed action directly (no PHY/NET/OPS evaluator fails here; charging at step 2 is constraint-valid, just wrong), the same pattern `check_ep006` already uses for escalation. The fourth episode (of seven) tagged `primary_capability=ADAPT`.
+- `TrustForecastOverActualAgent` (`baselines/seeded_failures/trust_forecast_over_actual.py`) — the 8th seeded-failure agent, mirroring `RuleBasedAgent` exactly except it keys CHARGE/DISCHARGE direction off `price_forecast_gbp_mwh` when present. Falls back to the actual price when no forecast exists, so it behaves identically to `RuleBasedAgent` (zero UCVs) on every scenario/episode that predates this field — deliberately **not** added to `tests/golden/test_seeded_failure_agents.py`'s 20-scenario sweep for that reason. Registered in `gridactionbench.cli.AGENTS` as `trust-forecast-over-actual`.
+- `tests/golden/test_episodes.py::test_ep007_forecast_reversal_triggers_for_trust_forecast_over_actual_agent` — the bidirectional-verification half (the reference-agent-never-triggers half is already covered by that file's existing generic sweep over `EPISODES`).
+
+### Changed
+- `docs/suites/gb-bess/SPECIFICATION.md` §2, `docs/suites/gb-bess/SCENARIO_CATALOGUE.md` — document the new field and episode.
+- `docs/benchmark/CAPABILITY_TAXONOMY.md` (ADAPT section), `docs/benchmark/STRESS_DIMENSIONS.md` (U1), `docs/project/GAP_ANALYSIS.md`, `docs/project/BACKLOG.md`, `docs/project/DEFINITION_OF_DONE.md` (Gate 3) — record this as a partial close: forecast-was-wrong (U1) is done, tool failure (U5) and physical deviation remain open. Gate 3 remains **not satisfied** overall.
+- `docs/benchmark/VALIDATION_FRAMEWORK.md`, `docs/benchmark/PUBLIC_PRIVATE_POLICY.md`, `docs/benchmark/TASK_MODEL.md`, `docs/architecture/adr/ADR-005-oracle-observation-separation.md`, `docs/suites/gb-bess/SCENARIO_TEMPLATES.md`, `README.md` — episode/agent counts updated (6→7 episodes, 7→8 seeded-failure agents). `docs/benchmark/CALIBRATION_RESULTS.md` and `docs/benchmark/CROSS_MODE_COMPARISON.md` are left as dated snapshots against the roster that existed when each was produced, not retroactively updated.
+- `tests/unit/test_capability_tags.py::test_episodes_naming_adapt_as_primary_match_the_taxonomy_s_own_account` — updated to include `GB-BESS-EP-007`.
+
 ## [Unreleased] — Cross-mode comparison (closes BACKLOG.md P1 item 7)
 
 Fourth pass following the tagging/reporting/TrajectoryRecord work below — analysis only, using the existing 10 reference/seeded-failure agents against the existing 20 Atomic scenarios and 6 Operational episodes. No evaluator, scenario, or schema change. Tests unaffected (no new test file — this pass produces a document and a reproducibility script, not library code).

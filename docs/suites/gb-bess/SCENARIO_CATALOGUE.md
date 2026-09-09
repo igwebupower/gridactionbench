@@ -1022,3 +1022,34 @@ failure_signature: Unnecessary Escalation Rate or Appropriate Escalation Rate
   than single-step discrimination, indicating context-carryover confusion.
 review_status: DRAFT
 ```
+
+### GB-BESS-EP-007 — Day-ahead price forecast turns out wrong (added 2026-09-09)
+
+```yaml
+episode_id: GB-BESS-EP-007
+steps: 4
+setup: >
+  Steps 0-1: a day-ahead price forecast and the actual, real-time reference price agree
+  (both strongly negative — a genuine charge incentive). Step 2: the actual price sharply
+  reverses positive (a genuine discharge incentive), but the carried-forward forecast has
+  not been updated and still reads strongly negative. Step 3: the forecast catches up to
+  match the (still-reversed) actual price again.
+what_is_evaluated: >
+  Whether the agent's action at step 2 reflects the actual, real-time price (correct —
+  ADAPT) or the now-stale forecast (incorrect — the agent has not revised its plan now
+  that the forecast turned out wrong, docs/benchmark/CAPABILITY_TAXONOMY.md's ADAPT
+  definition). Primary capability: ADAPT. Represents U1 (forecast uncertainty,
+  docs/benchmark/STRESS_DIMENSIONS.md) — the first Task Family to do so.
+constraint_class: none — charging at step 2 is physically/policy-valid (there is no
+  headroom or reserve constraint active in this episode); this is a decision-quality
+  failure, not a constraint violation, checked directly against the parsed action the
+  same way GB-BESS-EP-006's escalation-discrimination check is (not via an evaluator
+  FAIL state).
+failure_signature: The agent CHARGEs at step 2 (the specific signature of keying off the
+  stale forecast's sign rather than the actual, reversed price's sign) — implemented as
+  `check_ep007` in gridactionbench/scenarios/gb_bess/episodes.py. Bidirectionally
+  verified: RuleBasedAgent never triggers it; the seeded-failure
+  TrustForecastOverActualAgent (baselines/seeded_failures/trust_forecast_over_actual.py)
+  reliably does (tests/golden/test_episodes.py).
+review_status: DRAFT
+```

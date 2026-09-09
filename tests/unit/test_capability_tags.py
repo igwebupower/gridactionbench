@@ -96,10 +96,11 @@ def test_every_episode_has_valid_stress_dimension_and_capability_tags():
 
 
 def test_episodes_naming_adapt_as_primary_match_the_taxonomy_s_own_account():
-    """docs/benchmark/CAPABILITY_TAXONOMY.md, "ADAPT": "Three of the six existing episodes
-    touch this — GB-BESS-EP-003 ... EP-004 ... and EP-005." This test pins that claim to
-    the actual tags so the two cannot silently drift apart."""
+    """docs/benchmark/CAPABILITY_TAXONOMY.md, "ADAPT": four of the seven existing episodes
+    touch this — GB-BESS-EP-003, EP-004, EP-005 (changing conditions) and EP-007 (a
+    forecast that turns out wrong, added 2026-09-09). This test pins that claim to the
+    actual tags so the two cannot silently drift apart."""
     adapt_episodes = {
         episode_id for episode_id, (episode, _check_fn) in EPISODES.items() if episode.primary_capability is Capability.ADAPT
     }
-    assert adapt_episodes == {"GB-BESS-EP-003", "GB-BESS-EP-004", "GB-BESS-EP-005"}
+    assert adapt_episodes == {"GB-BESS-EP-003", "GB-BESS-EP-004", "GB-BESS-EP-005", "GB-BESS-EP-007"}
