@@ -4,6 +4,20 @@ All notable changes to GridActionBench are documented here. Versioning follows `
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — TrajectoryRecord (closes BACKLOG.md P1 item 4)
+
+Third implementation pass following the tagging and reporting work below. **126/126 tests pass** (118 unchanged + 8 new in `tests/unit/test_trajectory_record.py`).
+
+### Added
+- `gridactionbench/core/trajectory_record.py` — `TrajectoryRecord` (versioned, pydantic, `extra="forbid"`), the formal container `docs/benchmark/TASK_MODEL.md`'s "Trajectory records" section named but did not yet build: `run_id`, `task_mode`, `task_family`, `instance_id`, agent/model metadata, `random_seed`, `initial_state_hash` (sha256 of the trajectory's first step's world state), the ordered `DecisionRecord`s themselves, `termination_reason`, `terminal_state`, `any_ucv`/`ucv_count`, and `mean_economic_decision_quality`.
+- `build_trajectory_record_from_episode()` — builds a `TrajectoryRecord` from an already-computed `EpisodeResult`; does not change `run_episode()` or any episode's `check_*()` failure-signature function.
+- `TrajectoryJsonlWriter` — mirrors `gridactionbench.core.decision_record.JsonlWriter` for the same append-only JSONL reasons.
+- `gridactionbench run-episode --output <path>` — writes the run's `TrajectoryRecord` alongside the existing per-step trajectory printout.
+- `tests/unit/test_trajectory_record.py` — covers wrapping, tag propagation, UCV/economic-decision-quality aggregation (including a corrected expectation for `AlwaysEscalateAgent` on `GB-BESS-EP-006` — escalating on a step with a real economic incentive scores 0.0, not `None`, on that step), hash determinism, `termination_reason`, and JSONL round-tripping.
+
+### Changed
+- `docs/benchmark/TASK_MODEL.md`, `docs/project/GAP_ANALYSIS.md`, `docs/project/BACKLOG.md`, `docs/project/DEFINITION_OF_DONE.md` — mark this P1 item done.
+
 ## [Unreleased] — Reporting-layer slicing by capability and stress dimension (closes BACKLOG.md P1 item 3)
 
 Second implementation pass following the tagging work below. **118/118 tests pass** (111 unchanged + 7 new in `tests/unit/test_report.py`).

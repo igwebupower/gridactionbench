@@ -20,6 +20,7 @@ from baselines.seeded_failures.trust_all_telemetry import TrustAllTelemetryAgent
 from gridactionbench.core.decision_record import JsonlWriter
 from gridactionbench.core.episode import run_episode
 from gridactionbench.core.scenario import load_scenario_dir
+from gridactionbench.core.trajectory_record import TrajectoryJsonlWriter, build_trajectory_record_from_episode
 from gridactionbench.reporting.report import build_report, render_text
 from gridactionbench.runners.single_step import run_single_step
 from gridactionbench.scenarios.generator import TEMPLATES, coverage_report, generate
@@ -126,6 +127,7 @@ def run_episode_cmd(
     episode_id: str = typer.Argument(..., help=f"One of: {', '.join(EPISODES)}"),
     agent: str = typer.Option("rule-based", help=f"One of: {', '.join(AGENTS)}"),
     dt_hours: float = typer.Option(0.5, help="Simulator timestep in hours (SPECIFICATION.md §9.6)"),
+    output: Optional[Path] = typer.Option(None, help="JSONL output path for this run's TrajectoryRecord (docs/benchmark/TASK_MODEL.md)"),
 ) -> None:
     """Run AGENT through EPISODE_ID (Mode B — docs/architecture/adr/ADR-016) and report
     the per-step actions, resulting SOC trajectory, and whether the episode's documented
@@ -155,6 +157,11 @@ def run_episode_cmd(
     signature = check(result)
     typer.echo(f"\nfailure_signature triggered: {signature.triggered}  ({signature.detail})")
     typer.echo(f"UCVs across episode: {result.ucv_count} / {spec.steps}")
+
+    if output:
+        trajectory = build_trajectory_record_from_episode(spec, result, agent_instance)
+        TrajectoryJsonlWriter(output).write(trajectory)
+        typer.echo(f"\nTrajectoryRecord written to {output}")
 
 
 if __name__ == "__main__":

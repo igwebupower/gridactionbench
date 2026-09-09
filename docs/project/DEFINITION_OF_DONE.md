@@ -21,11 +21,11 @@
 - [x] Small episode (Operational) suite implemented — all 6 (`gridactionbench/scenarios/gb_bess/episodes.py`), each with a bidirectionally-verified `failure_signature` (`tests/golden/test_episodes.py`)
 - [x] Provenance tracked per scenario (`author`/`created_date`, `source_type: synthetic`)
 - [x] Versioning enforced per scenario (`scenario_version`, validated by the pydantic `Scenario` model)
-- [x] **118/118 tests pass** (`python -m pytest`)
+- [x] **126/126 tests pass** (`python -m pytest`)
 - [ ] Counterfactual support for selected scenarios (architecture designed, `ADR-017`; not built)
-- [ ] `TrajectoryRecord` for multi-step trials (`docs/benchmark/TASK_MODEL.md`; `EpisodeResult` carries the needed data informally — additive schema work, `docs/project/GAP_ANALYSIS.md` P1)
+- [x] `TrajectoryRecord` for multi-step trials — done 2026-09-09, `gridactionbench/core/trajectory_record.py`, `tests/unit/test_trajectory_record.py` (`docs/benchmark/TASK_MODEL.md`)
 
-**Gate 1 status: satisfied**, with the two open items above tracked as P1 additive work, not blockers to the gate itself (both are extensions, not corrections, of already-correct instrument behaviour).
+**Gate 1 status: satisfied**, with the one remaining open item above (counterfactual support, `ADR-017`) tracked as additive work, not a blocker to the gate itself — an extension, not a correction, of already-correct instrument behaviour.
 
 ## Gate 2 — Construct Validity
 
