@@ -4,6 +4,21 @@ All notable changes to GridActionBench are documented here. Versioning follows `
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — Private-seed holdout generator infrastructure (closes the generator-code half of BACKLOG.md P1 item 6)
+
+Sixth pass following the tagging/reporting/TrajectoryRecord/cross-mode/ADAPT-coverage work below. Implements `docs/benchmark/PUBLIC_PRIVATE_POLICY.md`'s items 3 and 4. **139/139 tests pass** (127 unchanged + 12 new in `tests/unit/test_holdouts.py`).
+
+### Added
+- `gridactionbench/holdouts/private_seed.py` — `resolve_private_seed()` reads `$GRIDACTIONBENCH_PRIVATE_SEED` or `fixtures/private_dev_only/private_seed.txt` (both already git-ignored) and raises `PrivateSeedNotConfigured`, with setup instructions, rather than ever defaulting to the public generator's own seed (`gridactionbench/scenarios/generator.py`'s `seed=42`).
+- `gridactionbench/holdouts/acceptance.py` — `check_acceptance()` implements the policy's three acceptance criteria for a candidate holdout instance: (1) the reference agent produces a scoreable, non-degenerate outcome; (2) the instance is internally consistent — a compliant reference agent is never forced into a HARD-constraint-invalid action; (3) a diagnostic (non-rejecting) sensitivity check for whether a small price perturbation flips the reference agent's action type. The perturbation is additive with an absolute floor, not purely multiplicative — a multiplicative-only perturbation can never cross zero, missing the single most relevant boundary (the price=0 charge/discharge crossover) entirely; caught and fixed during this pass's own manual verification, not shipped silently broken.
+- `gridactionbench/holdouts/generate.py` — `generate_holdouts()` draws candidates from the existing public templates via a given seed, filters them through acceptance, and writes only accepted instances plus a manifest to a git-ignored output directory.
+- `gridactionbench generate-holdouts` (CLI) — wires the above together; errors clearly when no private seed is configured.
+- `tests/unit/test_holdouts.py` — covers seed resolution (env var, local file, missing, malformed), acceptance/rejection logic (including a synthetic-record test double for the otherwise very-hard-to-naturally-trigger self-contradictory-oracle case), the sensitivity check's two branches, end-to-end generation with a real manifest/file round-trip, determinism, and a direct `git check-ignore` assertion that the output directory is actually git-ignored, not merely assumed to be. All 20 hand-authored scenarios pass acceptance (a real regression check).
+
+### Changed
+- `docs/benchmark/PUBLIC_PRIVATE_POLICY.md` — records items 3 and 4 as implemented; the separate `gridactionbench-evaluation-private` repository remains explicitly out of scope, not built by this pass.
+- `docs/project/GAP_ANALYSIS.md`, `docs/project/BACKLOG.md`, `docs/project/DEFINITION_OF_DONE.md` — mark the generator-code half of this item done; repository creation and an actual configured private seed are unchanged (still not started).
+
 ## [Unreleased] — GB-BESS-EP-007: a day-ahead price forecast turns out wrong (partially closes BACKLOG.md P1 item 5)
 
 Fifth pass following the tagging/reporting/TrajectoryRecord/cross-mode work below. Closes the U1 (forecast uncertainty) half of the ADAPT-capability gap `docs/benchmark/CAPABILITY_TAXONOMY.md` and `docs/project/GAP_ANALYSIS.md` both named; tool failure (U5) and physical-deviation-from-expectation remain open. **127/127 tests pass** (126 unchanged + 1 new golden episode test).

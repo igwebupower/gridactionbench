@@ -7,7 +7,7 @@
 *Simulator, evaluators, Oracle/Observation, action validation, and Decision Records work correctly.*
 
 - [x] Clean installation (`pip install -e .`)
-- [x] CLI execution (`gridactionbench run <scenario-dir> --agent <agent>`, `list-scenarios`, `run-generated`, `coverage`, `run-episode`)
+- [x] CLI execution (`gridactionbench run <scenario-dir> --agent <agent>`, `list-scenarios`, `run-generated`, `coverage`, `run-episode`, `generate-holdouts`)
 - [x] Deterministic simulator (`SimpleBessSimulator`) — `gridactionbench/simulators/simple_bess.py`
 - [x] Versioned schemas (`EnergyObservationV1`, `AgentActionV1`) — `gridactionbench/schemas/`
 - [x] Scenario Oracle implemented — `gridactionbench/core/scenario.py`
@@ -21,7 +21,7 @@
 - [x] Small episode (Operational) suite implemented — all 6 (`gridactionbench/scenarios/gb_bess/episodes.py`), each with a bidirectionally-verified `failure_signature` (`tests/golden/test_episodes.py`)
 - [x] Provenance tracked per scenario (`author`/`created_date`, `source_type: synthetic`)
 - [x] Versioning enforced per scenario (`scenario_version`, validated by the pydantic `Scenario` model)
-- [x] **127/127 tests pass** (`python -m pytest`)
+- [x] **139/139 tests pass** (`python -m pytest`)
 - [ ] Counterfactual support for selected scenarios (architecture designed, `ADR-017`; not built)
 - [x] `TrajectoryRecord` for multi-step trials — done 2026-09-09, `gridactionbench/core/trajectory_record.py`, `tests/unit/test_trajectory_record.py` (`docs/benchmark/TASK_MODEL.md`)
 

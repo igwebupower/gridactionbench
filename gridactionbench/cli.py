@@ -22,6 +22,8 @@ from gridactionbench.core.decision_record import JsonlWriter
 from gridactionbench.core.episode import run_episode
 from gridactionbench.core.scenario import load_scenario_dir
 from gridactionbench.core.trajectory_record import TrajectoryJsonlWriter, build_trajectory_record_from_episode
+from gridactionbench.holdouts.generate import DEFAULT_OUTPUT_DIR, generate_holdouts
+from gridactionbench.holdouts.private_seed import PrivateSeedNotConfigured, resolve_private_seed
 from gridactionbench.reporting.report import build_report, render_text
 from gridactionbench.runners.single_step import run_single_step
 from gridactionbench.scenarios.generator import TEMPLATES, coverage_report, generate
@@ -164,6 +166,32 @@ def run_episode_cmd(
         trajectory = build_trajectory_record_from_episode(spec, result, agent_instance)
         TrajectoryJsonlWriter(output).write(trajectory)
         typer.echo(f"\nTrajectoryRecord written to {output}")
+
+
+@app.command("generate-holdouts")
+def generate_holdouts_cmd(
+    n_per_template: int = typer.Option(5, help="Candidate instances generated per template before acceptance filtering"),
+    output_dir: Path = typer.Option(DEFAULT_OUTPUT_DIR, help="Output directory — git-ignored, never committed"),
+) -> None:
+    """Draw candidate official holdout instances from the public generator templates using
+    a private seed, filter them through the acceptance criteria, and write only the
+    accepted instances plus a manifest to OUTPUT_DIR (docs/benchmark/
+    PUBLIC_PRIVATE_POLICY.md). Requires a private seed: set $GRIDACTIONBENCH_PRIVATE_SEED
+    or create fixtures/private_dev_only/private_seed.txt."""
+    try:
+        seed = resolve_private_seed()
+    except PrivateSeedNotConfigured as exc:
+        typer.echo(str(exc))
+        raise typer.Exit(code=1)
+
+    summary = generate_holdouts(private_seed=seed, n_per_template=n_per_template, output_dir=output_dir)
+    typer.echo(f"Candidates generated: {summary.candidates_generated}")
+    typer.echo(f"Accepted: {summary.accepted}  |  Rejected: {summary.rejected}  |  Sensitivity-flagged: {summary.sensitivity_flagged}")
+    if summary.rejection_reasons:
+        typer.echo("Rejection reasons:")
+        for reason, count in summary.rejection_reasons.items():
+            typer.echo(f"  {count}x {reason}")
+    typer.echo(f"Written to {output_dir}/ (git-ignored)")
 
 
 if __name__ == "__main__":
