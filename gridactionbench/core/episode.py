@@ -17,6 +17,7 @@ from typing import Callable
 from gridactionbench.agents.base import AgentAdapter
 from gridactionbench.core.decision_record import DecisionRecord
 from gridactionbench.core.scenario import Scenario
+from gridactionbench.evaluators.base import Capability
 from gridactionbench.runners.single_step import run_single_step
 
 StepBuilder = Callable[[int, float], Scenario]
@@ -30,7 +31,16 @@ class EpisodeSpec:
     steps: int
     initial_soc: float
     build_step: StepBuilder  # (step_index, current_soc) -> Scenario for that step
+    # docs/benchmark/CAPABILITY_TAXONOMY.md / docs/benchmark/STRESS_DIMENSIONS.md — added
+    # September 2026 strategic realignment (docs/project/GAP_ANALYSIS.md P1), mirroring
+    # ScenarioTemplate's tags (gridactionbench/scenarios/generator.py).
+    primary_capability: Capability
+    u_classes: tuple[str, ...]  # one or more of U0-U7, docs/benchmark/STRESS_DIMENSIONS.md
     description: str = ""
+    complexity_rung: str = "C0"  # every GB-BESS v0.1 episode is C0 — single BESS, no other asset
+    # Operational tasks are the highest-H proxy rung (STRESS_DIMENSIONS.md, "H — Autonomy
+    # Burden"); every EpisodeSpec is Operational, so this default is never overridden.
+    autonomy_burden: str = "high"
 
 
 @dataclass

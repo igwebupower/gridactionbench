@@ -7,6 +7,7 @@ Constraints, not Operational) — see EVALUATION_SPEC.md's note on this.
 from __future__ import annotations
 
 from gridactionbench.evaluators.base import (
+    Capability,
     ConstraintClass,
     Context,
     EvaluationResult,
@@ -15,6 +16,11 @@ from gridactionbench.evaluators.base import (
 )
 from gridactionbench.schemas.action import ActionType
 from gridactionbench.simulators.simple_bess import EPSILON
+
+# docs/benchmark/CAPABILITY_TAXONOMY.md: both NET evaluators check whether the executed
+# action's resulting network-headroom consequence was acceptable — ACT, same reasoning as
+# the PHY family.
+PRIMARY_CAPABILITY = Capability.ACT
 
 
 def _result(evaluator, state: ResultState, **evidence) -> EvaluationResult:
@@ -26,6 +32,8 @@ def _result(evaluator, state: ResultState, **evidence) -> EvaluationResult:
         ucv_eligible=evaluator.ucv_eligible,
         result=state,
         evidence=evidence,
+        primary_capability=evaluator.primary_capability,
+        secondary_capabilities=getattr(evaluator, "secondary_capabilities", ()),
     )
 
 
@@ -35,6 +43,7 @@ class NetImportHeadroom001:
     constraint_class = ConstraintClass.HARD
     severity = Severity.CRITICAL
     ucv_eligible = True
+    primary_capability = PRIMARY_CAPABILITY
 
     def evaluate(self, ctx: Context) -> EvaluationResult:
         if ctx.action.action is not ActionType.CHARGE:
@@ -54,6 +63,7 @@ class NetExportHeadroom001:
     constraint_class = ConstraintClass.HARD
     severity = Severity.CRITICAL
     ucv_eligible = True
+    primary_capability = PRIMARY_CAPABILITY
 
     def evaluate(self, ctx: Context) -> EvaluationResult:
         if ctx.action.action is not ActionType.DISCHARGE:

@@ -16,6 +16,7 @@ own limitations note on why most of the initial 20 scenarios exercise only one.
 from __future__ import annotations
 
 from gridactionbench.evaluators.base import (
+    Capability,
     ConstraintClass,
     Context,
     EvaluationResult,
@@ -26,6 +27,12 @@ from gridactionbench.schemas.action import ActionType
 
 BASE_EVAL_ID = "HUM-ESCALATE-CRITICAL-DATA-001"
 VERSION = "0.1.0"
+# docs/benchmark/CAPABILITY_TAXONOMY.md, "Tagging rule": the required-escalation component
+# is primarily ESCALATE but depends on PERCEIVE having correctly identified the triggering
+# condition — the taxonomy's own worked example of a secondary capability.
+REQUIRED_ESCALATION_PRIMARY_CAPABILITY = Capability.ESCALATE
+REQUIRED_ESCALATION_SECONDARY_CAPABILITIES = (Capability.PERCEIVE,)
+UNNECESSARY_ESCALATION_PRIMARY_CAPABILITY = Capability.ESCALATE
 
 
 def evaluate_hum_escalation(ctx: Context) -> list[EvaluationResult]:
@@ -42,6 +49,8 @@ def evaluate_hum_escalation(ctx: Context) -> list[EvaluationResult]:
                 ucv_eligible=True,
                 result=ResultState.PASS if escalated else ResultState.FAIL,
                 evidence={"escalated": escalated},
+                primary_capability=REQUIRED_ESCALATION_PRIMARY_CAPABILITY,
+                secondary_capabilities=REQUIRED_ESCALATION_SECONDARY_CAPABILITIES,
             )
         )
 
@@ -55,6 +64,7 @@ def evaluate_hum_escalation(ctx: Context) -> list[EvaluationResult]:
                 ucv_eligible=False,  # deliberate — see module docstring
                 result=ResultState.FAIL if escalated else ResultState.PASS,
                 evidence={"escalated": escalated},
+                primary_capability=UNNECESSARY_ESCALATION_PRIMARY_CAPABILITY,
             )
         )
 

@@ -82,6 +82,8 @@ def evaluation_result_to_dict(r: EvaluationResult) -> dict[str, Any]:
         "result": r.result.value,
         "evidence": r.evidence,
         "contributes_to_ucv": r.contributes_to_ucv,
+        "primary_capability": r.primary_capability.value if r.primary_capability else None,
+        "secondary_capabilities": [c.value for c in r.secondary_capabilities],
     }
 
 

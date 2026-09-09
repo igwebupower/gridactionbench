@@ -48,7 +48,17 @@ Can the agent recognise when autonomous action is inappropriate — insufficient
 
 ## Tagging rule
 
-Every evaluator and every Task Family should carry a `primary_capability` tag from `{PERCEIVE, DECIDE, ACT, ADAPT, ESCALATE}`, and may carry secondary tags where a single evaluator genuinely measures more than one (e.g. `HUM-ESCALATE-CRITICAL-DATA-001`'s required-escalation component is primarily ESCALATE but depends on PERCEIVE having correctly identified the triggering condition). **This tagging has not yet been applied to the 18 existing evaluators or 20 existing scenarios** — it is a documentation/metadata addition, tracked as a P1 backlog item (`docs/project/GAP_ANALYSIS.md`), not retrofitted in this pass. The mapping given in each capability section above is a narrative description of where existing evaluators land, not a claim that the formal tag field exists in code yet.
+Every evaluator and every Task Family should carry a `primary_capability` tag from `{PERCEIVE, DECIDE, ACT, ADAPT, ESCALATE}`, and may carry secondary tags where a single evaluator genuinely measures more than one (e.g. `HUM-ESCALATE-CRITICAL-DATA-001`'s required-escalation component is primarily ESCALATE but depends on PERCEIVE having correctly identified the triggering condition).
+
+**Applied — 2026-09-09, closing this P1 backlog item (`docs/project/GAP_ANALYSIS.md`, `docs/project/BACKLOG.md`).** Every evaluator now carries a `primary_capability` class/module attribute (`gridactionbench/evaluators/gb_bess/*.py`) that flows through into `EvaluationResult` and, from there, into every Decision Record (`gridactionbench/core/decision_record.py`) — not a documentation-only tag. Every `ScenarioTemplate` (`gridactionbench/scenarios/generator.py`) and `EpisodeSpec` (`gridactionbench/scenarios/gb_bess/episodes.py`) carries the same tag, plus `complexity_rung`, `u_classes`, and `autonomy_burden` (`docs/benchmark/STRESS_DIMENSIONS.md`). `tests/unit/test_capability_tags.py` pins every assignment, including the ADAPT-episode claim below, so the two cannot silently drift apart. The mapping given in each capability section above is the rationale actually assigned in code, not merely a narrative description — the concrete assignments:
+
+- **ACT** — all PHY and NET evaluators (post-action physical/network state check), `GB-BESS-EP-002`.
+- **DECIDE** — `OPS-RESERVE-SOC-001`, `OPS-TEMP-CHARGE/DISCHARGE-PROHIBITION-001` (reserve requirements, operational policy), `ADV-INSTRUCTION-OVERRIDE-001` (competing objectives under adversarial pressure), both MKT templates, `GB-BESS-EP-001`.
+- **PERCEIVE** — all five DATA evaluators; secondary on `HUM-ESCALATE-CRITICAL-DATA-001`'s required-escalation component.
+- **ADAPT** — `GB-BESS-EP-003`, `GB-BESS-EP-004`, `GB-BESS-EP-005` (the three episodes this document already named above as touching ADAPT).
+- **ESCALATE** — `OPS-APPROVAL-REQUIRED-001` (ESCALATE's own definition names "human approval required" as a paradigm case, ahead of DECIDE's narrower "authority" mention), both `HUM-ESCALATE-CRITICAL-DATA-001` components, `GB-BESS-EP-001`'s reserve-depletion pressure is DECIDE not ESCALATE — only `GB-BESS-EP-006` is tagged ESCALATE among episodes, per this document's own "closest to an Operational-task version of this capability" account.
+
+Reporting-layer slicing by these tags (`docs/benchmark/SCORING.md`'s "sliceable by" requirement) remains open — tracked separately as `docs/project/GAP_ANALYSIS.md`'s P1 item 3, since it is additive reporting work distinct from the tagging itself.
 
 ## Relationship to constraint_class
 

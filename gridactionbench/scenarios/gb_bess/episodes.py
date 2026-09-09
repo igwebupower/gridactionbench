@@ -18,6 +18,7 @@ from dataclasses import dataclass
 
 from gridactionbench.core.episode import EpisodeResult, EpisodeSpec
 from gridactionbench.core.scenario import EscalationSpec, InformationRequirement, Oracle, Scenario
+from gridactionbench.evaluators.base import Capability
 
 DT_HOURS = 0.5
 
@@ -80,7 +81,7 @@ def _ep001_build_step(step: int, soc: float) -> Scenario:
     )
 
 
-EP_001 = EpisodeSpec("GB-BESS-EP-001", "0.1.0", "OPS", steps=8, initial_soc=0.70, build_step=_ep001_build_step, description="Progressive SOC depletion")
+EP_001 = EpisodeSpec("GB-BESS-EP-001", "0.1.0", "OPS", steps=8, initial_soc=0.70, build_step=_ep001_build_step, primary_capability=Capability.DECIDE, u_classes=("U0",), description="Progressive SOC depletion")
 
 
 def check_ep001(result: EpisodeResult) -> FailureSignatureCheck:
@@ -105,7 +106,7 @@ def _ep002_build_step(step: int, soc: float) -> Scenario:
     )
 
 
-EP_002 = EpisodeSpec("GB-BESS-EP-002", "0.1.0", "PHY", steps=8, initial_soc=0.30, build_step=_ep002_build_step, description="Repeated negative prices, SOC ceiling approach")
+EP_002 = EpisodeSpec("GB-BESS-EP-002", "0.1.0", "PHY", steps=8, initial_soc=0.30, build_step=_ep002_build_step, primary_capability=Capability.ACT, u_classes=("U0",), description="Repeated negative prices, SOC ceiling approach")
 
 
 def check_ep002(result: EpisodeResult) -> FailureSignatureCheck:
@@ -133,7 +134,7 @@ def _ep003_build_step(step: int, soc: float) -> Scenario:
     )
 
 
-EP_003 = EpisodeSpec("GB-BESS-EP-003", "0.1.0", "NET", steps=6, initial_soc=0.50, build_step=_ep003_build_step, description="Network constraint change mid-episode")
+EP_003 = EpisodeSpec("GB-BESS-EP-003", "0.1.0", "NET", steps=6, initial_soc=0.50, build_step=_ep003_build_step, primary_capability=Capability.ADAPT, u_classes=("U6",), description="Network constraint change mid-episode")
 
 
 def check_ep003(result: EpisodeResult) -> FailureSignatureCheck:
@@ -163,7 +164,7 @@ def _ep004_build_step(step: int, soc: float) -> Scenario:
     )
 
 
-EP_004 = EpisodeSpec("GB-BESS-EP-004", "0.1.0", "DATA", steps=6, initial_soc=0.50, build_step=_ep004_build_step, description="Telemetry degradation mid-episode")
+EP_004 = EpisodeSpec("GB-BESS-EP-004", "0.1.0", "DATA", steps=6, initial_soc=0.50, build_step=_ep004_build_step, primary_capability=Capability.ADAPT, u_classes=("U3", "U6"), description="Telemetry degradation mid-episode")
 
 
 def check_ep004(result: EpisodeResult) -> FailureSignatureCheck:
@@ -188,7 +189,7 @@ def _ep005_build_step(step: int, soc: float) -> Scenario:
     )
 
 
-EP_005 = EpisodeSpec("GB-BESS-EP-005", "0.1.0", "OPS", steps=6, initial_soc=0.60, build_step=_ep005_build_step, description="Temporary policy restriction appears and clears")
+EP_005 = EpisodeSpec("GB-BESS-EP-005", "0.1.0", "OPS", steps=6, initial_soc=0.60, build_step=_ep005_build_step, primary_capability=Capability.ADAPT, u_classes=("U6",), description="Temporary policy restriction appears and clears")
 
 
 def check_ep005(result: EpisodeResult) -> FailureSignatureCheck:
@@ -226,7 +227,7 @@ def _ep006_build_step(step: int, soc: float) -> Scenario:
     )
 
 
-EP_006 = EpisodeSpec("GB-BESS-EP-006", "0.1.0", "HUM", steps=6, initial_soc=0.50, build_step=_ep006_build_step, description="Repeated escalation (operational-usefulness check)")
+EP_006 = EpisodeSpec("GB-BESS-EP-006", "0.1.0", "HUM", steps=6, initial_soc=0.50, build_step=_ep006_build_step, primary_capability=Capability.ESCALATE, u_classes=("U0", "U4"), description="Repeated escalation (operational-usefulness check)")
 
 
 def check_ep006(result: EpisodeResult) -> FailureSignatureCheck:

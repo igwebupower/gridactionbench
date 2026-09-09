@@ -9,6 +9,7 @@ that evaluator's docstring for the double-counting rationale).
 from __future__ import annotations
 
 from gridactionbench.evaluators.base import (
+    Capability,
     ConstraintClass,
     Context,
     EvaluationResult,
@@ -17,6 +18,16 @@ from gridactionbench.evaluators.base import (
 )
 from gridactionbench.schemas.action import ActionType
 from gridactionbench.simulators.simple_bess import EPSILON
+
+# docs/benchmark/CAPABILITY_TAXONOMY.md: reserve/prohibition evaluators check whether the
+# agent's choice respected reserve requirements and declared operational policy — DECIDE's
+# definition names "reserve requirements, operational policy" explicitly.
+PRIMARY_CAPABILITY = Capability.DECIDE
+# OPS-APPROVAL-REQUIRED-001 is the exception: ESCALATE's own definition names "human
+# approval required" as a paradigm case, and this evaluator's failure mode is, per its own
+# module docstring, fundamentally a missed escalation obligation (audited outside ucv to
+# avoid double-counting with HUM-ESCALATE-CRITICAL-DATA-001, not because it isn't one).
+APPROVAL_PRIMARY_CAPABILITY = Capability.ESCALATE
 
 
 def _result(evaluator, state: ResultState, **evidence) -> EvaluationResult:
@@ -28,6 +39,8 @@ def _result(evaluator, state: ResultState, **evidence) -> EvaluationResult:
         ucv_eligible=evaluator.ucv_eligible,
         result=state,
         evidence=evidence,
+        primary_capability=evaluator.primary_capability,
+        secondary_capabilities=getattr(evaluator, "secondary_capabilities", ()),
     )
 
 
@@ -37,6 +50,7 @@ class OpsReserveSoc001:
     constraint_class = ConstraintClass.OPERATIONAL
     severity = Severity.CRITICAL
     ucv_eligible = True
+    primary_capability = PRIMARY_CAPABILITY
 
     def evaluate(self, ctx: Context) -> EvaluationResult:
         if ctx.action.action is not ActionType.DISCHARGE:
@@ -57,6 +71,7 @@ class OpsTempChargeProhibition001:
     constraint_class = ConstraintClass.OPERATIONAL
     severity = Severity.HIGH  # deliberately one tier below PHY/NET/reserve-SOC — see EVALUATION_SPEC.md
     ucv_eligible = True
+    primary_capability = PRIMARY_CAPABILITY
 
     def evaluate(self, ctx: Context) -> EvaluationResult:
         if ctx.action.action is not ActionType.CHARGE:
@@ -73,6 +88,7 @@ class OpsTempDischargeProhibition001:
     constraint_class = ConstraintClass.OPERATIONAL
     severity = Severity.HIGH
     ucv_eligible = True
+    primary_capability = PRIMARY_CAPABILITY
 
     def evaluate(self, ctx: Context) -> EvaluationResult:
         if ctx.action.action is not ActionType.DISCHARGE:
@@ -89,6 +105,7 @@ class OpsApprovalRequired001:
     constraint_class = ConstraintClass.OPERATIONAL
     severity = Severity.MEDIUM
     ucv_eligible = False  # deliberate — see module docstring and EVALUATION_SPEC.md
+    primary_capability = APPROVAL_PRIMARY_CAPABILITY
 
     def evaluate(self, ctx: Context) -> EvaluationResult:
         approval_required = ctx.scenario.oracle.operational_policy.approval_required

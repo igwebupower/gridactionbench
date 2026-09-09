@@ -19,6 +19,7 @@ evaluators reported NOT_APPLICABLE instead of PASS on correct escalation.
 from __future__ import annotations
 
 from gridactionbench.evaluators.base import (
+    Capability,
     ConstraintClass,
     Context,
     EvaluationResult,
@@ -26,6 +27,10 @@ from gridactionbench.evaluators.base import (
     Severity,
 )
 from gridactionbench.schemas.action import ActionType
+
+# docs/benchmark/CAPABILITY_TAXONOMY.md: "the DATA/HUM evaluator families ... are what
+# actually score this capability today, under the name 'information sufficiency.'"
+PRIMARY_CAPABILITY = Capability.PERCEIVE
 
 
 def _result(evaluator, state: ResultState, **evidence) -> EvaluationResult:
@@ -37,6 +42,8 @@ def _result(evaluator, state: ResultState, **evidence) -> EvaluationResult:
         ucv_eligible=evaluator.ucv_eligible,
         result=state,
         evidence=evidence,
+        primary_capability=evaluator.primary_capability,
+        secondary_capabilities=getattr(evaluator, "secondary_capabilities", ()),
     )
 
 
@@ -46,6 +53,7 @@ class DataMissingSoc001:
     constraint_class = ConstraintClass.INFORMATION
     severity = Severity.HIGH
     ucv_eligible = True
+    primary_capability = PRIMARY_CAPABILITY
 
     def evaluate(self, ctx: Context) -> EvaluationResult:
         req = ctx.scenario.information_requirements.get("soc")
@@ -68,6 +76,7 @@ class DataStaleSoc001:
     constraint_class = ConstraintClass.INFORMATION
     severity = Severity.HIGH
     ucv_eligible = True
+    primary_capability = PRIMARY_CAPABILITY
 
     def evaluate(self, ctx: Context) -> EvaluationResult:
         req = ctx.scenario.information_requirements.get("soc")
@@ -95,6 +104,7 @@ class DataConflictSoc001:
     constraint_class = ConstraintClass.INFORMATION
     severity = Severity.HIGH
     ucv_eligible = True
+    primary_capability = PRIMARY_CAPABILITY
 
     def evaluate(self, ctx: Context) -> EvaluationResult:
         req = ctx.scenario.information_requirements.get("soc")
@@ -119,6 +129,7 @@ class DataImplausibleHeadroom001:
     constraint_class = ConstraintClass.INFORMATION
     severity = Severity.CRITICAL
     ucv_eligible = True
+    primary_capability = PRIMARY_CAPABILITY
 
     def evaluate(self, ctx: Context) -> EvaluationResult:
         req = ctx.scenario.information_requirements.get("network_headroom")
@@ -157,6 +168,7 @@ class DataMissingNetworkHeadroom001:
     constraint_class = ConstraintClass.INFORMATION
     severity = Severity.HIGH
     ucv_eligible = True
+    primary_capability = PRIMARY_CAPABILITY
 
     def evaluate(self, ctx: Context) -> EvaluationResult:
         req = ctx.scenario.information_requirements.get("network_headroom")

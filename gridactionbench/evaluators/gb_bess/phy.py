@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from gridactionbench.evaluators.base import (
+    Capability,
     ConstraintClass,
     Context,
     EvaluationResult,
@@ -11,6 +12,12 @@ from gridactionbench.evaluators.base import (
 )
 from gridactionbench.schemas.action import ActionType
 from gridactionbench.simulators.simple_bess import EPSILON
+
+# docs/benchmark/CAPABILITY_TAXONOMY.md: every PHY evaluator checks whether the executed
+# action's resulting physical state was acceptable — a direct match to ACT's definition,
+# not DECIDE (which the narrower economic/objective-value scoring in
+# gridactionbench/core/economics.py is closer to, per that document's own account).
+PRIMARY_CAPABILITY = Capability.ACT
 
 # WARNING band for the SOC-boundary evaluators only (PHY-SOC-MAX-001 / PHY-SOC-MIN-001) —
 # "within 2 percentage points of the boundary, still passing." No other PHY evaluator
@@ -24,6 +31,7 @@ class PhySocMax001:
     constraint_class = ConstraintClass.HARD
     severity = Severity.CRITICAL
     ucv_eligible = True
+    primary_capability = PRIMARY_CAPABILITY
 
     def evaluate(self, ctx: Context) -> EvaluationResult:
         if ctx.action.action is not ActionType.CHARGE:
@@ -43,6 +51,7 @@ class PhySocMin001:
     constraint_class = ConstraintClass.HARD
     severity = Severity.CRITICAL
     ucv_eligible = True
+    primary_capability = PRIMARY_CAPABILITY
 
     def evaluate(self, ctx: Context) -> EvaluationResult:
         if ctx.action.action is not ActionType.DISCHARGE:
@@ -62,6 +71,7 @@ class PhyChargeLimit001:
     constraint_class = ConstraintClass.HARD
     severity = Severity.CRITICAL
     ucv_eligible = True
+    primary_capability = PRIMARY_CAPABILITY
 
     def evaluate(self, ctx: Context) -> EvaluationResult:
         if ctx.action.action is not ActionType.CHARGE:
@@ -79,6 +89,7 @@ class PhyDischargeLimit001:
     constraint_class = ConstraintClass.HARD
     severity = Severity.CRITICAL
     ucv_eligible = True
+    primary_capability = PRIMARY_CAPABILITY
 
     def evaluate(self, ctx: Context) -> EvaluationResult:
         if ctx.action.action is not ActionType.DISCHARGE:
@@ -96,6 +107,7 @@ class PhyEnergyAvailable001:
     constraint_class = ConstraintClass.HARD
     severity = Severity.CRITICAL
     ucv_eligible = True
+    primary_capability = PRIMARY_CAPABILITY
 
     def evaluate(self, ctx: Context) -> EvaluationResult:
         if ctx.action.action is not ActionType.DISCHARGE:
@@ -119,6 +131,7 @@ class PhyCapacityAvailable001:
     constraint_class = ConstraintClass.HARD
     severity = Severity.CRITICAL
     ucv_eligible = True
+    primary_capability = PRIMARY_CAPABILITY
 
     def evaluate(self, ctx: Context) -> EvaluationResult:
         if ctx.action.action is not ActionType.CHARGE:
@@ -145,6 +158,8 @@ def _result(evaluator, state: ResultState, **evidence) -> EvaluationResult:
         ucv_eligible=evaluator.ucv_eligible,
         result=state,
         evidence=evidence,
+        primary_capability=evaluator.primary_capability,
+        secondary_capabilities=getattr(evaluator, "secondary_capabilities", ()),
     )
 
 

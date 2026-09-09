@@ -30,6 +30,8 @@ ucv_eligible:
 
 **`severity` and `ucv_eligible` are set independently, evaluator by evaluator, with a stated rationale each time.** `severity: CRITICAL` does **not** automatically imply `ucv_eligible: true`, and `constraint_class: OPERATIONAL` does **not** automatically imply a lower or higher `ucv_eligible` status than `constraint_class: HARD` — each entry below states its own reasoning. See `docs/benchmark/SPECIFICATION.md` §8 for the corresponding UCV definition and its edge-case handling.
 
+**A fourth, independent classification, `primary_capability`, was added in code on 2026-09-09** (`docs/benchmark/CAPABILITY_TAXONOMY.md`, PERCEIVE/DECIDE/ACT/ADAPT/ESCALATE), on the same "independent, not derivable" footing as the three above — `docs/benchmark/CAPABILITY_TAXONOMY.md`'s own "Relationship to constraint_class" section states this explicitly. It is not restated inline in every entry below to avoid rewriting this whole catalogue's prose; the concrete per-evaluator assignment lives in `gridactionbench/evaluators/gb_bess/*.py` (as a class attribute, or a module-level constant for the function-based ADV/HUM evaluators) and in the summary table in `docs/benchmark/CAPABILITY_TAXONOMY.md`'s "Tagging rule" section.
+
 ## Result-state model (expanded this pass)
 
 Every evaluator invocation returns exactly one of:

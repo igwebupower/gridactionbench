@@ -4,6 +4,23 @@ All notable changes to GridActionBench are documented here. Versioning follows `
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — Capability and stress-dimension tagging (closes BACKLOG.md P1 items 1-2)
+
+The first implementation work following the strategic realignment below — evaluator set and Task Family schemas are additively extended, no `evaluate()` body, `build` function, or `check_*` function is modified. **111/111 tests pass** (105 unchanged + 6 new in `tests/unit/test_capability_tags.py`).
+
+### Added
+- `Capability` enum (PERCEIVE/DECIDE/ACT/ADAPT/ESCALATE, `docs/benchmark/CAPABILITY_TAXONOMY.md`) and `primary_capability`/`secondary_capabilities` fields on `EvaluationResult` — `gridactionbench/evaluators/base.py`.
+- `primary_capability` tagging on all 18 evaluators (class attribute for PHY/NET/OPS/DATA; module-level constant for the function-based ADV/HUM evaluators), flowing through the shared `_result()` helpers into every Decision Record — not left as documentation-only metadata (closes the specific concern `docs/project/RISK_REGISTER.md` R-19 named). `HUM-ESCALATE-CRITICAL-DATA-001`'s required-escalation component additionally carries `secondary_capabilities=(PERCEIVE,)`, per `docs/benchmark/CAPABILITY_TAXONOMY.md`'s own worked example.
+- `primary_capability`, `complexity_rung`, `u_classes`, and `autonomy_burden` fields on `ScenarioTemplate` (`gridactionbench/scenarios/generator.py`) and `EpisodeSpec` (`gridactionbench/core/episode.py`), populated for all 20 templates and 6 episodes (`gridactionbench/scenarios/gb_bess/episodes.py`) per `docs/benchmark/STRESS_DIMENSIONS.md`.
+- `tests/unit/test_capability_tags.py` — pins every evaluator's and Task Family's tag to a valid value, checks the tag actually reaches `EvaluationResult`, and pins the specific claim `docs/benchmark/CAPABILITY_TAXONOMY.md`'s ADAPT section makes (episodes EP-003/004/005, not EP-001/002/006) so the two cannot silently drift apart.
+
+### Changed
+- `evaluation_result_to_dict()` (`gridactionbench/core/decision_record.py`) — adds `primary_capability`/`secondary_capabilities` keys.
+- `docs/benchmark/CAPABILITY_TAXONOMY.md`'s "Tagging rule" — records the concrete per-evaluator/per-episode assignments now that tagging is applied, rather than only describing it as pending.
+- `docs/benchmark/STRESS_DIMENSIONS.md` — records `complexity_rung`/`u_classes`/`autonomy_burden` as applied; asset/constraint-count metrics remain explicitly open (a definitional decision, not yet made).
+- `docs/suites/gb-bess/EVALUATION_SPEC.md`, `docs/suites/gb-bess/SCENARIO_TEMPLATES.md` — cross-reference the new tags without rewriting each evaluator's/template's existing prose.
+- `docs/project/GAP_ANALYSIS.md`, `docs/project/BACKLOG.md`, `docs/project/RISK_REGISTER.md` (R-19) — mark the tagging items done; reporting-layer slicing (BACKLOG.md P1 item 3) remains open and is now unblocked rather than blocked-and-pending.
+
 ## [Unreleased] — September 2026 strategic realignment (documentation and specification only)
 
 Prompted by an explicit challenge to the project's framing ("the exact problem GridActionBench is solving... sounds very narrow and not very useful," followed by "thinking more on a system level rather than battery unit level"). Rather than expand GB-BESS's implementation reactively, this pass produced a research-grounded redefinition of GridActionBench's mission, task/capability/stress-dimension model, and release gates, while leaving all working Phase 1-3 implementation untouched. **105/105 tests pass, unchanged, before and after this pass.** No evaluator, schema, scenario file, or simulator equation was modified. Per this pass's own explicit stop condition, no large code refactor is implemented here — all resulting work is queued in `docs/project/BACKLOG.md`'s new prioritised (P0-P3) section for explicit review before implementation begins.

@@ -39,6 +39,16 @@ class Severity(str, Enum):
     CRITICAL = "CRITICAL"
 
 
+class Capability(str, Enum):
+    """Perceive/Decide/Act/Adapt/Escalate — docs/benchmark/CAPABILITY_TAXONOMY.md."""
+
+    PERCEIVE = "PERCEIVE"
+    DECIDE = "DECIDE"
+    ACT = "ACT"
+    ADAPT = "ADAPT"
+    ESCALATE = "ESCALATE"
+
+
 @dataclass
 class EvaluationResult:
     eval_id: str
@@ -48,6 +58,11 @@ class EvaluationResult:
     ucv_eligible: bool
     result: ResultState
     evidence: dict[str, Any] = field(default_factory=dict)
+    # docs/benchmark/CAPABILITY_TAXONOMY.md, "Tagging rule" — independent of
+    # constraint_class (see that document's "Relationship to constraint_class"), assigned
+    # per evaluator on its own merits, not derived mechanically.
+    primary_capability: Optional[Capability] = None
+    secondary_capabilities: tuple[Capability, ...] = ()
 
     @property
     def contributes_to_ucv(self) -> bool:
@@ -73,5 +88,6 @@ class Evaluator(Protocol):
     constraint_class: Optional[ConstraintClass]
     severity: Severity
     ucv_eligible: bool
+    primary_capability: Capability
 
     def evaluate(self, ctx: Context) -> EvaluationResult: ...

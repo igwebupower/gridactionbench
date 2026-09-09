@@ -27,6 +27,19 @@ Every template declares fixed tags for: `soc_regime`, `network_regime`, `price_r
 
 **Honest read of this table:** `soc_regime` and `price_regime` are dominated by `mid`/`mixed` because most templates hold SOC and price at a representative midpoint while varying a different dimension (headroom, policy, information quality) — this is intentional, not an oversight, but it does mean SOC-regime and price-regime coverage specifically would benefit most from additional templates in a future pass, not from generating more instances of the existing 20.
 
+## Capability and stress-dimension tags (added 2026-09-09)
+
+Each `ScenarioTemplate` (and each `EpisodeSpec`, `gridactionbench/scenarios/gb_bess/episodes.py`) now additionally carries `primary_capability` (`docs/benchmark/CAPABILITY_TAXONOMY.md`), `complexity_rung`, `u_classes`, and `autonomy_burden` (`docs/benchmark/STRESS_DIMENSIONS.md`) — additive dataclass fields, independent of the `coverage` dict above, not a replacement for it. Current template-level breakdown:
+
+| Dimension | Tags represented across the 20 templates |
+|---|---|
+| `primary_capability` | ACT (6: all PHY + NET), DECIDE (5: all OPS reserve/prohibition + both MKT + ADV), PERCEIVE (5: all DATA), ESCALATE (4: OPS-APPROVAL + both HUM) |
+| `complexity_rung` | C0 (20 — GB-BESS v0.1 has no other rung implemented) |
+| `u_classes` | U0 (13), U2 (2), U3 (1), U4 (1), U7 (2, one of which — `HUM-REQUIRED` — also carries U2 and U4) |
+| `autonomy_burden` | low (20 — every `ScenarioTemplate` is Atomic) |
+
+No `EpisodeSpec` is tagged ACT+ADAPT ambiguity away by convenience: `GB-BESS-EP-001` (progressive depletion, static conditions) is DECIDE, `GB-BESS-EP-002` (SOC-ceiling approach, static conditions) is ACT, and only `GB-BESS-EP-003`/`004`/`005` (the three episodes `docs/benchmark/CAPABILITY_TAXONOMY.md`'s own ADAPT section already names as touching this capability) are tagged ADAPT — `GB-BESS-EP-006` is ESCALATE, per that document's "closer to an Operational-task version of this capability" account. All six episodes are `autonomy_burden: high` (Operational). See `tests/unit/test_capability_tags.py` for the test that pins every one of these assignments.
+
 ## What generating this set actually found (not a hypothetical benefit)
 
 Running the 300-scenario generated set against `RuleBasedAgent` — the benchmark's own "correct" reference controller — surfaced a real bug: the agent never checked `telemetry.field_status.network` at all. This was invisible in the hand-authored initial 20 because the one scenario testing missing network headroom (`GB-BESS-HUM-019`) *also* has a conflicting SOC reading, which the agent did check — masking the network-specific gap entirely. The generator's `DATA-MISSING-NETWORK` template isolates network-missingness without a SOC conflict and produced 15 UCVs out of 300 scenarios, all from that one template, all from the same root cause. Fixed in `baselines/rule_based/agent.py`; the specific case is now a permanent regression test (`tests/golden/test_generated_scenarios.py`). This is the concrete argument for why `≥1,000 executions` is a real target and not busywork — a hand-picked 20-scenario set has structural blind spots that broader, systematic parameter coverage reliably finds.

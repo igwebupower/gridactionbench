@@ -11,10 +11,13 @@ Derived from `docs/project/GAP_ANALYSIS.md`'s architecture gap analysis. **Nothi
 - Environment-vs-Benchmark distinction made explicit — `docs/architecture/ARCHITECTURE.md`.
 - North-star mission, capability model, and stress-dimension model documented — `docs/benchmark/RELIABILITY_BOUNDARY_MODEL.md`, `CAPABILITY_TAXONOMY.md`, `STRESS_DIMENSIONS.md`, `TASK_MODEL.md`.
 
+### P1 items 1-2 — done 2026-09-09 (first implementation pass following the realignment above)
+Unlike the documentation-only pass above, this is real, tested code: `primary_capability` tagging on every evaluator (flowing through `EvaluationResult` into every Decision Record, not left as documentation-only metadata) and `primary_capability`/`complexity_rung`/`u_classes`/`autonomy_burden` tagging on every `ScenarioTemplate` and `EpisodeSpec`. See `docs/benchmark/CAPABILITY_TAXONOMY.md`'s "Tagging rule" and `docs/benchmark/STRESS_DIMENSIONS.md` for the assignments and rationale, `tests/unit/test_capability_tags.py` for the regression coverage, and `CHANGELOG.md` for the full change list. 111/111 tests pass (105 unchanged + 6 new). No `evaluate()` body, `build` function, or `check_*` function was modified — exactly as items 1 and 2 below originally scoped.
+
 ### P1 — required for a credible GB-BESS v0.1 under the revised Definition of Done
-1. Tag all 18 existing evaluators with `primary_capability` (`docs/benchmark/CAPABILITY_TAXONOMY.md`).
-2. Tag all existing `ScenarioTemplate`/`EpisodeSpec` Task Families with C/U/H stress-dimension metadata (`docs/benchmark/STRESS_DIMENSIONS.md`) — additive dataclass fields, no change to existing `build`/`check` logic.
-3. Extend the reporting layer to slice reliability results by the new tags once (1) and (2) exist — depends on both.
+1. ~~Tag all 18 existing evaluators with `primary_capability` (`docs/benchmark/CAPABILITY_TAXONOMY.md`).~~ **Done — see above.**
+2. ~~Tag all existing `ScenarioTemplate`/`EpisodeSpec` Task Families with C/U/H stress-dimension metadata (`docs/benchmark/STRESS_DIMENSIONS.md`) — additive dataclass fields, no change to existing `build`/`check` logic.~~ **Done — see above.**
+3. Extend the reporting layer to slice reliability results by the new tags now that (1) and (2) exist.
 4. Design and implement `TrajectoryRecord` as an additive schema wrapping ordered `DecisionRecord`s (`docs/benchmark/TASK_MODEL.md`, "Trajectory records") — `EpisodeResult` already carries the needed data informally.
 5. Expand ADAPT-capability coverage (`docs/benchmark/CAPABILITY_TAXONOMY.md`) — at minimum one Task Family testing a forecast that turns out wrong (new U1 representation, `docs/benchmark/STRESS_DIMENSIONS.md`).
 6. Build the public/private holdout generator infrastructure (`docs/benchmark/PUBLIC_PRIVATE_POLICY.md`) — carried over from `docs/research/BENCHMARK_DESIGN_REVIEW.md`'s pre-existing higher-priority flag, unchanged by this pass.
