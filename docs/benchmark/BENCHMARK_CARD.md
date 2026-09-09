@@ -1,19 +1,25 @@
 # Benchmark Card — GridActionBench
 
 **Benchmark:** GridActionBench
-**First suite:** GB-BESS v0.1 (draft, unreleased)
-**Status:** Phase 0 — specification and research, no released results yet
-**Last updated:** 2026-09-08
+**First environment:** GB-BESS v0.1 (draft, unreleased)
+**Status:** Phase 0-3 specification, research, and initial implementation; revised by the September 2026 strategic realignment; no released results yet
+**Last updated:** 2026-09-09
 
 This card follows the spirit of model/dataset cards (e.g., Mitchell et al., "Model Cards for Model Reporting"; Gebru et al., "Datasheets for Datasets") applied to a benchmark rather than a model or dataset.
 
 ---
 
-## Purpose
+## Mission
+
+**GridActionBench is an open benchmark for evaluating the reliability boundaries of autonomous AI agents acting in dynamic energy systems.** It measures how different agent architectures perceive, decide, act, adapt, and escalate as system complexity, operational uncertainty, and autonomy burden increase. Initially grounded in the Great Britain electricity system, GridActionBench combines executable energy environments, reproducible scenarios, consequential actions, and deterministic evaluation to identify where autonomous behaviour remains reliable and where it begins to fail. See `docs/benchmark/RELIABILITY_BOUNDARY_MODEL.md` for the formal statement.
+
+GridActionBench does not claim to be the first energy-agent benchmark, the first executable energy benchmark, the first long-horizon energy-agent benchmark, or the first dynamic power-system AI benchmark — see `docs/research/DESIGN_EVIDENCE_BASE.md` for how prior research is used as evidence for specific design choices rather than as a novelty claim. The defensible position: GridActionBench focuses specifically on measuring the reliability boundaries of autonomous agent architectures as operational burden increases, initially within a rigorously GB-grounded energy-system context.
+
+## Purpose of the first environment, GB-BESS v0.1
 
 GridActionBench evaluates whether an AI agent (or any decision-making system — LLM agent, rule-based controller, optimizer, RL policy, hybrid, tool-using agent) **selects a valid and appropriate operational action** given what it knows, what it does not know, the constraints governing the system, and the consequences of that action. The governing principle: *do not just evaluate what an AI says — evaluate what happens if you let it act.*
 
-The first benchmark suite, **GB-BESS v0.1**, applies this to operational decisions for a simulated grid-connected Battery Energy Storage System (BESS) in a Great Britain electricity-system context.
+The first environment, **GB-BESS v0.1**, applies this to operational decisions for a simulated grid-connected Battery Energy Storage System (BESS) in a Great Britain electricity-system context — the first, deliberately narrow rung (C0, `docs/benchmark/STRESS_DIMENSIONS.md`) of a named future complexity progression, not the permanent boundary of what GridActionBench evaluates. See `docs/project/PID.md` §2.3 for that progression and the explicit non-commitment framing around it.
 
 ## Intended users
 
@@ -83,7 +89,9 @@ Reported as independent dimensions, never collapsed into a single opaque score (
 
 ## Known limitations (stated plainly, per HELM's precedent — see `docs/research/PRIOR_ART.md`)
 
-- GB-BESS v0.1 models a single BESS asset in isolation, not a multi-asset or whole-grid system.
+- GB-BESS v0.1 models a single BESS asset in isolation, not a multi-asset or whole-grid system — this is documented as the first rung (C0) of a named complexity progression (`docs/benchmark/STRESS_DIMENSIONS.md`), not a claim that single-asset evaluation is sufficient on its own.
+- The ADAPT capability (`docs/benchmark/CAPABILITY_TAXONOMY.md`) is thinly represented — most existing episodes test policy or telemetry change, none test a wrong forecast or a failed tool call.
+- Operational uncertainty coverage (`docs/benchmark/STRESS_DIMENSIONS.md`) omits forecast uncertainty and tool/source failure entirely as of this card's last-updated date.
 - The simulator is a simplified state-transition model, not a physics-grade power-flow or dynamic simulator.
 - Economic modeling is a narrow scalar reference-price signal, not a full revenue-stacking model.
 - GB specificity is currently contextual/structural, not yet data-grounded in licence-confirmed real GB market data (see `docs/suites/gb-bess/GB_SPECIFICITY.md`, "Honest self-assessment").

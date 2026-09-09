@@ -1,6 +1,6 @@
 # Scoring
 
-**Status:** Revised — Phase 0.5. Adds explicit handling for the expanded evaluator result-state enum (NOT_APPLICABLE/INDETERMINATE/EVALUATOR_ERROR), renames High-Confidence UCV to Self-Reported High-Confidence UCV, adds UCV breakdown by `constraint_class`, and adds a decision-quality reporting rule distinct from constraint-adherence reporting.
+**Status:** Revised — September 2026 strategic realignment. This document's mechanics are unchanged; it is now explicitly framed as producing one instance of the multidimensional **reliability profile** defined in `docs/benchmark/RELIABILITY_BOUNDARY_MODEL.md`, and its existing decision-quality/constraint-adherence separation (below) is named as a specific case of that document's general **reliability vs. effectiveness** split. Once evaluators and Task Families carry the capability (`docs/benchmark/CAPABILITY_TAXONOMY.md`) and stress-dimension (`docs/benchmark/STRESS_DIMENSIONS.md`) tags tracked in `docs/project/GAP_ANALYSIS.md`, this document's reporting format should be extended to slice by them — not built in this pass. Carried over from Phase 0.5: explicit handling for the expanded evaluator result-state enum (NOT_APPLICABLE/INDETERMINATE/EVALUATOR_ERROR), the Self-Reported High-Confidence UCV rename, UCV breakdown by `constraint_class`, and the decision-quality reporting rule below.
 
 ## No opaque overall score
 
@@ -57,6 +57,8 @@ Per master brief §7, UCV and Self-Reported High-Confidence UCV counts are repor
 ## Decision quality is reported separately from constraint adherence
 
 Per `docs/benchmark/SPECIFICATION.md` §9.1, a scenario's `preferred_actions` and any counterfactual objective-value comparison feed a **decision-quality** dimension (e.g. "economic decision quality," "escalation appropriateness beyond the binary required/not-required check"), which is never presented using constraint-violation language or folded into a `PASS`/`FAIL` dimension. An agent that always chooses a constraint-valid but suboptimal or overly cautious action should show up as weak on decision-quality metrics while remaining strong on constraint-adherence metrics — collapsing the two into one number would hide exactly this distinction, which is one of the more interesting behavioural findings this benchmark can produce.
+
+**This is the specific, already-implemented case of the general reliability-vs-effectiveness split** (`docs/benchmark/RELIABILITY_BOUNDARY_MODEL.md`): constraint-adherence dimensions measure reliability, decision-quality dimensions (economic decision quality, escalation appropriateness beyond the required/not-required binary) measure effectiveness. `AlwaysEscalateAgent`'s existing calibration result (0 UCVs, 85.7% escalation appropriateness) is the concrete evidence this split already produces — a perfectly "reliable" agent that is measurably not fully effective.
 
 ## Reference vs. Extended track scores are never merged
 

@@ -1,8 +1,8 @@
 # Domain Model
 
-**Status:** Draft — Phase 0
+**Status:** Revised — September 2026 strategic realignment. This document's entities (below) are the GB-BESS-specific instantiation of the general Task/Task Family/Instance/Trial/Trajectory/Outcome/Grader ontology now defined in `docs/benchmark/TASK_MODEL.md` — read that document first for the general model, then this one for how GB-BESS's concrete classes (`Scenario`, `DecisionRecord`, `Evaluator`) map onto it. No entity below is renamed or changed by this pass; `docs/benchmark/TASK_MODEL.md`'s "Terminology mapping" table gives the term-for-term correspondence.
 
-This document is the conceptual (not code-level) domain model; see `docs/architecture/DATA_MODEL.md` for concrete schema field types and `docs/benchmark/SPECIFICATION.md` for the methodology these concepts support.
+See `docs/architecture/DATA_MODEL.md` for concrete schema field types and `docs/benchmark/SPECIFICATION.md` for the methodology these concepts support.
 
 ## Core entities
 

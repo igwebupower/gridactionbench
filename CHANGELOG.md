@@ -4,6 +4,37 @@ All notable changes to GridActionBench are documented here. Versioning follows `
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — September 2026 strategic realignment (documentation and specification only)
+
+Prompted by an explicit challenge to the project's framing ("the exact problem GridActionBench is solving... sounds very narrow and not very useful," followed by "thinking more on a system level rather than battery unit level"). Rather than expand GB-BESS's implementation reactively, this pass produced a research-grounded redefinition of GridActionBench's mission, task/capability/stress-dimension model, and release gates, while leaving all working Phase 1-3 implementation untouched. **105/105 tests pass, unchanged, before and after this pass.** No evaluator, schema, scenario file, or simulator equation was modified. Per this pass's own explicit stop condition, no large code refactor is implemented here — all resulting work is queued in `docs/project/BACKLOG.md`'s new prioritised (P0-P3) section for explicit review before implementation begins.
+
+### Added
+- `docs/benchmark/RELIABILITY_BOUNDARY_MODEL.md` — the central research object (R = f(agent architecture, complexity, uncertainty, autonomy burden)), the multidimensional reliability profile, and the reliability-vs-effectiveness split, generalising the existing Unnecessary-Escalation-Rate mechanism into a named principle.
+- `docs/benchmark/TASK_MODEL.md` — Task / Task Family / Instance / Trial / Trajectory / Outcome / Grader ontology; reframes Mode A/Mode B as the Atomic/Operational ends of an Atomic→Sequential→Operational ladder and names the missing Sequential rung as a real, tracked gap rather than an oversight discovered later.
+- `docs/benchmark/CAPABILITY_TAXONOMY.md` — formal Perceive/Decide/Act/Adapt/Escalate definitions, with an honest per-capability account of what GB-BESS v0.1 already exercises (DECIDE, ESCALATE — mature; ACT — foundational; PERCEIVE — partial; ADAPT — thin, named as the primary near-term task-design focus).
+- `docs/benchmark/STRESS_DIMENSIONS.md` — System Complexity (C0-C4+), Operational Uncertainty (U0-U7), and Autonomy Burden (H) dimensions, explicitly not collapsed into a single difficulty score and explicitly not yet frozen as a numeric scale pending calibration evidence.
+- `docs/benchmark/VALIDATION_FRAMEWORK.md` — six named validation properties (instrument validity, construct validity, sensitivity, discrimination, stability, robustness) with current evidence stated honestly per property, including the still-untested ceiling-effect risk against genuinely capable agents first flagged in `docs/research/BENCHMARK_DESIGN_REVIEW.md`.
+- `docs/research/DESIGN_EVIDENCE_BASE.md` — evidence/inference/design-decision/assumption structure for major methodology choices; adds real, sourced citations for Terminal-Bench (arXiv:2601.11868), Grid-Agent (arXiv:2508.05702), VeraGrid-Agent/VeraGrid-MCQ-150 (arXiv:2607.25155), and "LLMs for Agentic Home Energy Management" (arXiv:2607.04569), plus current GB AI-energy policy context (DESNZ's 2026-09-08 "Vision for an AI-enabled clean energy system"; Ofgem's AI technical sandbox pilot), explicitly framed as evidence the problem is timely, never as endorsement.
+- `docs/project/GAP_ANALYSIS.md` — architecture gap analysis table (current capability → required capability → gap → code change needed → priority) and a research traceability matrix (research question → construct → task type → metric → evidence generated so far), both stated honestly as "partial" or "none yet" in most rows.
+- `docs/research/PRIOR_ART.md` §10 — the four new sources above, reviewed for what they support and explicitly distinguished from GridActionBench's own design (e.g. VeraGrid-MCQ-150 is a question-answering benchmark, structurally different from GridActionBench's consequential-action evaluation); a documented, honest "searched, not found" note for a hypothesised "SolarBench."
+
+### Changed
+- `docs/project/DEFINITION_OF_DONE.md` — fully reorganised around five evidence-based release gates (Instrument Validity, Construct Validity, Operational Depth, GB Grounding, External Review), replacing the earlier raw "≥100 templates / ≥1,000 executions" style targets per this pass's explicit instruction. Every prior checkbox fact is preserved, regrouped under the gate it actually evidences — nothing done was un-done, nothing pending was marked done.
+- `docs/project/PID.md` — adds §0 (mission statement, superseding the narrower Phase 0 purpose statement where they differ) and §2.3 ("Scope as a ladder, not a ceiling") — positions GB-BESS explicitly as C0 of a named future complexity progression (C1 PV+BESS, C2 +load = the named-but-unscheduled "GB-DER" next environment, C3+ network/portfolio/multi-agent), with explicit non-commitment language throughout.
+- `docs/project/RISK_REGISTER.md` — R-13 (single-asset scope) reframed as an open risk with a stated mitigation (the scope ladder) rather than closed by redefinition alone; adds R-18 (risk that naming future scope reads as an implied roadmap commitment) and R-19 (risk that the new capability/stress-dimension tagging schemes go unapplied).
+- `docs/project/ASSUMPTIONS.md` — adds A-13 through A-17 for the open questions this pass explicitly declines to resolve by assertion (C-rung boundaries, whether H should become a composite index, UCV's terminology/scope fit within the broader model, minimum stochastic trial count, economic-regret normalisation).
+- `docs/project/BACKLOG.md` — adds a prioritised (P0-P3) section derived from `GAP_ANALYSIS.md`, on top of the unchanged original Phase 1 backlog.
+- `docs/benchmark/SPECIFICATION.md` §2 — reframed (mechanics unchanged) as GB-BESS's instantiation of the general Task Model; Mode A/Mode B relabelled "Atomic / Single-Step" and "Operational / Episode" respectively.
+- `docs/benchmark/SCORING.md`, `docs/benchmark/BENCHMARK_CARD.md` — cross-referenced to the reliability profile, capability taxonomy, and stress dimensions; mission language updated in the Benchmark Card without changing any metric definition.
+- `docs/architecture/ARCHITECTURE.md` — adds an explicit "Environment/Harness vs. Benchmark" section, naming a distinction the package layout already implemented but had not previously stated in words.
+- `docs/architecture/DOMAIN_MODEL.md` — cross-referenced to `docs/benchmark/TASK_MODEL.md` as the general ontology this document's GB-BESS-specific entities instantiate.
+- `docs/suites/gb-bess/SCENARIO_CATALOGUE.md` — adds a Golden Verification Case / Atomic Benchmark Probe classification table for all 20 existing scenarios, operationally defined by presence in `tests/golden/test_golden_scenarios.py`'s hard-coded assertion set.
+- `docs/suites/gb-bess/GB_CONTEXT.md` — adds current GB AI-energy policy context (DESNZ, Ofgem), with the same non-endorsement framing already established for the connections-queue policy narrative.
+- `README.md` — mission statement, status section (test count, gate status), and key-documents table updated to reflect the above; no claim about implementation state was changed beyond the actual current numbers (105 tests, 20 scenarios + 6 episodes, 300 generated instances).
+
+### Not changed
+- No evaluator logic, schema field, scenario file, simulator equation, agent implementation, or test. UCV's mechanics, the 20 scenarios' content, the 18 evaluators, and the CLI are all unchanged.
+
 ## [Unreleased] — Mode B (episode evaluation) implementation
 
 ### Added

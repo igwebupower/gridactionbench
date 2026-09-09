@@ -34,6 +34,16 @@ This is real, current, sourced context for why AI-assisted BESS operational deci
 
 GBP as the currency unit is an artifact of the GB Balancing and Settlement Code (Elexon). This, by itself, still does not establish GB specificity — using GBP as a unit label changes no benchmark behaviour on its own, independent of the (now benchmark-affecting) timestep decision documented in `GB_SPECIFICITY.md`, Feature 3.
 
+## AI-specific GB policy context (added — September 2026 strategic realignment)
+
+*Same status as the rest of this document: real, current, sourced context for why this project is timely to a GB audience — not a claim that GridActionBench satisfies, informs, or is endorsed by either body's process, and not a claim that removing this section would change any evaluator, scenario, or schema field in GB-BESS v0.1.*
+
+**DESNZ.** On 2026-09-08, DESNZ published a "Vision for an AI-enabled clean energy system," opening a three-month consultation (to 2026-11-06) ahead of a planned UK "AI for Clean Energy Strategy." Per contemporaneous reporting, the document describes a future in which "autonomous AI agents representing assets such as batteries or heat pumps coordinate continuously," with outcomes "shaped through continuously applied decision rules and interactions between agents, rather than discrete human-led interventions," and separately observes that when outcomes emerge from many automated decisions, they "cannot easily be traced back to any single choice or actor." Source: New Civil Engineer, "Government to use AI in bid to create more sustainable energy grid" (accessed 2026-09-09); the primary GOV.UK publication was not independently loaded in this research pass — see `docs/research/DESIGN_EVIDENCE_BASE.md` for the full citation and the same caveat stated there.
+
+**Ofgem.** Ofgem decided to proceed with a 12-month AI technical sandbox pilot (consultation closed 2026-03-21; "AI technical sandbox consultation outcome" published 2026-06-03; pilot targeted for late autumn 2026), intended to generate structured, practical evidence on AI system behaviour and regulatory considerations ahead of future regulatory approaches. Source: `ofgem.gov.uk/consultation/ai-technical-sandbox`, accessed 2026-09-09.
+
+**Why this is cited, and what it is not cited for:** this is used only to establish that autonomous energy-asset agents and their accountability implications are a live, current UK policy topic — not as evidence that GridActionBench's specific constructs (UCV, escalation quality) are useful inputs to either body's process. That question is explicitly marked "requires expert review" in `docs/research/DESIGN_EVIDENCE_BASE.md`, not answered here. GridActionBench does not claim DESNZ or Ofgem endorsement, participation, or awareness of this project.
+
 ## What GB-BESS v0.1 explicitly does not model
 
 - Balancing Mechanism bid/offer submission and acceptance mechanics.

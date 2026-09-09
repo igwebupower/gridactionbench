@@ -1,6 +1,16 @@
 # Architecture
 
-**Status:** Draft — Phase 0 design, not yet implemented (implementation begins Phase 1)
+**Status:** Revised — September 2026 strategic realignment adds the "Environment/Harness vs. Benchmark" section below, made explicit per that pass's requirement; the rest of this document (package layout, interfaces, everything from Phase 1 implementation) is unchanged.
+
+## Environment/Harness vs. Benchmark (added — September 2026 strategic realignment)
+
+These are two distinct things, and this codebase has always implemented both without previously naming the boundary between them:
+
+**Environment / Harness** — the reusable system that initialises world state, exposes observations, mediates any tools, accepts actions, advances simulation, records trajectories, and runs evaluators. In this codebase: `gridactionbench/core/`, `schemas/`, `simulators/`, `evaluators/base.py`, `runners/`, `provenance/` — none of this is specific to GB-BESS's particular constants or scenario content, and (per `docs/architecture/adr/ADR-002-package-architecture.md`) is explicitly the part of the codebase a future second environment (GB-DER, `docs/project/PID.md` §2.3) would reuse without modification, if its interfaces hold up as intended.
+
+**Benchmark** — a frozen, repeatable evaluation protocol built on the environment: canonical task families, task distributions, public/private instances, fixed evaluation rules, metrics, baseline agents, a repeated-run protocol where necessary, a reporting format, and versioning. In this codebase: `gridactionbench/evaluators/gb_bess/` (concrete evaluator instances), `gridactionbench/scenarios/gb_bess/`, `suites/gb_bess/v0_1/`, `baselines/`, and everything in `docs/suites/gb-bess/` and `docs/benchmark/` that names GB-BESS-specific constraints, thresholds, or scenario content.
+
+**A runnable environment alone is not a benchmark.** `gridactionbench/`'s core package being fully functional does not by itself constitute a released, comparable benchmark — that requires the frozen protocol elements above, which is exactly why `docs/project/DEFINITION_OF_DONE.md`'s five gates exist as a separate concept from "does the code run."
 
 ## Component pipeline
 

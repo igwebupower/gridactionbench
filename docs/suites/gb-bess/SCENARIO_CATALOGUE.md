@@ -4,6 +4,41 @@
 
 **Conventions:** all scenarios are `source_type: synthetic` (per master brief §36). All numeric values are illustrative placeholders for Phase 1 implementation, not final calibrated parameters — final numeric ranges are Phase 3 (parameterised scenario generation) work informed by domain review. Simulator-specific numeric fields (`power_mw` ranges, SOC transition math) follow the frozen conventions in `docs/suites/gb-bess/SPECIFICATION.md` §9 (grid-side power, non-negative `power_mw`, efficiency direction as defined there).
 
+## Golden Verification Case vs. Atomic Benchmark Probe (added — September 2026 strategic realignment)
+
+Per `docs/benchmark/TASK_MODEL.md`, every scenario below is reclassified — not renamed, not modified — as one of:
+
+- **Golden Verification Case** — tests whether GridActionBench's own machinery (simulator, evaluator, boundary arithmetic) is correct. The system under test is the benchmark.
+- **Atomic Benchmark Probe** — tests whether an agent identifies and handles a controlled condition correctly. The system under test is the agent.
+- **Both** — the same fixture legitimately supports both purposes.
+
+The operational definition used here: a scenario is classified **Both** if it carries a hard-coded expected-result assertion in `tests/golden/test_golden_scenarios.py` (i.e., it is used both to verify the benchmark's own correctness *and* as part of the public scenario set every calibrated agent is run against, `docs/benchmark/CALIBRATION_RESULTS.md`); otherwise it is classified **Atomic Benchmark Probe (primary)** — it still exercises evaluator code paths and is covered by calibration sweeps, but has no individually hard-coded golden assertion of its own.
+
+| Scenario | Classification | Why |
+|---|---|---|
+| `GB-BESS-PHY-001` | Both | Master-brief §50 worked example; asserted in `test_golden_scenarios.py` |
+| `GB-BESS-PHY-002` | Atomic Benchmark Probe (primary) | Boundary-precision probe; no individual golden assertion — depends on `dt_hours` |
+| `GB-BESS-PHY-003` | Both | Worked example; asserted in `test_golden_scenarios.py` |
+| `GB-BESS-PHY-004` | Atomic Benchmark Probe (primary) | Boundary-precision mirror of PHY-002 |
+| `GB-BESS-PHY-005` | Atomic Benchmark Probe (primary) | Rate-limit-under-price-pressure probe; not in the golden set |
+| `GB-BESS-PHY-006` | Atomic Benchmark Probe (primary) | Mirror of PHY-005 |
+| `GB-BESS-NET-007` | Both | Master-brief §50 worked example; asserted in `test_golden_scenarios.py` |
+| `GB-BESS-NET-008` | Atomic Benchmark Probe (primary) | Boundary-precision variant of NET-007 |
+| `GB-BESS-NET-009` | Both | Asserted in `test_golden_scenarios.py` |
+| `GB-BESS-NET-010` | Atomic Benchmark Probe (primary) | Boundary-precision variant of NET-009 |
+| `GB-BESS-OPS-011` | Both | Master-brief §50 worked example; asserted in `test_golden_scenarios.py` |
+| `GB-BESS-OPS-012` | Atomic Benchmark Probe (primary) | Central OPS scenario, but not individually golden-asserted |
+| `GB-BESS-OPS-013` | Both | Asserted in `test_golden_scenarios.py`; also the scenario making the UCV-attribution split concrete |
+| `GB-BESS-DATA-014` | Both | Asserted in `test_golden_scenarios.py` |
+| `GB-BESS-DATA-015` | Atomic Benchmark Probe (primary) | Threshold depends on this scenario's own declared value, not independently golden-asserted |
+| `GB-BESS-DATA-016` | Both | Asserted in `test_golden_scenarios.py` |
+| `GB-BESS-DATA-017` | Atomic Benchmark Probe (primary) | Self-Reported High-Confidence UCV paradigm case, not individually golden-asserted |
+| `GB-BESS-ADV-018` | Both | Asserted in `test_golden_scenarios.py` |
+| `GB-BESS-HUM-019` | Atomic Benchmark Probe (primary) | Primary Appropriate-Escalation-Rate reference case; not individually golden-asserted (though its evaluator list was itself corrected during Phase 1, which is Golden-Verification-adjacent activity even without a formal assertion) |
+| `GB-BESS-HUM-020` | Both | Master-brief §22 anti-gaming control case; asserted in `test_golden_scenarios.py` |
+
+**Do not conflate the two claims.** "Does `PHY-SOC-MAX-001` correctly detect invalid charging?" (answered by the 10 **Both**-classified scenarios above, via `test_golden_scenarios.py`) and "Does `RuleBasedAgent` avoid invalid charging on `GB-BESS-PHY-002`?" (answered by `docs/benchmark/CALIBRATION_RESULTS.md`, using an **Atomic Benchmark Probe**-classified scenario) are evidence about different systems, even though both use PHY-family fixtures. A future scenario contribution should state which purpose it is intended for, per `docs/benchmark/TASK_MODEL.md`.
+
 ---
 
 ## PHY — Physical constraints

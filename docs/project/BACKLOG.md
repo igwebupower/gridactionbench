@@ -1,4 +1,41 @@
-# Implementation Backlog — Phase 1 Technical Spike
+# Implementation Backlog
+
+**Status:** Revised — September 2026 strategic realignment adds the prioritised backlog below, on top of the unchanged Phase 1 technical-spike backlog that follows it. The Phase 1 backlog is retained in full (Gate 1 was satisfied and nothing below invalidates that) — this file now has two sections: forward-looking priorities from the redesign, then the original Phase 1 completion record.
+
+## Prioritised backlog — September 2026 strategic realignment
+
+Derived from `docs/project/GAP_ANALYSIS.md`'s architecture gap analysis. **Nothing in this section is implemented by this pass** — per that pass's explicit stop condition, this is a queued work list for the next implementation phase, not a claim of work done. Priorities: **P0** benchmark correctness / conceptual blocker, **P1** required for a credible GB-BESS v0.1 under the revised Definition of Done, **P2** desirable after v0.1, **P3** future environment expansion.
+
+### P0 — done in this pass (documentation only)
+- Golden Verification Case / Atomic Benchmark Probe reclassification of the 20 existing scenarios — `docs/suites/gb-bess/SCENARIO_CATALOGUE.md`.
+- Environment-vs-Benchmark distinction made explicit — `docs/architecture/ARCHITECTURE.md`.
+- North-star mission, capability model, and stress-dimension model documented — `docs/benchmark/RELIABILITY_BOUNDARY_MODEL.md`, `CAPABILITY_TAXONOMY.md`, `STRESS_DIMENSIONS.md`, `TASK_MODEL.md`.
+
+### P1 — required for a credible GB-BESS v0.1 under the revised Definition of Done
+1. Tag all 18 existing evaluators with `primary_capability` (`docs/benchmark/CAPABILITY_TAXONOMY.md`).
+2. Tag all existing `ScenarioTemplate`/`EpisodeSpec` Task Families with C/U/H stress-dimension metadata (`docs/benchmark/STRESS_DIMENSIONS.md`) — additive dataclass fields, no change to existing `build`/`check` logic.
+3. Extend the reporting layer to slice reliability results by the new tags once (1) and (2) exist — depends on both.
+4. Design and implement `TrajectoryRecord` as an additive schema wrapping ordered `DecisionRecord`s (`docs/benchmark/TASK_MODEL.md`, "Trajectory records") — `EpisodeResult` already carries the needed data informally.
+5. Expand ADAPT-capability coverage (`docs/benchmark/CAPABILITY_TAXONOMY.md`) — at minimum one Task Family testing a forecast that turns out wrong (new U1 representation, `docs/benchmark/STRESS_DIMENSIONS.md`).
+6. Build the public/private holdout generator infrastructure (`docs/benchmark/PUBLIC_PRIVATE_POLICY.md`) — carried over from `docs/research/BENCHMARK_DESIGN_REVIEW.md`'s pre-existing higher-priority flag, unchanged by this pass.
+7. Produce a documented cross-mode comparison (same agent, Atomic vs. Operational) — currently missing per `docs/project/GAP_ANALYSIS.md`'s research traceability matrix.
+
+### P2 — desirable after v0.1
+1. A Sequential task mode implementation (state-dependent, static conditions — the currently-missing middle rung, `docs/benchmark/TASK_MODEL.md`).
+2. An optimisation/MPC baseline agent.
+3. `instance × k` repeated-trial execution and distributional reporting (needed before any stochastic/LLM agent is evaluated, `docs/project/ASSUMPTIONS.md` A-16).
+4. A dedicated MKT evaluator (carried over, unchanged, from `docs/suites/gb-bess/EVALUATION_SPEC.md`'s coverage note).
+5. U5 (tool/source failure) representation — coupled to the `AgentAdapter` interface gap below.
+
+### P3 — future environment expansion (named, not committed to a timeline)
+1. GB-DER environment (PV + BESS + load, C1/C2, `docs/benchmark/STRESS_DIMENSIONS.md`) — the next named environment after GB-BESS; not started, not scheduled.
+2. `AgentAdapter` interface revision to express tool selection / multiple information-source queries — revisit only once a scenario genuinely needs it, per `docs/research/BENCHMARK_DESIGN_REVIEW.md`'s original Phase 0 finding.
+3. Portfolio/network/multi-agent environments (C3+) — unscoped, named only as a future direction in `docs/benchmark/STRESS_DIMENSIONS.md`.
+4. Resolution of the open UCV-terminology question (`docs/project/ASSUMPTIONS.md` A-15) — review-gated, not a code task until a decision is made.
+
+---
+
+# Implementation Backlog — Phase 1 Technical Spike (original, unchanged)
 
 **Status:** Phase 1 complete (Gate 1 satisfied — see acceptance criteria below, all checked). Ordered for the technical spike (Phase 1, master brief §68), with dependencies, acceptance criteria, and explicitly deferred work. Original Phase 0 ordering preserved below with completion status; see `CHANGELOG.md` for the full Phase 1 change list.
 

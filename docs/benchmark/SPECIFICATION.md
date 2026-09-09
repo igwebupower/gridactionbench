@@ -1,6 +1,6 @@
 # GridActionBench — Core Specification
 
-**Status:** Revised — Phase 0.5 methodology correction pass. §8 (UCV) is tightened to require an explicit `ucv_eligible` constraint classification rather than treating "critical" as automatically UCV-eligible, and reviewed for edge cases; §8 also renames the confidence-based UCV variant to **Self-Reported High-Confidence UCV** and adds explicit confidence-limitation language; a new §9.1 formalizes the orthogonality of action validity and decision quality; a new §11.1 defines the evaluator result-state enum. See `CHANGELOG.md` for the full change list.
+**Status:** Revised — September 2026 strategic realignment. §2 is reframed (not changed in mechanics) as the Atomic/Operational instantiation of the general Task Model — see `docs/benchmark/TASK_MODEL.md`, which is now the canonical ontology document; this section retains the Mode A/Mode B names since they remain accurate for GB-BESS specifically. Carried over from Phase 0.5: §8 (UCV) requires an explicit `ucv_eligible` constraint classification rather than treating "critical" as automatically UCV-eligible; §8 also renames the confidence-based UCV variant to **Self-Reported High-Confidence UCV**; §9.1 formalizes the orthogonality of action validity and decision quality; §11.1 defines the evaluator result-state enum. See `CHANGELOG.md` for the full change list.
 **Scope:** the suite-agnostic architecture, domain model, and methodology shared by every GridActionBench suite. Suite-specific instantiation (schemas, simulator, scenario catalogue) for the first suite lives in `docs/suites/gb-bess/`.
 
 ---
@@ -51,7 +51,9 @@ Ground truth (Oracle), agent observation, and evaluation are three **distinct ob
 
 ## 2. Two benchmark modes
 
-### Mode A — Single-Step Evaluation (primary for v0.1)
+**These are GB-BESS's current instantiation of the general Atomic/Sequential/Operational task-mode ladder (`docs/benchmark/TASK_MODEL.md`) — GB-BESS implements the two ends of that ladder (Atomic, Operational) and not yet the middle rung (Sequential); see that document for the ladder in full and `docs/project/GAP_ANALYSIS.md` for the resulting gap.** Mode A is not "primary" in the sense of being the benchmark's main purpose — it is the atomic special case of a more general repeated-decision architecture (`docs/architecture/adr/ADR-016-episode-architecture.md`), and is simply the mode GB-BESS v0.1 currently has the most coverage in.
+
+### Mode A — Atomic / Single-Step Evaluation
 
 ```text
 State(t) -> Agent -> Action(t) -> Simulator -> State(t+1) -> Evaluation
@@ -59,7 +61,7 @@ State(t) -> Agent -> Action(t) -> Simulator -> State(t+1) -> Evaluation
 
 Evaluates one operational decision under precisely controlled conditions. This is the majority of every GridActionBench suite in v0.1.
 
-### Mode B — Episode Evaluation (small validated subset in v0.1)
+### Mode B — Operational / Episode Evaluation (small validated subset in v0.1)
 
 ```text
 State(t) -> Agent -> Action(t) -> State(t+1) -> Agent -> Action(t+1) -> State(t+2) -> ...

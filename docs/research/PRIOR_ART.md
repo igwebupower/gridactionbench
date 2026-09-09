@@ -1,7 +1,7 @@
 # Prior Art Review
 
-**Status:** Draft — Phase 0 foundation research
-**Access date for all sources below:** 2026-09-08
+**Status:** Revised — September 2026 strategic realignment adds §10 (recent LLM/agentic energy-domain literature and terminal-agent-benchmark methodology, researched 2026-09-09) and two rows to the §6 summary table. Sections 1-9 are otherwise unchanged and keep their original numbering so existing cross-references remain valid, per this project's established practice. See `docs/research/DESIGN_EVIDENCE_BASE.md` for how the new sources in §10 map to specific GridActionBench design decisions (evidence/inference/design-decision/assumption structure), which this document does not duplicate.
+**Access date for §1-9:** 2026-09-08. **Access date for §10:** 2026-09-09.
 **Author:** GridActionBench Lead Benchmark Architect (AI-assisted research; all claims sourced to primary documents, see citations)
 
 This document surveys benchmark methodology directly relevant to GridActionBench: GB-BESS v0.1, so that the project's design choices can be justified against, rather than invented independently of, existing work.
@@ -116,6 +116,9 @@ MLPerf's relevance is governance and comparability methodology, not task content
 | Hardware/throughput submission machinery | MLPerf | **Reject** | Not applicable |
 | General-purpose LM scenario taxonomy | HELM | **Reject** | Domain-native taxonomy (PHY/NET/OPS/MKT/DATA/ADV/HUM) used instead |
 | Reward-maximization RL training/evaluation loop | Grid2Op/RL2Grid | **Reject** | GridActionBench evaluates given decision-makers against fixed scenarios; it does not train policies or define a reward function |
+| Containerised task + programmatic verification + oracle solution structure | Terminal-Bench (§10.1) | **Convergent, not adopted from** | Independently present as Scenario/Simulator/Evaluator/reference-policy (`docs/benchmark/TASK_MODEL.md`) |
+| Deterministic-solver-grounded LLM evaluation (accuracy jumps sharply with tool/solver access) | VeraGrid-Agent (§10.3) | **Adopt as further evidence** | Reinforces the existing deterministic-evaluator-first commitment (`docs/benchmark/METHODOLOGY.md` §2) |
+| Question-answering-style benchmark structure (MCQ against solved state) | VeraGrid-MCQ-150 (§10.3) | **Reject** | GridActionBench evaluates chosen actions and their consequences, not answers to questions about a pre-solved state |
 
 ### 6.1 What distinguishes GridActionBench from the projects surveyed above
 
@@ -145,3 +148,41 @@ RESEARCH TODO — NETWORK ACCESS REQUIRED (if revisited offline)
 - Confirm RL2Grid's repository code licence directly (only the paper's CC BY 4.0 licence was confirmed in this pass).
 - The LF Energy project page for Grid2Op (lfenergy.org/projects/grid2op/) could not be substantively fetched in this pass (metadata only) — the GitHub repository was used as the primary source instead; revisit if LF Energy governance details become relevant.
 ```
+
+---
+
+## 10. Recent LLM/agentic energy-domain literature and terminal-agent-benchmark methodology (added — September 2026 strategic realignment)
+
+**Access date: 2026-09-09.** Reviewed per that pass's explicit instruction to survey "recent LLM energy reasoning/evaluation literature," "relevant microgrid/energy scheduling agent work," "multi-agent energy benchmarks," and "terminal-oriented agent benchmarks" as prior art for executable agent evaluation generally. None of the sources below changed a GB-BESS v0.1 design decision on their own — they are cited as further evidence for decisions already made (see `docs/research/DESIGN_EVIDENCE_BASE.md`) and as an honest account of the neighbouring literature, not as new dependencies or comparison targets.
+
+### 10.1 Terminal-Bench — executable agent evaluation outside the energy domain
+
+**Source:** Merrill et al., "Terminal-Bench: Benchmarking Agents on Hard, Realistic Tasks in Command Line Interfaces" (arXiv:2601.11868, submitted 2026-01-17, CC BY 4.0); `github.com/laude-institute/terminal-bench`. Access date 2026-09-09.
+
+89 hand-crafted, human-verified command-line tasks, each with a containerised environment, a programmatic verification suite, and an oracle solution; frontier models scored below 65%. This is the clearest terminal-oriented analogue to the "executable tasks, environment state, tools, consequential actions, independent verification, reference solutions, reproducibility" pattern named in this realignment — GridActionBench arrives at the same pattern independently, in a different domain (single-asset energy operations rather than open-ended shell environments), and is not built on or dependent on Terminal-Bench. No code or task content has been reused.
+
+### 10.2 Grid-Agent — multi-agent LLM grid control (network scale, not evaluated here as a benchmark)
+
+**Source:** Zhang, Saber, Youssef, Kundur, "Grid-Agent: An LLM-Powered Multi-Agent System for Power Grid Control" (arXiv:2508.05702, submitted 2025-08-07). Access date 2026-09-09.
+
+An LLM-driven multi-agent framework that detects and remediates grid violations (switch reconfiguration, battery deployment, load management) across a network, using planning and validation agents. This operates at the network/multi-asset complexity level GB-BESS v0.1 deliberately does not yet address (`docs/benchmark/STRESS_DIMENSIONS.md`, C1+) and is not itself a benchmark with a held-out evaluation protocol in the form reviewed here — cited as evidence that LLM-based multi-asset grid-operation research exists, not as a comparable benchmark.
+
+### 10.3 VeraGrid-Agent / VeraGrid-MCQ-150 — deterministic-solver-grounded LLM evaluation
+
+**Source:** Tripathi, Mohsenian-Rad, Raissi, "VeraGrid-Agent: Tool-Augmented LLMs for Distribution Optimal Power Flow at the Grid Edge" (arXiv:2607.25155, submitted 2026-07-28). Access date 2026-09-09.
+
+A tool-augmented LLM agent that constructs simulator inputs, runs the open-source VeraGrid power-flow solver, and interprets outputs to answer power-flow questions, evaluated against VeraGrid-MCQ-150 (150 deterministic, expert-authored multiple-choice questions). Reported accuracy: 42.7-49.3% without tool access, 97.3-100.0% with solver access. **Structurally distinct from GridActionBench**: this is a question-answering benchmark (does the agent correctly answer a question about a solved power-flow state) rather than a consequential-action benchmark (does the agent's chosen action, once executed, produce an acceptable world state) — the two evaluate different things even though both concern power-system reasoning. Cited in `docs/research/DESIGN_EVIDENCE_BASE.md` as evidence for pairing LLM output with deterministic ground truth, not as a comparable benchmark design.
+
+### 10.4 LLMs for Agentic Home Energy Management — closest domain analogue reviewed
+
+**Source:** Jonah, Moses, Babatunde, Ajao-Olarinoye, Bammeke, "LLMs for Agentic Home Energy Management" (arXiv:2607.04569, submitted 2026-07-06, revised 2026-07-28). Access date 2026-09-09.
+
+A tool-calling ReAct agent that converts natural-language household preferences into appliance schedules against dynamic electricity pricing, incorporating weather/solar forecasts, with feasibility validated deterministically; reported capturing 96.7-98.0% of MILP-optimal savings. This is the closest single source reviewed to GridActionBench's own domain (consequential scheduling decisions against physical/cost constraints, verified deterministically rather than trusted from the LLM) — it has no escalation, information-sufficiency, or adversarial-robustness axis, and operates at the household/appliance level rather than a grid-connected BESS. No code or scenario content reused.
+
+### 10.5 SolarBench — searched, not found
+
+A search for a benchmark specifically named or positioned as "SolarBench" for AI agents in solar energy did not surface a matching, citable project as of 2026-09-09. Recorded here so a future contributor does not need to repeat the search, not asserted as proof no such project exists — see `docs/research/DESIGN_EVIDENCE_BASE.md`'s equivalent note.
+
+### 10.6 Summary — where §10's sources land
+
+None of the five sources above changed any GB-BESS v0.1 evaluator, scenario, or schema. Their contribution is evidentiary, per `docs/research/DESIGN_EVIDENCE_BASE.md`: Terminal-Bench and the Power Systems Agent Benchmark (§1) jointly support executable/consequence-based evaluation as a methodology adopted independently by multiple projects across domains; VeraGrid-Agent and the HEMS paper jointly support pairing LLM output with deterministic verification rather than trusting an LLM's self-report, which GridActionBench already does (`docs/benchmark/METHODOLOGY.md` §4); Grid-Agent is evidence of network-scale LLM grid-operation research existing at a complexity level (`docs/benchmark/STRESS_DIMENSIONS.md` C1+) GridActionBench has named as a future direction but not yet built.
