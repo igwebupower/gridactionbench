@@ -3,7 +3,7 @@
 **Status:** Proposed
 
 ## Context
-Master brief §9 requires a strict separation between ground truth (Oracle) and what the agent believes (Observation), explicitly to enable rigorous testing of stale, missing, incorrect, and contradictory data. This is arguably the single most load-bearing design decision in the entire benchmark — without it, the DATA and HUM scenario families (7 of the initial 20 scenarios, plus 2 of 7 episodes) have no coherent definition.
+Master brief §9 requires a strict separation between ground truth (Oracle) and what the agent believes (Observation), explicitly to enable rigorous testing of stale, missing, incorrect, and contradictory data. This is arguably the single most load-bearing design decision in the entire benchmark — without it, the DATA and HUM scenario families (7 of the initial 20 scenarios, plus 2 of 8 episodes) have no coherent definition.
 
 ## Decision
 `Oracle` and `EnergyObservationV1` are modeled as two distinct data structures, both derived from a single `Scenario` definition but never conflated into one object at any point in the pipeline (`docs/architecture/ARCHITECTURE.md`, "Oracle / Observation separation"). The `Evaluation Engine` receives both; the `AgentAdapter` receives only the Observation. A scenario's `observation_generation` spec explicitly declares how the Observation relates to the Oracle for that scenario (identity, redaction, or deliberate corruption) — never a generic, implicit "observations are always a truncated oracle" rule.

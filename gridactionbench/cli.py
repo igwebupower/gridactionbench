@@ -9,6 +9,7 @@ import typer
 
 from baselines.always_escalate.agent import AlwaysEscalateAgent
 from baselines.always_idle.agent import AlwaysIdleAgent
+from baselines.mpc_lookahead.agent import MpcLookaheadAgent
 from baselines.rule_based.agent import RuleBasedAgent
 from baselines.seeded_failures.always_charge import AlwaysChargeAgent
 from baselines.seeded_failures.ignore_minimum_soc import IgnoreMinimumSOCAgent
@@ -35,6 +36,7 @@ AGENTS = {
     "always-idle": lambda dt_hours: AlwaysIdleAgent(),
     "always-escalate": lambda dt_hours: AlwaysEscalateAgent(),
     "rule-based": lambda dt_hours: RuleBasedAgent(dt_hours=dt_hours),
+    "mpc-lookahead": lambda dt_hours: MpcLookaheadAgent(dt_hours=dt_hours),
     "always-charge": lambda dt_hours: AlwaysChargeAgent(),
     "ignore-network": lambda dt_hours: IgnoreNetworkAgent(dt_hours=dt_hours),
     "ignore-minimum-soc": lambda dt_hours: IgnoreMinimumSOCAgent(dt_hours=dt_hours),

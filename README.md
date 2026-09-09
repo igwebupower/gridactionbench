@@ -12,7 +12,7 @@ GridActionBench does not claim to be the first energy-agent benchmark, the first
 
 ## Status
 
-**Phase 1-3 implementation in progress; specification revised by the September 2026 strategic realignment.** The core pipeline is implemented and running: schemas, `SimpleBessSimulator`, all 19 specified evaluators, 3 reference agents, 8 seeded-failure agents, a parameterised scenario generator (20 templates, 300 instances), 7 validated episodes, a JSONL Decision Record writer, per-dimension reporting, and a CLI — **148 passing tests**, all 20 initial scenarios plus 7 episodes executable end-to-end. See `docs/project/DEFINITION_OF_DONE.md` for the current status against the five evidence-based release gates (Instrument Validity, Construct Validity, Operational Depth, GB Grounding, External Review — replacing the earlier raw scenario/execution-count targets), `docs/project/GAP_ANALYSIS.md` for the architecture gap analysis and research traceability matrix, and `docs/benchmark/CALIBRATION_RESULTS.md` for real calibration output.
+**Phase 1-3 implementation in progress; specification revised by the September 2026 strategic realignment.** The core pipeline is implemented and running: schemas, `SimpleBessSimulator`, all 19 specified evaluators, 4 reference agents, 8 seeded-failure agents, a parameterised scenario generator (20 templates, 300 instances), 8 validated episodes, a JSONL Decision Record writer, per-dimension reporting, and a CLI — **152 passing tests**, all 20 initial scenarios plus 8 episodes executable end-to-end. See `docs/project/DEFINITION_OF_DONE.md` for the current status against the five evidence-based release gates (Instrument Validity, Construct Validity, Operational Depth, GB Grounding, External Review — replacing the earlier raw scenario/execution-count targets), `docs/project/GAP_ANALYSIS.md` for the architecture gap analysis and research traceability matrix, and `docs/benchmark/CALIBRATION_RESULTS.md` for real calibration output.
 
 ```bash
 pip install -e .
@@ -44,10 +44,10 @@ This pipeline is the **Atomic** special case of a more general Task/Trial/Trajec
 ```text
 docs/           specification, research, architecture, project, and testing documentation
 gridactionbench/ core library: schemas, simulator, evaluators, runner, reporting, CLI
-baselines/       reference agents (always_idle, always_escalate, rule_based) and 8 seeded-failure agents
+baselines/       reference agents (always_idle, always_escalate, rule_based, mpc_lookahead) and 8 seeded-failure agents
 suites/gb_bess/  GB-BESS scenario data — all 20 initial scenarios, suites/gb_bess/v0_1/scenarios/*.yaml
 data/            synthetic data and manifests
-tests/           unit, integration, golden, reproducibility tests — 148 passing
+tests/           unit, integration, golden, reproducibility tests — 152 passing
 scripts/         one-off utilities (e.g. the scenario-catalogue backfill script)
 ```
 
@@ -63,7 +63,7 @@ scripts/         one-off utilities (e.g. the scenario-catalogue backfill script)
 | `docs/benchmark/BENCHMARK_CARD.md` | Purpose, intended use, out-of-scope use, limitations |
 | `docs/benchmark/SPECIFICATION.md` | Core architecture and methodology |
 | `docs/suites/gb-bess/SPECIFICATION.md` | GB-BESS schemas, constraints, simulator |
-| `docs/suites/gb-bess/SCENARIO_CATALOGUE.md` | The initial 20 scenarios and 7 episode designs, plus Golden-Verification-Case-vs-Atomic-Benchmark-Probe classification |
+| `docs/suites/gb-bess/SCENARIO_CATALOGUE.md` | The initial 20 scenarios and 8 episode designs, plus Golden-Verification-Case-vs-Atomic-Benchmark-Probe classification |
 | `docs/suites/gb-bess/EVALUATION_SPEC.md` | The evaluator catalogue |
 | `docs/benchmark/CALIBRATION_RESULTS.md` | Real output from 10 agents (3 reference, 7 seeded-failure) against the 20 initial scenarios |
 | `docs/benchmark/CROSS_MODE_COMPARISON.md` | The same 10 agents, Atomic vs. Operational — does good atomic performance predict operational reliability? (No.) |

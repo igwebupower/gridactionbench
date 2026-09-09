@@ -1059,3 +1059,44 @@ failure_signature: The agent CHARGEs at step 2 (the specific signature of keying
   reliably does (tests/golden/test_episodes.py).
 review_status: DRAFT
 ```
+
+### GB-BESS-EP-008 — Two-peak price, a genuine multi-step timing tradeoff (added 2026-09-09)
+
+```yaml
+episode_id: GB-BESS-EP-008
+steps: 6
+setup: >
+  Steps 0-1: a modest positive price (+10 GBP/MWh) — enough to trigger RuleBasedAgent's
+  "discharge on any positive price" policy. Steps 2-5: a much higher price (+200 GBP/MWh).
+  market.price_forecast_gbp_mwh is a constant +200 throughout — a correct, never-wrong
+  forecast of the coming peak (unlike GB-BESS-EP-007's forecast that turns out wrong).
+  Verified against the actual SimpleBessSimulator before this episode was written
+  (soc=0.50, min_soc=0.10, capacity_mwh=10.0, max_discharge_mw=2.0,
+  discharge_efficiency=0.95, dt_hours=0.5): discharging at max rate on every positive-price
+  step (RuleBasedAgent's actual policy) nets 380 GBP total; holding during steps 0-1 and
+  discharging at max rate only once price rises nets 760 GBP — exactly double, because the
+  battery's limited capacity cannot fund both the modest-price and the full peak-price
+  discharge.
+what_is_evaluated: >
+  Whether the agent holds back during the modest-price window in favour of the much larger
+  forecast opportunity, or greedily discharges at the lesser price and forfeits capacity
+  needed for the peak. Primary capability: DECIDE (this document's own definition names
+  "future-state consequences" explicitly). u_class: U0 — an honest, imperfect fit; this
+  episode tests full-information multi-step planning, which none of
+  docs/benchmark/STRESS_DIMENSIONS.md's U0-U7 classes actually name (it is not U1, since
+  the forecast here is always correct, never wrong).
+constraint_class: none — discharging at the modest price is physically/policy-valid; this
+  is a decision-quality failure, checked via MKT-PREFERRED-ACTION-001
+  (docs/suites/gb-bess/EVALUATION_SPEC.md, "MKT"), which each step declares
+  preferred_actions for (["IDLE"] during the modest-price window, ["DISCHARGE"] once the
+  peak arrives).
+failure_signature: MKT-PREFERRED-ACTION-001 FAILs on step 0 or 1 — the agent discharged at
+  the modest price instead of holding — implemented as `check_ep008`
+  (gridactionbench/scenarios/gb_bess/episodes.py). **Deliberately verified in the opposite
+  direction from every other episode**: RuleBasedAgent is *expected* to trigger this (its
+  economic-sophistication limits are already disclaimed, docs/project/ASSUMPTIONS.md A-12)
+  — the new MpcLookaheadAgent (baselines/mpc_lookahead/agent.py), built specifically to
+  solve this tradeoff, is expected not to (tests/golden/test_episodes.py, which also
+  verifies the exact 380/760 GBP revenue split directly against the simulator).
+review_status: DRAFT
+```

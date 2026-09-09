@@ -1,6 +1,18 @@
-"""The 7 GB-BESS v0.1 episodes. See docs/suites/gb-bess/SCENARIO_CATALOGUE.md, "Episode
+"""The 8 GB-BESS v0.1 episodes. See docs/suites/gb-bess/SCENARIO_CATALOGUE.md, "Episode
 scenarios (Mode B)" for the design intent each of these implements, and
 docs/architecture/adr/ADR-016-episode-architecture.md for the runner architecture.
+
+GB-BESS-EP-008 (added 2026-09-09) is a genuine multi-step timing tradeoff (a modest price
+now, a much higher one later in the same episode, with limited battery capacity forcing a
+real choice) — built specifically to give the new MpcLookaheadAgent
+(baselines/mpc_lookahead/agent.py) something real to prove: under every *other* episode's
+constant-or-recognition-only conditions, greedy per-step discharge is already provably
+revenue-optimal, so no optimisation-style agent could show genuine advantage
+(docs/project/GAP_ANALYSIS.md). RuleBasedAgent is *expected* to trigger this episode's
+failure_signature — its economic-sophistication limits are already disclaimed
+(docs/project/ASSUMPTIONS.md A-12) — see tests/golden/test_episodes.py for the one
+explicit, documented exception this requires to the "RuleBasedAgent never triggers any
+episode" invariant.
 
 GB-BESS-EP-007 (added 2026-09-09) is the first episode tagged `primary_capability=ADAPT`
 representing U1 (forecast uncertainty, docs/benchmark/STRESS_DIMENSIONS.md) — closing the
@@ -58,12 +70,14 @@ def _episode_scenario(
     observation_overrides: dict | None = None,
     information_requirements: dict | None = None,
     escalation: EscalationSpec | None = None,
+    preferred_actions: list[str] | None = None,
 ) -> Scenario:
     return Scenario(
         scenario_id=f"{episode_id}-STEP-{step:02d}",
         scenario_version="0.1.0",
         family=family,
         source_type="synthetic",
+        preferred_actions=preferred_actions or [],
         oracle=Oracle(
             battery={
                 "soc": soc,
@@ -300,6 +314,54 @@ def check_ep007(result: EpisodeResult) -> FailureSignatureCheck:
     return FailureSignatureCheck(False, "step 2: did not charge — did not key off the stale forecast")
 
 
+# --- EP-008: Two-peak price — a genuine multi-step timing tradeoff (DECIDE) ---
+
+
+def _ep008_build_step(step: int, soc: float) -> Scenario:
+    """Steps 0-1: a modest positive price (+10/MWh — still enough to trigger
+    RuleBasedAgent's "discharge on any positive price" policy). Steps 2-5: a much higher
+    price (+200/MWh). `price_forecast_gbp_mwh` is a constant +200 throughout — a correct,
+    never-wrong forecast of the coming peak (unlike GB-BESS-EP-007's forecast that turns
+    out wrong). Verified with the actual SimpleBessSimulator before this episode was
+    written (docs/project/BACKLOG.md P2 item 2): discharging at max rate on every positive
+    step (RuleBasedAgent's actual policy) yields 380 GBP total; holding during steps 0-1
+    and discharging at max rate only once the price rises yields 760 GBP — exactly double,
+    because the battery's limited capacity (SOC 0.50 down to min_soc 0.10) cannot fund both
+    the modest-price and the full peak-price discharge — using any of it early strictly
+    costs capacity that would otherwise capture the much larger later opportunity.
+    `preferred_actions` encodes this: IDLE is preferred while the forecast promises a much
+    better opportunity than the current price; DISCHARGE is preferred once that promised
+    price actually arrives."""
+    if step < 2:
+        price, preferred = 10.0, ["IDLE"]
+    else:
+        price, preferred = 200.0, ["DISCHARGE"]
+    return _episode_scenario(
+        "GB-BESS-EP-008", step, "MKT", soc=soc,
+        market={"reference_price_gbp_mwh": price, "price_forecast_gbp_mwh": 200.0},
+        preferred_actions=preferred,
+    )
+
+
+EP_008 = EpisodeSpec("GB-BESS-EP-008", "0.1.0", "MKT", steps=6, initial_soc=0.50, build_step=_ep008_build_step, primary_capability=Capability.DECIDE, u_classes=("U0",), task_mode="Operational", autonomy_burden="high", description="Two-peak price — a genuine multi-step timing tradeoff")
+
+
+def check_ep008(result: EpisodeResult) -> FailureSignatureCheck:
+    """Checks: did MKT-PREFERRED-ACTION-001 (gridactionbench/evaluators/gb_bess/mkt.py)
+    FAIL on step 0 or 1 — i.e., did the agent discharge at the modest price instead of
+    holding for the forecast peak? Deliberately the one episode where RuleBasedAgent IS
+    expected to trigger this (docs/project/ASSUMPTIONS.md A-12 already disclaims
+    RuleBasedAgent's economic sophistication) — see tests/golden/test_episodes.py for the
+    explicit, documented exception to the "RuleBasedAgent never triggers" invariant this
+    requires, and the corresponding positive test that MpcLookaheadAgent
+    (baselines/mpc_lookahead/agent.py) does NOT trigger it."""
+    for i in (0, 1):
+        for r in result.step_records[i].evaluation_results:
+            if r["eval_id"] == "MKT-PREFERRED-ACTION-001" and r["result"] == "FAIL":
+                return FailureSignatureCheck(True, f"step {i}: discharged at the modest price instead of holding for the forecast peak")
+    return FailureSignatureCheck(False, "held during the low-price window, as the forecast peak justified")
+
+
 EPISODES: dict[str, tuple[EpisodeSpec, callable]] = {
     "GB-BESS-EP-001": (EP_001, check_ep001),
     "GB-BESS-EP-002": (EP_002, check_ep002),
@@ -308,4 +370,5 @@ EPISODES: dict[str, tuple[EpisodeSpec, callable]] = {
     "GB-BESS-EP-005": (EP_005, check_ep005),
     "GB-BESS-EP-006": (EP_006, check_ep006),
     "GB-BESS-EP-007": (EP_007, check_ep007),
+    "GB-BESS-EP-008": (EP_008, check_ep008),
 }
