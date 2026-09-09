@@ -59,6 +59,7 @@ class TaskFamilyTags(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
+    task_mode: str  # "Atomic" | "Sequential" | "Operational" — docs/benchmark/TASK_MODEL.md
     primary_capability: str
     complexity_rung: str
     u_classes: tuple[str, ...]

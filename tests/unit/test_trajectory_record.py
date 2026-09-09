@@ -37,6 +37,15 @@ def test_trajectory_record_wraps_every_step_of_the_episode():
     assert trajectory.task_mode == "Operational"
 
 
+def test_trajectory_record_reflects_the_sequential_reclassification():
+    """GB-BESS-EP-001/EP-002 were reclassified task_mode="Sequential" 2026-09-09
+    (docs/benchmark/TASK_MODEL.md) — a TrajectoryRecord built from either must reflect
+    that, not the "Operational" every episode used to carry unconditionally."""
+    trajectory = _build("GB-BESS-EP-001", RuleBasedAgent(dt_hours=DT_HOURS))
+    assert trajectory.task_mode == "Sequential"
+    assert trajectory.task_family_tags.task_mode == "Sequential"
+
+
 def test_trajectory_record_carries_the_episode_s_task_family_tags():
     trajectory = _build("GB-BESS-EP-003", RuleBasedAgent(dt_hours=DT_HOURS))
     episode, _check_fn = EPISODES["GB-BESS-EP-003"]

@@ -18,10 +18,10 @@
 - [x] UCV detection implemented — `gridactionbench/core/engine.py`, gated on `ucv_eligible`, not severity alone (definition and open naming/scope question: `docs/benchmark/RELIABILITY_BOUNDARY_MODEL.md`, "UCV's place in this model")
 - [x] Escalation evaluation implemented — `gridactionbench/evaluators/gb_bess/hum.py`
 - [x] Single-step (Atomic) suite implemented — `suites/gb_bess/v0_1/scenarios/*.yaml`, all 20, plus 300 generated instances (`gridactionbench/scenarios/generator.py`)
-- [x] Small episode (Operational) suite implemented — all 6 (`gridactionbench/scenarios/gb_bess/episodes.py`), each with a bidirectionally-verified `failure_signature` (`tests/golden/test_episodes.py`)
+- [x] Small multi-step episode suite implemented — all 7 (`gridactionbench/scenarios/gb_bess/episodes.py`; 2 Sequential, 5 Operational, `docs/benchmark/TASK_MODEL.md`), each with a bidirectionally-verified `failure_signature` (`tests/golden/test_episodes.py`)
 - [x] Provenance tracked per scenario (`author`/`created_date`, `source_type: synthetic`)
 - [x] Versioning enforced per scenario (`scenario_version`, validated by the pydantic `Scenario` model)
-- [x] **139/139 tests pass** (`python -m pytest`)
+- [x] **141/141 tests pass** (`python -m pytest`)
 - [ ] Counterfactual support for selected scenarios (architecture designed, `ADR-017`; not built)
 - [x] `TrajectoryRecord` for multi-step trials — done 2026-09-09, `gridactionbench/core/trajectory_record.py`, `tests/unit/test_trajectory_record.py` (`docs/benchmark/TASK_MODEL.md`)
 
@@ -49,12 +49,12 @@
 *Validated Atomic → Sequential → Operational task progressions exist; ADAPT is genuinely exercised.*
 
 - [x] Atomic task family implemented and validated — 20 hand-authored + 300 generated instances
-- [x] Operational task family implemented and validated — 7 episodes, each bidirectionally verified
-- [ ] Sequential task family (the middle rung: state-dependent, non-changing conditions) — not implemented; a real, named gap (`docs/benchmark/TASK_MODEL.md`), not an oversight discovered late
+- [x] Operational task family implemented and validated — 5 episodes (`GB-BESS-EP-003`-`EP-007`), each bidirectionally verified
+- [x] Sequential task family (the middle rung: state-dependent, non-changing conditions) — done 2026-09-09, by reclassification: `GB-BESS-EP-001`/`EP-002` were found to already have static conditions and are now tagged `task_mode="Sequential"` (`docs/benchmark/TASK_MODEL.md`); no new scenario content was written
 - [ ] ADAPT genuinely exercised — improved but still partial: 4 of 7 episodes now touch it, including `GB-BESS-EP-007`'s forecast-turns-out-wrong case added 2026-09-09; a failed tool call and physical deviation from expectation remain untested (`docs/benchmark/CAPABILITY_TAXONOMY.md`)
 - [x] Cross-mode comparison (does good Atomic performance predict Operational reliability, for the same agent) — done 2026-09-09, `docs/benchmark/CROSS_MODE_COMPARISON.md`; answer is no, not reliably, verified concretely for two agents
 
-**Gate 3 status: not satisfied.** This is a genuine, named gap, not a target left over from an abandoned raw-count goal — the redesign specifically calls out ADAPT as underrepresented relative to intended scope, and this gate exists so that fact stays visible rather than being smoothed over by the Atomic suite's relative maturity. The cross-mode comparison above is evidence *for* this gap mattering, not evidence it is closed: it found that the (then-6-episode) Operational suite gives uneven exposure to different agent defects, which is a direct consequence of the same thin Operational task-family coverage this gate already tracks. `GB-BESS-EP-007` (added 2026-09-09) closes the forecast-was-wrong half of the ADAPT gap concretely, but Sequential task mode is still entirely unimplemented and tool-failure/physical-deviation ADAPT content is still untested — the gate remains not satisfied on its own stated terms.
+**Gate 3 status: still not satisfied — one of its two named gaps closes, one remains.** The Sequential-task-mode gap above is now closed, honestly, as a reclassification of existing content rather than a claim of new capability. ADAPT is not: U5 (tool/source failure) and physical-deviation-from-expectation remain untested, coupled to the unresolved `AgentAdapter` interface question (`docs/project/GAP_ANALYSIS.md`). The cross-mode comparison's finding — that a small Operational suite gives uneven exposure to different agents' defects — was reported against the 6-episode suite that existed at the time it ran; it is not retroactively invalidated by the Sequential reclassification (that suite is now known to have had 2 Sequential + 4 Operational episodes, not 6 Operational, but the comparison's actual finding concerned defect-exposure unevenness, which stands either way).
 
 **On scenario/instance counts specifically:** the earlier "≥100 templates / ≥1,000 executions" targets are retired as release criteria. Coverage and validity of what exists — not raw volume — is the standard from this point forward, per the redesign's explicit instruction. The current 20 templates / 300 generated instances (`docs/suites/gb-bess/SCENARIO_TEMPLATES.md`) are evaluated against Gates 2 and 3 above, not against a numeric target.
 
@@ -93,4 +93,4 @@
 
 ## Current overall status
 
-**Gate 1: satisfied** (with two additive extensions queued, not corrections). **Gate 2: partially satisfied** (strong baseline evidence; external and frontier-agent validation pending). **Gate 3: not satisfied** (Sequential task mode and ADAPT depth are genuine, named gaps). **Gate 4: partially satisfied** (scenario-design GB-groundedness exists; licensed real data does not yet). **Gate 5: not satisfied** (no external review yet). This reflects real progress from Phase 1-3 implementation work, reorganised honestly rather than inflated by the reframing itself — moving from a flat checklist to five gates changes how the same facts are grouped, not what they are.
+**Gate 1: satisfied** (with two additive extensions queued, not corrections). **Gate 2: partially satisfied** (strong baseline evidence; external and frontier-agent validation pending). **Gate 3: not satisfied** (Sequential task mode closed 2026-09-09 by reclassification; ADAPT depth — specifically U5/tool-failure — remains a genuine, named gap). **Gate 4: partially satisfied** (scenario-design GB-groundedness exists; licensed real data does not yet). **Gate 5: not satisfied** (no external review yet). This reflects real progress from Phase 1-3 implementation work, reorganised honestly rather than inflated by the reframing itself — moving from a flat checklist to five gates changes how the same facts are grouped, not what they are.

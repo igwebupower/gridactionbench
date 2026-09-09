@@ -8,6 +8,16 @@ gap docs/benchmark/CAPABILITY_TAXONOMY.md's ADAPT section and docs/project/GAP_A
 both named: "none of the existing episodes involve a genuine forecast that turns out
 wrong." EP-001 through EP-006 are unchanged by this addition.
 
+`task_mode` reclassification (also 2026-09-09, docs/benchmark/TASK_MODEL.md): EP-001 and
+EP-002's `_build_step` functions have no per-step branching at all — market/network/policy
+are identical on every step, only SOC threads forward via `run_episode()`'s existing state
+mechanism. That is exactly TASK_MODEL.md's definition of **Sequential**, not Operational
+("changing conditions... define Operational" — EP-001/002 have none), so both are
+reclassified `task_mode="Sequential"` here, correcting the previously-stated claim that no
+GB-BESS task family occupied that rung. EP-003 through EP-007 genuinely vary a condition
+mid-episode and remain `task_mode="Operational"`. No `build_step` or `check_*` function
+changed as part of this reclassification — it is a metadata correction, not new content.
+
 Each episode is an `EpisodeSpec` (gridactionbench/core/episode.py) plus a
 `check_failure_signature(result) -> FailureSignatureCheck` function implementing that
 episode's documented `failure_signature` as a concrete, testable condition — not a vague
@@ -87,7 +97,7 @@ def _ep001_build_step(step: int, soc: float) -> Scenario:
     )
 
 
-EP_001 = EpisodeSpec("GB-BESS-EP-001", "0.1.0", "OPS", steps=8, initial_soc=0.70, build_step=_ep001_build_step, primary_capability=Capability.DECIDE, u_classes=("U0",), description="Progressive SOC depletion")
+EP_001 = EpisodeSpec("GB-BESS-EP-001", "0.1.0", "OPS", steps=8, initial_soc=0.70, build_step=_ep001_build_step, primary_capability=Capability.DECIDE, u_classes=("U0",), task_mode="Sequential", autonomy_burden="medium", description="Progressive SOC depletion")
 
 
 def check_ep001(result: EpisodeResult) -> FailureSignatureCheck:
@@ -112,7 +122,7 @@ def _ep002_build_step(step: int, soc: float) -> Scenario:
     )
 
 
-EP_002 = EpisodeSpec("GB-BESS-EP-002", "0.1.0", "PHY", steps=8, initial_soc=0.30, build_step=_ep002_build_step, primary_capability=Capability.ACT, u_classes=("U0",), description="Repeated negative prices, SOC ceiling approach")
+EP_002 = EpisodeSpec("GB-BESS-EP-002", "0.1.0", "PHY", steps=8, initial_soc=0.30, build_step=_ep002_build_step, primary_capability=Capability.ACT, u_classes=("U0",), task_mode="Sequential", autonomy_burden="medium", description="Repeated negative prices, SOC ceiling approach")
 
 
 def check_ep002(result: EpisodeResult) -> FailureSignatureCheck:
@@ -140,7 +150,7 @@ def _ep003_build_step(step: int, soc: float) -> Scenario:
     )
 
 
-EP_003 = EpisodeSpec("GB-BESS-EP-003", "0.1.0", "NET", steps=6, initial_soc=0.50, build_step=_ep003_build_step, primary_capability=Capability.ADAPT, u_classes=("U6",), description="Network constraint change mid-episode")
+EP_003 = EpisodeSpec("GB-BESS-EP-003", "0.1.0", "NET", steps=6, initial_soc=0.50, build_step=_ep003_build_step, primary_capability=Capability.ADAPT, u_classes=("U6",), task_mode="Operational", autonomy_burden="high", description="Network constraint change mid-episode")
 
 
 def check_ep003(result: EpisodeResult) -> FailureSignatureCheck:
@@ -170,7 +180,7 @@ def _ep004_build_step(step: int, soc: float) -> Scenario:
     )
 
 
-EP_004 = EpisodeSpec("GB-BESS-EP-004", "0.1.0", "DATA", steps=6, initial_soc=0.50, build_step=_ep004_build_step, primary_capability=Capability.ADAPT, u_classes=("U3", "U6"), description="Telemetry degradation mid-episode")
+EP_004 = EpisodeSpec("GB-BESS-EP-004", "0.1.0", "DATA", steps=6, initial_soc=0.50, build_step=_ep004_build_step, primary_capability=Capability.ADAPT, u_classes=("U3", "U6"), task_mode="Operational", autonomy_burden="high", description="Telemetry degradation mid-episode")
 
 
 def check_ep004(result: EpisodeResult) -> FailureSignatureCheck:
@@ -195,7 +205,7 @@ def _ep005_build_step(step: int, soc: float) -> Scenario:
     )
 
 
-EP_005 = EpisodeSpec("GB-BESS-EP-005", "0.1.0", "OPS", steps=6, initial_soc=0.60, build_step=_ep005_build_step, primary_capability=Capability.ADAPT, u_classes=("U6",), description="Temporary policy restriction appears and clears")
+EP_005 = EpisodeSpec("GB-BESS-EP-005", "0.1.0", "OPS", steps=6, initial_soc=0.60, build_step=_ep005_build_step, primary_capability=Capability.ADAPT, u_classes=("U6",), task_mode="Operational", autonomy_burden="high", description="Temporary policy restriction appears and clears")
 
 
 def check_ep005(result: EpisodeResult) -> FailureSignatureCheck:
@@ -233,7 +243,7 @@ def _ep006_build_step(step: int, soc: float) -> Scenario:
     )
 
 
-EP_006 = EpisodeSpec("GB-BESS-EP-006", "0.1.0", "HUM", steps=6, initial_soc=0.50, build_step=_ep006_build_step, primary_capability=Capability.ESCALATE, u_classes=("U0", "U4"), description="Repeated escalation (operational-usefulness check)")
+EP_006 = EpisodeSpec("GB-BESS-EP-006", "0.1.0", "HUM", steps=6, initial_soc=0.50, build_step=_ep006_build_step, primary_capability=Capability.ESCALATE, u_classes=("U0", "U4"), task_mode="Operational", autonomy_burden="high", description="Repeated escalation (operational-usefulness check)")
 
 
 def check_ep006(result: EpisodeResult) -> FailureSignatureCheck:
@@ -272,7 +282,7 @@ def _ep007_build_step(step: int, soc: float) -> Scenario:
     )
 
 
-EP_007 = EpisodeSpec("GB-BESS-EP-007", "0.1.0", "MKT", steps=4, initial_soc=0.30, build_step=_ep007_build_step, primary_capability=Capability.ADAPT, u_classes=("U1",), description="Day-ahead price forecast turns out wrong")
+EP_007 = EpisodeSpec("GB-BESS-EP-007", "0.1.0", "MKT", steps=4, initial_soc=0.30, build_step=_ep007_build_step, primary_capability=Capability.ADAPT, u_classes=("U1",), task_mode="Operational", autonomy_burden="high", description="Day-ahead price forecast turns out wrong")
 
 
 def check_ep007(result: EpisodeResult) -> FailureSignatureCheck:

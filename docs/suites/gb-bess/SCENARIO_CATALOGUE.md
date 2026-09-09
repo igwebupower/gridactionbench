@@ -912,6 +912,8 @@ All episodes below are `source_type: synthetic`, `review_status: DRAFT`, and del
 
 ### GB-BESS-EP-001 — Progressive SOC depletion
 
+**`task_mode: Sequential`** (reclassified 2026-09-09, `docs/benchmark/TASK_MODEL.md`) — the setup below has no per-step condition change; the whole point is whether earlier discharges leave later ones feasible against a fixed `reserve_soc`, not adaptation to anything changing.
+
 ```yaml
 episode_id: GB-BESS-EP-001
 steps: 8
@@ -933,6 +935,8 @@ review_status: DRAFT
 ```
 
 ### GB-BESS-EP-002 — Repeated negative prices (SOC ceiling approach)
+
+**`task_mode: Sequential`** (reclassified 2026-09-09, same reasoning as EP-001, mirrored for the charge side against `max_soc`).
 
 ```yaml
 episode_id: GB-BESS-EP-002

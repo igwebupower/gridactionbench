@@ -387,6 +387,7 @@ def generate(templates: list[ScenarioTemplate] = TEMPLATES, n_per_template: int 
     for template in templates:
         rng = random.Random(f"{seed}:{template.template_id}")
         tags = TaskFamilyTags(
+            task_mode="Atomic",  # every ScenarioTemplate instance is Atomic — docs/benchmark/TASK_MODEL.md
             primary_capability=template.primary_capability.value,
             complexity_rung=template.complexity_rung,
             u_classes=template.u_classes,

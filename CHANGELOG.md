@@ -4,6 +4,21 @@ All notable changes to GridActionBench are documented here. Versioning follows `
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — GB-BESS-EP-001/EP-002 reclassified as Sequential (closes BACKLOG.md P2 item 1)
+
+Seventh pass, and the first pure reclassification rather than new code: `docs/benchmark/TASK_MODEL.md` and three other documents claimed GridActionBench had zero implementation of the Sequential task mode ("all... episodes are already Operational... none are pure Sequential"). That claim was never checked against each episode's own content and was wrong — `GB-BESS-EP-001` and `GB-BESS-EP-002`'s `build_step` functions have no per-step branching at all; only SOC threads forward. That is exactly Sequential's definition (state-dependent, no changing conditions), not Operational's. Both are now tagged accordingly. **No `build_step` or `check_*` function changed, no new scenario/agent was written — this closes the gap by finding an existing match, not by building something new**, and is documented as such everywhere it's referenced. **141/141 tests pass** (139 unchanged + 2 new). EP-001/EP-002's CLI output is byte-identical before and after (verified manually).
+
+### Changed
+- `gridactionbench/core/episode.py` — `EpisodeSpec` gains `task_mode: str` (`"Sequential"` | `"Operational"`, required); `autonomy_burden`'s default is removed (no longer uniformly `"high"` — required per-episode now).
+- `gridactionbench/core/scenario.py` — `TaskFamilyTags` gains `task_mode: str` (required).
+- `gridactionbench/scenarios/generator.py` — `generate()`'s `TaskFamilyTags` construction sets `task_mode="Atomic"` (every `ScenarioTemplate` instance is Atomic).
+- `gridactionbench/core/trajectory_record.py` — `build_trajectory_record_from_episode()`'s hardcoded `task_mode="Operational"` now reads `episode.task_mode`.
+- `gridactionbench/scenarios/gb_bess/episodes.py` — `EP_001`/`EP_002` tagged `task_mode="Sequential", autonomy_burden="medium"` (a new H-proxy value, between Atomic's `"low"` and Operational's `"high"`); `EP_003`-`EP_007` tagged `task_mode="Operational", autonomy_burden="high"` (now explicit).
+- `docs/benchmark/TASK_MODEL.md`, `docs/project/GAP_ANALYSIS.md`, `docs/project/BACKLOG.md`, `docs/project/DEFINITION_OF_DONE.md` (Gate 3), `docs/benchmark/STRESS_DIMENSIONS.md`, `docs/suites/gb-bess/SCENARIO_TEMPLATES.md`, `docs/suites/gb-bess/SCENARIO_CATALOGUE.md` — corrected everywhere the "no Sequential implementation" claim appeared. `docs/benchmark/CROSS_MODE_COMPARISON.md` is left as a dated snapshot against the 6-episode roster that existed when it ran, not retroactively updated — its actual finding (uneven defect exposure across a small episode suite) is unaffected by this reclassification either way.
+- `tests/unit/test_capability_tags.py` — replaced the blanket `autonomy_burden == "high"` assertion with a task-mode-aware check; added a pinning test for the Sequential set, mirroring the existing ADAPT-episode pinning test.
+- `tests/unit/test_trajectory_record.py` — added a test asserting an EP-001-derived `TrajectoryRecord` carries `task_mode="Sequential"`.
+- `tests/unit/test_report.py` — three direct `TaskFamilyTags(...)` constructions updated with `task_mode="Atomic"` (not testing task_mode semantics; any valid value works).
+
 ## [Unreleased] — Private-seed holdout generator infrastructure (closes the generator-code half of BACKLOG.md P1 item 6)
 
 Sixth pass following the tagging/reporting/TrajectoryRecord/cross-mode/ADAPT-coverage work below. Implements `docs/benchmark/PUBLIC_PRIVATE_POLICY.md`'s items 3 and 4. **139/139 tests pass** (127 unchanged + 12 new in `tests/unit/test_holdouts.py`).

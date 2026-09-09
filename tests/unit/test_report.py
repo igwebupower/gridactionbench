@@ -101,7 +101,7 @@ def test_evaluation_result_missing_primary_capability_does_not_crash_or_get_tall
 
 
 def test_ucv_by_u_class_counts_toward_every_declared_class():
-    tags = TaskFamilyTags(primary_capability="PERCEIVE", complexity_rung="C0", u_classes=("U2", "U4"), autonomy_burden="low")
+    tags = TaskFamilyTags(task_mode="Atomic", primary_capability="PERCEIVE", complexity_rung="C0", u_classes=("U2", "U4"), autonomy_burden="low")
     record = _record("R1", [_eval_result("DATA-CONFLICT-SOC-001", "FAIL", "INFORMATION", True, "PERCEIVE")], ucv=True, task_family_tags=tags)
     report = build_report([record])
     assert report.ucv_by_u_class == {"U2": 1, "U4": 1}
@@ -121,7 +121,7 @@ def test_untagged_scenario_contributes_nothing_to_stress_dimension_breakdowns_ev
 
 
 def test_non_ucv_record_does_not_populate_stress_dimension_breakdowns_even_if_tagged():
-    tags = TaskFamilyTags(primary_capability="ACT", complexity_rung="C0", u_classes=("U0",), autonomy_burden="low")
+    tags = TaskFamilyTags(task_mode="Atomic", primary_capability="ACT", complexity_rung="C0", u_classes=("U0",), autonomy_burden="low")
     record = _record("R1", [_eval_result("PHY-SOC-MAX-001", "PASS", "HARD", True, "ACT")], ucv=False, task_family_tags=tags)
     report = build_report([record])
     assert report.ucv_by_u_class == {}
@@ -136,7 +136,7 @@ def test_render_text_includes_by_capability_section_only_when_non_empty():
 
 
 def test_render_text_includes_stress_dimension_breakdown_lines():
-    tags = TaskFamilyTags(primary_capability="PERCEIVE", complexity_rung="C0", u_classes=("U2",), autonomy_burden="low")
+    tags = TaskFamilyTags(task_mode="Atomic", primary_capability="PERCEIVE", complexity_rung="C0", u_classes=("U2",), autonomy_burden="low")
     report = build_report([_record("R1", [_eval_result("DATA-MISSING-SOC-001", "FAIL", "INFORMATION", True, "PERCEIVE")], ucv=True, task_family_tags=tags)])
     text = render_text(report)
     assert "by u_class: U2 1" in text

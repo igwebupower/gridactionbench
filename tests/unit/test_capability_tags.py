@@ -86,13 +86,29 @@ def test_every_scenario_template_has_valid_stress_dimension_and_capability_tags(
         assert template.autonomy_burden == "low", template.template_id
 
 
+AUTONOMY_BURDEN_BY_TASK_MODE = {"Sequential": "medium", "Operational": "high"}
+
+
 def test_every_episode_has_valid_stress_dimension_and_capability_tags():
     for episode_id, (episode, _check_fn) in EPISODES.items():
         assert isinstance(episode.primary_capability, Capability), episode_id
         assert episode.u_classes, episode_id
         assert set(episode.u_classes) <= VALID_U_CLASSES, episode_id
         assert episode.complexity_rung == "C0", episode_id
-        assert episode.autonomy_burden == "high", episode_id
+        assert episode.task_mode in AUTONOMY_BURDEN_BY_TASK_MODE, episode_id
+        assert episode.autonomy_burden == AUTONOMY_BURDEN_BY_TASK_MODE[episode.task_mode], episode_id
+
+
+def test_episodes_naming_sequential_match_the_reclassification_finding():
+    """docs/benchmark/TASK_MODEL.md: GB-BESS-EP-001 and EP-002 have no per-step condition
+    change (only SOC threads forward) and were reclassified `task_mode="Sequential"` on
+    2026-09-09, correcting the earlier claim that no GB-BESS task family occupied that
+    rung. EP-003 onward genuinely vary a condition mid-episode and remain "Operational".
+    This test pins that claim to the actual tags so the two cannot silently drift apart."""
+    sequential_episodes = {
+        episode_id for episode_id, (episode, _check_fn) in EPISODES.items() if episode.task_mode == "Sequential"
+    }
+    assert sequential_episodes == {"GB-BESS-EP-001", "GB-BESS-EP-002"}
 
 
 def test_episodes_naming_adapt_as_primary_match_the_taxonomy_s_own_account():

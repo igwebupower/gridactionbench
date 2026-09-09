@@ -36,11 +36,19 @@ class EpisodeSpec:
     # ScenarioTemplate's tags (gridactionbench/scenarios/generator.py).
     primary_capability: Capability
     u_classes: tuple[str, ...]  # one or more of U0-U7, docs/benchmark/STRESS_DIMENSIONS.md
+    # "Sequential" | "Operational" (docs/benchmark/TASK_MODEL.md) — added 2026-09-09 when
+    # GB-BESS-EP-001/EP-002 were found, on inspection, to already have static conditions
+    # (no per-step branching in their build_step) and were reclassified from Operational to
+    # Sequential; EP-003 onward genuinely vary a condition mid-episode and remain
+    # Operational. Required, not defaulted — which value applies is a fact about each
+    # episode's own content, not a safe default to assume.
+    task_mode: str
+    # H proxy (STRESS_DIMENSIONS.md, "Task modes as an H proxy, not a definition"):
+    # "medium" for Sequential, "high" for Operational — no longer a single value uniform
+    # across every EpisodeSpec, so no longer defaulted (see task_mode above).
+    autonomy_burden: str
     description: str = ""
     complexity_rung: str = "C0"  # every GB-BESS v0.1 episode is C0 — single BESS, no other asset
-    # Operational tasks are the highest-H proxy rung (STRESS_DIMENSIONS.md, "H — Autonomy
-    # Burden"); every EpisodeSpec is Operational, so this default is never overridden.
-    autonomy_burden: str = "high"
 
 
 @dataclass
@@ -73,6 +81,7 @@ def run_episode(episode: EpisodeSpec, agent: AgentAdapter, dt_hours: float, run_
     step_records: list[DecisionRecord] = []
     world_soc_after_step: list[float] = []
     tags = TaskFamilyTags(
+        task_mode=episode.task_mode,
         primary_capability=episode.primary_capability.value,
         complexity_rung=episode.complexity_rung,
         u_classes=episode.u_classes,

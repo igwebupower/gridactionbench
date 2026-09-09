@@ -38,8 +38,11 @@ Unlike the documentation-only pass above, this is real, tested code: `primary_ca
 6. ~~Build the public/private holdout generator infrastructure.~~ **Generator code done — see below.** The separate private repository and an actual configured private seed remain not started — this item's "generator code" half only.
 7. ~~Produce a documented cross-mode comparison (same agent, Atomic vs. Operational).~~ **Done — see above.**
 
+### P2 item 1 — done 2026-09-09 (seventh pass — reclassification, not new code)
+`GB-BESS-EP-001`/`EP-002`'s `build_step` functions were found, on direct inspection, to have no per-step condition change at all — market/network/policy are identical every step, only SOC threads forward — which is exactly `docs/benchmark/TASK_MODEL.md`'s definition of Sequential, not Operational. The original claim that no GB-BESS task family occupied the Sequential rung had never actually been checked against each episode's own code. Both episodes are now tagged `task_mode="Sequential"`, `autonomy_burden="medium"` (a new H-proxy value, between Atomic's `"low"` and Operational's `"high"`); `EP-003`-`EP-007` (which do genuinely vary a condition) are now explicitly tagged `task_mode="Operational"`. `EpisodeSpec`/`TaskFamilyTags` gained a `task_mode` field; no `build_step` or `check_*` function changed, and EP-001/EP-002's actual CLI output is byte-identical before and after (verified). This closes the gap by finding an existing match, not by building new content — recorded honestly as a reclassification, not a new Task Family. 141/141 tests pass (139 unchanged + 2 new).
+
 ### P2 — desirable after v0.1
-1. A Sequential task mode implementation (state-dependent, static conditions — the currently-missing middle rung, `docs/benchmark/TASK_MODEL.md`).
+1. ~~A Sequential task mode implementation.~~ **Done — see above (via reclassification).**
 2. An optimisation/MPC baseline agent.
 3. `instance × k` repeated-trial execution and distributional reporting (needed before any stochastic/LLM agent is evaluated, `docs/project/ASSUMPTIONS.md` A-16).
 4. A dedicated MKT evaluator (carried over, unchanged, from `docs/suites/gb-bess/EVALUATION_SPEC.md`'s coverage note).

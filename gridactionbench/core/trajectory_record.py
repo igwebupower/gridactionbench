@@ -109,7 +109,7 @@ def build_trajectory_record_from_episode(
 
     return TrajectoryRecord(
         run_id=run_id,
-        task_mode="Operational",
+        task_mode=episode.task_mode,
         task_family=episode.episode_id,
         instance_id=episode.episode_id,
         agent_id=agent.agent_id,
