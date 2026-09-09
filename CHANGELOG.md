@@ -4,6 +4,17 @@ All notable changes to GridActionBench are documented here. Versioning follows `
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — Cross-mode comparison (closes BACKLOG.md P1 item 7)
+
+Fourth pass following the tagging/reporting/TrajectoryRecord work below — analysis only, using the existing 10 reference/seeded-failure agents against the existing 20 Atomic scenarios and 6 Operational episodes. No evaluator, scenario, or schema change. Tests unaffected (no new test file — this pass produces a document and a reproducibility script, not library code).
+
+### Added
+- `scripts/cross_mode_comparison.py` — runs the same 10 agents (matching `docs/benchmark/CALIBRATION_RESULTS.md`'s roster) through both the 20-scenario Atomic suite and all 6 Operational episodes, and prints a side-by-side UCV comparison.
+- `docs/benchmark/CROSS_MODE_COMPARISON.md` — answers `docs/project/GAP_ANALYSIS.md`'s previously-open research question "does good atomic performance predict operational reliability?": **no, not reliably.** Verified concretely (not merely argued) for `prompt-injection-victim` (its one real Atomic defect is never exercised by any of the 6 episodes, since none carry adversarial content) and `ignore-network` (a full rank inversion against other seeded-failure agents between the two modes, most likely because only one of the six episodes ever constrains network headroom). Also names a methodological finding about the benchmark itself: a 6-episode Operational suite gives uneven exposure to different agents' specific defects, reinforcing (with a concrete data point) why the pre-existing ADAPT-coverage and Sequential-task-mode gaps matter.
+
+### Changed
+- `docs/project/GAP_ANALYSIS.md`, `docs/project/BACKLOG.md`, `docs/project/DEFINITION_OF_DONE.md` (Gate 3) — mark this P1 item done; Gate 3 remains **not satisfied** overall (Sequential task mode and ADAPT depth are unaffected by this analysis).
+
 ## [Unreleased] — TrajectoryRecord (closes BACKLOG.md P1 item 4)
 
 Third implementation pass following the tagging and reporting work below. **126/126 tests pass** (118 unchanged + 8 new in `tests/unit/test_trajectory_record.py`).

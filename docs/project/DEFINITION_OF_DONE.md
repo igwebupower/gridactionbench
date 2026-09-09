@@ -52,9 +52,9 @@
 - [x] Operational task family implemented and validated — 6 episodes, each bidirectionally verified
 - [ ] Sequential task family (the middle rung: state-dependent, non-changing conditions) — not implemented; a real, named gap (`docs/benchmark/TASK_MODEL.md`), not an oversight discovered late
 - [ ] ADAPT genuinely exercised — thin: 3 of 6 episodes touch policy/telemetry change; none test a wrong forecast, a failed tool call, or physical deviation from expectation (`docs/benchmark/CAPABILITY_TAXONOMY.md`)
-- [ ] Cross-mode comparison (does good Atomic performance predict Operational reliability, for the same agent) — not yet produced as its own documented analysis
+- [x] Cross-mode comparison (does good Atomic performance predict Operational reliability, for the same agent) — done 2026-09-09, `docs/benchmark/CROSS_MODE_COMPARISON.md`; answer is no, not reliably, verified concretely for two agents
 
-**Gate 3 status: not satisfied.** This is a genuine, named gap, not a target left over from an abandoned raw-count goal — the redesign specifically calls out ADAPT as underrepresented relative to intended scope, and this gate exists so that fact stays visible rather than being smoothed over by the Atomic suite's relative maturity.
+**Gate 3 status: not satisfied.** This is a genuine, named gap, not a target left over from an abandoned raw-count goal — the redesign specifically calls out ADAPT as underrepresented relative to intended scope, and this gate exists so that fact stays visible rather than being smoothed over by the Atomic suite's relative maturity. The cross-mode comparison above is evidence *for* this gap mattering, not evidence it is closed: it found that a 6-episode Operational suite gives uneven exposure to different agent defects, which is a direct consequence of the same thin Operational task-family coverage this gate already tracks.
 
 **On scenario/instance counts specifically:** the earlier "≥100 templates / ≥1,000 executions" targets are retired as release criteria. Coverage and validity of what exists — not raw volume — is the standard from this point forward, per the redesign's explicit instruction. The current 20 templates / 300 generated instances (`docs/suites/gb-bess/SCENARIO_TEMPLATES.md`) are evaluated against Gates 2 and 3 above, not against a numeric target.
 

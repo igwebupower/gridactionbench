@@ -66,6 +66,7 @@ scripts/         one-off utilities (e.g. the scenario-catalogue backfill script)
 | `docs/suites/gb-bess/SCENARIO_CATALOGUE.md` | The initial 20 scenarios and 6 episode designs, plus Golden-Verification-Case-vs-Atomic-Benchmark-Probe classification |
 | `docs/suites/gb-bess/EVALUATION_SPEC.md` | The evaluator catalogue |
 | `docs/benchmark/CALIBRATION_RESULTS.md` | Real output from 10 agents (3 reference, 7 seeded-failure) against the 20 initial scenarios |
+| `docs/benchmark/CROSS_MODE_COMPARISON.md` | The same 10 agents, Atomic vs. Operational — does good atomic performance predict operational reliability? (No.) |
 | `docs/suites/gb-bess/SCENARIO_TEMPLATES.md` | Parameterised scenario generator: 20 templates, 300 generated instances |
 | `docs/project/DEFINITION_OF_DONE.md` | The five evidence-based release gates |
 | `docs/project/GAP_ANALYSIS.md` | Architecture gap analysis and research traceability matrix |
