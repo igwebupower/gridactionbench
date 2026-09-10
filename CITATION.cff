@@ -12,7 +12,7 @@ type: software
 version: "0.0.0-phase0"
 date-released: "2026-09-08"
 license: Apache-2.0
-repository-code: "TBD — not yet published to a public remote"
+repository-code: "https://github.com/igwebupower/gridactionbench"
 keywords:
   - benchmark
   - AI agents

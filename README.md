@@ -8,11 +8,11 @@ GridActionBench measures how different agent architectures **perceive, decide, a
 
 GridActionBench is a benchmark suite built on a reusable executable energy-agent evaluation environment/harness — the two are distinct (`docs/architecture/ARCHITECTURE.md`). The first environment is **GB-BESS v0.1**, evaluating operational decisions for a simulated grid-connected Battery Energy Storage System in a Great Britain electricity-system context — the first, deliberately narrow rung of a named future complexity progression (`docs/project/PID.md` §2.3), not the permanent scope of the project.
 
-GridActionBench does not claim to be the first energy-agent benchmark, the first executable energy benchmark, or the first dynamic power-system AI benchmark — see `docs/research/DESIGN_EVIDENCE_BASE.md` for how prior research informs specific design choices without a novelty claim attached.
+GridActionBench does not claim to be the first energy-agent benchmark, the first executable energy benchmark, or the first dynamic power-system AI benchmark — see `docs/research/PRIOR_ART.md` for the related-work survey behind that position.
 
 ## Status
 
-**Phase 1-3 implementation in progress; specification revised by the September 2026 strategic realignment.** The core pipeline is implemented and running: schemas, `SimpleBessSimulator`, all 19 specified evaluators, 4 reference agents, 8 seeded-failure agents, a parameterised scenario generator (20 templates, 300 instances), 8 validated episodes, a JSONL Decision Record writer, per-dimension reporting, and a CLI — **152 passing tests**, all 20 initial scenarios plus 8 episodes executable end-to-end. See `docs/project/DEFINITION_OF_DONE.md` for the current status against the five evidence-based release gates (Instrument Validity, Construct Validity, Operational Depth, GB Grounding, External Review — replacing the earlier raw scenario/execution-count targets), `docs/project/GAP_ANALYSIS.md` for the architecture gap analysis and research traceability matrix, and `docs/benchmark/CALIBRATION_RESULTS.md` for real calibration output.
+**Phase 1-3 implementation in progress; specification revised by the September 2026 strategic realignment.** The core pipeline is implemented and running: schemas, `SimpleBessSimulator`, all 19 specified evaluators, 4 reference agents, 8 seeded-failure agents, a parameterised scenario generator (20 templates, 300 instances), 8 validated episodes, a JSONL Decision Record writer, per-dimension reporting, and a CLI — **152 passing tests**, all 20 initial scenarios plus 8 episodes executable end-to-end. See `docs/project/DEFINITION_OF_DONE.md` for the current status against the five evidence-based release gates (Instrument Validity, Construct Validity, Operational Depth, GB Grounding, External Review — replacing the earlier raw scenario/execution-count targets) and `docs/benchmark/CALIBRATION_RESULTS.md` for real calibration output.
 
 ```bash
 pip install -e .
@@ -70,9 +70,7 @@ scripts/         one-off utilities (e.g. the scenario-catalogue backfill script)
 | `docs/benchmark/PUBLIC_PRIVATE_POLICY.md` | Public/private scenario split rationale; the private-seed holdout generator (`gridactionbench/holdouts/`) and its acceptance criteria |
 | `docs/suites/gb-bess/SCENARIO_TEMPLATES.md` | Parameterised scenario generator: 20 templates, 300 generated instances |
 | `docs/project/DEFINITION_OF_DONE.md` | The five evidence-based release gates |
-| `docs/project/GAP_ANALYSIS.md` | Architecture gap analysis and research traceability matrix |
 | `docs/research/PRIOR_ART.md` | Prior-art research and differentiation |
-| `docs/research/DESIGN_EVIDENCE_BASE.md` | Evidence → inference → design decision → assumption, for major design choices |
 | `docs/architecture/adr/` | Architecture decision records |
 | `GOVERNANCE.md`, `CONTRIBUTING.md` | How to participate |
 
