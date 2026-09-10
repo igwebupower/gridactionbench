@@ -35,3 +35,13 @@ holdouts_private/
 *.jsonl.local
 /runs/
 /reports/local/
+
+# Internal-only project review documents — candid self-assessment (open risks,
+# unresolved weaknesses, gap analysis) kept local rather than in the public repo.
+# Scrubbed from git history 2026-09-10; restore from a private backup if needed,
+# never re-add these paths to tracking.
+docs/project/ASSUMPTIONS.md
+docs/project/RISK_REGISTER.md
+docs/project/GAP_ANALYSIS.md
+docs/research/BENCHMARK_DESIGN_REVIEW.md
+docs/research/DESIGN_EVIDENCE_BASE.md
