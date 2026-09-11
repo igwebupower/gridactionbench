@@ -1,6 +1,6 @@
 # GridActionBench
 
-**An open benchmark for evaluating the reliability boundaries of autonomous AI agents in dynamic energy systems.**
+**An open benchmark for evaluating the reliability boundaries of autonomous AI agents acting in dynamic energy systems.**
 
 > Do not just evaluate what an AI says. Evaluate what happens if you let it act.
 
@@ -12,12 +12,16 @@ GridActionBench does not claim to be the first energy-agent benchmark, the first
 
 ## Status
 
-**Phase 1-3 implementation in progress; specification revised by the September 2026 strategic realignment.** The core pipeline is implemented and running: schemas, `SimpleBessSimulator`, all 19 specified evaluators, 4 reference agents, 8 seeded-failure agents, a parameterised scenario generator (20 templates, 300 instances), 8 validated episodes, a JSONL Decision Record writer, per-dimension reporting, and a CLI — **152 passing tests**, all 20 initial scenarios plus 8 episodes executable end-to-end. See `docs/project/DEFINITION_OF_DONE.md` for the current status against the five evidence-based release gates (Instrument Validity, Construct Validity, Operational Depth, GB Grounding, External Review — replacing the earlier raw scenario/execution-count targets) and `docs/benchmark/CALIBRATION_RESULTS.md` for real calibration output.
+**Phase 1-3 implementation in progress; specification revised by the September 2026 strategic realignment.** The core pipeline is implemented and running: schemas, `SimpleBessSimulator`, all 20 specified evaluators, 4 reference agents, 8 seeded-failure agents, a parameterised scenario generator (20 templates, 300 instances), 8 validated episodes, a JSONL Decision Record writer (plus a Trajectory Record writer for episodes), per-dimension reporting, and a CLI — **152 passing tests**, all 20 initial scenarios plus 8 episodes executable end-to-end. All reference and seeded-failure agents are deterministic, built-in baselines; no capable LLM or externally-hosted agent has been evaluated against GB-BESS as of this writing. See `docs/project/DEFINITION_OF_DONE.md` for the current status against the five evidence-based release gates (Instrument Validity, Construct Validity, Operational Depth, GB Grounding, External Review — replacing the earlier raw scenario/execution-count targets) and `docs/benchmark/CALIBRATION_RESULTS.md` for repository-reported calibration output (not yet through external domain review).
 
 ```bash
 pip install -e .
 gridactionbench run suites/gb_bess/v0_1/scenarios --agent rule-based
 ```
+
+## Physical-system scope
+
+GB-BESS v0.1 is simulation-only and cannot interact with physical energy assets. Future GridActionBench environments may examine controlled digital-twin, hardware-in-the-loop, laboratory or sandboxed operational settings, subject to separate safety, security, governance and validation requirements. See `SECURITY.md` for the current architectural isolation guarantee.
 
 ## Why this benchmark exists
 

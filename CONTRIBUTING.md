@@ -4,12 +4,11 @@ Thank you for considering a contribution. See `GOVERNANCE.md` for roles and deci
 
 ## Current project status
 
-GridActionBench is in Phase 0 (specification and research) as of this writing — see `docs/project/PROJECT_PLAN.md`. There is no implementation code to contribute to yet; the highest-value contributions right now are:
+GridActionBench is a runnable, simulation-based benchmark harness — Phase 1-3 implementation in progress, per `docs/project/PROJECT_PLAN.md` and the root `README.md`'s Status section. The core pipeline (schemas, simulator, evaluators, reference and seeded-failure agents, scenario generator, episodes, CLI) exists and is tested; see `README.md` for current counts. The highest-value contributions right now are:
 
-- Review of the Phase 0 specification documents (`docs/`) — especially from energy-domain and benchmark-methodology perspectives (see `docs/research/EXPERT_REVIEW_CHECKLIST.md` for the kind of critical feedback most useful).
-- Identification of gaps, errors, or unjustified assumptions (`docs/project/ASSUMPTIONS.md`) in the specification.
-
-Once Phase 1 implementation begins, this document will be expanded with concrete code-contribution workflow (branch naming, test requirements, PR template).
+- Review of the specification documents (`docs/`) — especially from energy-domain and benchmark-methodology perspectives (see `docs/research/EXPERT_REVIEW_CHECKLIST.md` for the kind of critical feedback most useful).
+- Identification of gaps, errors, or unjustified assumptions in the specification — the maintainer tracks these internally; open an issue describing what you found rather than expecting a public assumptions register to check against (see `docs/benchmark/PUBLIC_PRIVATE_POLICY.md` for why some internal review material is not published).
+- The code-level contributions listed below, which now have working implementations to build on rather than a blank slate.
 
 ## What you can contribute
 

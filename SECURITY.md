@@ -2,7 +2,7 @@
 
 ## Physical-system isolation (the most important thing in this file)
 
-**GridActionBench GB-BESS v0.1 is simulation-only.** No component in this repository may issue commands to, or maintain credentials for, a physical energy asset or operational energy-system interface (SCADA, EMS, inverter control, DNO control, DERMS, market bidding execution). This is an architectural guarantee, enforced by design — see `docs/architecture/SECURITY.md` and `docs/architecture/adr/ADR-015-physical-system-isolation.md` for the full statement and enforcement mechanism.
+**GridActionBench GB-BESS v0.1 is simulation-only.** No component in this repository may issue commands to, or maintain credentials for, a physical energy asset or operational energy-system interface (SCADA, EMS, inverter control, DNO control, DERMS, market bidding execution). This is an architectural guarantee, enforced by design — see `docs/architecture/SECURITY.md` and `docs/architecture/adr/ADR-015-physical-system-isolation.md` for the full statement and enforcement mechanism. This is a scope boundary for the current environment, not a permanent limit on the project: future GridActionBench environments may examine controlled digital-twin, hardware-in-the-loop, laboratory or sandboxed operational settings, subject to separate safety, security, governance and validation requirements, and would require an entirely new, separately-approved architecture (`docs/architecture/adr/ADR-015-physical-system-isolation.md`, "Consequences").
 
 If you believe you have found a code path, dependency, or schema field that could plausibly reach a real operational endpoint, **report it immediately** as described below — this is treated as the highest-severity class of issue this project can have.
 

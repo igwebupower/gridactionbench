@@ -1,6 +1,6 @@
 # Governance
 
-**Status:** Draft — Phase 0. GridActionBench currently has one identified maintainer and no confirmed external contributors or reviewers (see `docs/project/RISK_REGISTER.md`, R-14). This document defines the intended structure so independent participation is possible from the outset, not merely once the project happens to attract contributors.
+**Status:** Draft. This governance structure predates the project's implementation work and has not needed to change as it progressed — GridActionBench's implementation is currently Phase 1-3 (`docs/project/PROJECT_PLAN.md`), but there is still one identified maintainer and no confirmed external contributors or reviewers (tracked in a maintainer-controlled internal record). This document defines the intended structure so independent participation is possible from the outset, not merely once the project happens to attract contributors.
 
 ## Roles
 
@@ -8,7 +8,7 @@
 Responsible for repository and release management: merging changes, cutting versioned releases (`docs/benchmark/VERSIONING.md`), and final decisions when review roles disagree. The maintainer does not have unilateral authority to change scoring logic, evaluator behaviour, or released scenario content without following the change-control process below (§ "Changes affecting official benchmark behaviour").
 
 ### Domain Reviewer
-Energy-engineering review: battery physics, GB network operations, market mechanics. Assesses whether scenario parameters, physical/network/operational constraints, and GB-specificity claims are defensible (feeds `docs/project/ASSUMPTIONS.md` and the Phase 7 external validation process in `docs/research/EXPERT_REVIEW_CHECKLIST.md`).
+Energy-engineering review: battery physics, GB network operations, market mechanics. Assesses whether scenario parameters, physical/network/operational constraints, and GB-specificity claims are defensible (feeds a maintainer-controlled internal assumptions record and the Phase 7 external validation process in `docs/research/EXPERT_REVIEW_CHECKLIST.md`).
 
 ### Benchmark Reviewer
 Evaluation-methodology review: construct validity, statistical power, contamination resistance, scoring design. Assesses whether a metric measures what its name claims (`docs/benchmark/METHODOLOGY.md` §9) and whether proposed evaluator or scenario changes preserve or degrade benchmark integrity.
@@ -40,4 +40,4 @@ Where Domain Reviewer and Benchmark Reviewer assessments conflict (e.g., a physi
 
 ## Current role holders
 
-To be populated as the project gains contributors. As of Phase 0, the Maintainer role is held by the project's original author; no Domain Reviewer or Benchmark Reviewer role has been formally filled.
+To be populated as the project gains contributors. As of this writing, the Maintainer role is held by the project's original author; no Domain Reviewer or Benchmark Reviewer role has been formally filled.
