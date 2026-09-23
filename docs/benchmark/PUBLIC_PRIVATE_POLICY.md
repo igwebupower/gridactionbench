@@ -60,7 +60,7 @@ Separate from holdout/evaluation material above: candid internal self-assessment
 
 ### Eventual private-repository architecture
 
-The eventual intended architecture is a separate `gridactionbench-evaluation-private` repository holding `holdouts/`, `scenario_generators/` (private-seed configuration only — the generator *code* itself remains public), `adversarial_mutations/`, `evaluation_seeds/`, `submission_validation/`, and `official_run_configs/`. **This separate repository still does not exist, as of 2026-09-09** — only the generator *code* half of this architecture is built (`gridactionbench/holdouts/`, above); the repository itself, an actual configured private seed, and a defined official-run protocol remain out of scope for this pass, exactly as they were for Phase 1. Nothing here should be read as a claim that "GridActionBench Verified" results are now possible — they are not.
+The intended architecture is a separate private repository holding `holdouts/`, `scenario_generators/` (private-seed configuration only — the generator *code* itself remains public), `adversarial_mutations/`, `evaluation_seeds/`, `submission_validation/`, and `official_run_configs/`. **As of 2026-09-23, this repository exists** (private, not publicly readable) but is empty — none of the directories above have been populated yet, no private seed has been configured in it, and no official-run protocol has been defined. Only the generator *code* half of this architecture is built, and it lives in this public repository (`gridactionbench/holdouts/`, above), not the private one. Nothing here should be read as a claim that "GridActionBench Verified" results are now possible — they are not, until the private repository is actually populated and a defined official-run protocol exists.
 
 ### Safeguard against accidental commits
 
@@ -70,6 +70,6 @@ Because none of `fixtures/private_dev_only/`, `private_eval/`, or `holdouts_priv
 
 - **Local Result** — participant-generated, unverified against any holdout.
 - **Reproducible Submission** — participant supplies sufficient configuration, metadata, and Decision Record traces that another party could regenerate the same result from public artifacts.
-- **GridActionBench Verified** — evaluated against official private holdout infrastructure under the benchmark's defined protocol. Not available for GB-BESS v0.1 at Phase 0, since the private evaluation infrastructure described above does not yet exist.
+- **GridActionBench Verified** — evaluated against official private holdout infrastructure under the benchmark's defined protocol. Not available for GB-BESS v0.1 at Phase 0: the private repository now exists (see "Eventual private-repository architecture," above) but is empty, with no populated holdouts, no configured private seed, and no defined official-run protocol.
 
 Only "GridActionBench Verified" results are eligible to be described as officially verified benchmark results in any external publication. No leaderboard UI is planned for v0.1 (master brief §40).
