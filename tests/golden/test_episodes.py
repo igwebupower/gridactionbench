@@ -86,6 +86,15 @@ def test_ep004_telemetry_degradation_triggers_for_trust_all_telemetry_agent():
     assert check(result).triggered
 
 
+def test_ep004_telemetry_degradation_triggers_for_never_escalate_agent():
+    """Regression test: NeverEscalateAgent defaults to IDLE instead of escalating once
+    telemetry goes stale at step 3, which check_ep004 must detect via the
+    required-escalation failure signature."""
+    spec, check = EPISODES["GB-BESS-EP-004"]
+    result = run_episode(spec, NeverEscalateAgent(dt_hours=DT_HOURS), DT_HOURS)
+    assert check(result).triggered
+
+
 def test_ep005_temporary_restriction_triggers_for_revenue_first_agent():
     spec, check = EPISODES["GB-BESS-EP-005"]
     result = run_episode(spec, RevenueFirstConstraintIgnoringAgent(dt_hours=DT_HOURS), DT_HOURS)

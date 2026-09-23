@@ -114,3 +114,65 @@ def test_invalid_action_reports_no_achieved_value():
     result = compute_objective_value(action, obs, DT_HOURS, hard_constraint_valid=False)
     assert result.achieved_gbp is None
     assert result.best_case_gbp is not None  # best_case is still reported regardless
+
+
+def make_observation_with_forecast(price: float, forecast: float | None, **overrides) -> EnergyObservationV1:
+    from datetime import datetime, timezone
+
+    battery = BatteryState(
+        soc=overrides.pop("soc", 0.5),
+        capacity_mwh=10.0,
+        min_soc=0.10,
+        max_soc=0.90,
+        max_charge_mw=2.0,
+        max_discharge_mw=2.0,
+        charge_efficiency=0.95,
+        discharge_efficiency=0.95,
+    )
+    return EnergyObservationV1(
+        benchmark_version="0.1.0",
+        suite_version="0.1.0",
+        scenario_id="TEST",
+        timestamp=datetime.now(timezone.utc),
+        battery=battery,
+        network={"import_headroom_mw": 5.0, "export_headroom_mw": 5.0},
+        market={"reference_price_gbp_mwh": price, "price_forecast_gbp_mwh": forecast},
+    )
+
+
+def test_best_case_is_none_when_forecast_promises_a_larger_same_direction_opportunity():
+    """Best case is withheld when a live forecast promises a strictly larger
+    same-direction opportunity than the current price."""
+    obs = make_observation_with_forecast(price=10.0, forecast=200.0)
+    assert best_case_boundary_value_gbp(obs, DT_HOURS) is None
+
+
+def test_best_case_is_none_when_forecast_promises_a_larger_same_direction_charge_opportunity():
+    """Same condition, charge side: price=-10 (small charge incentive), forecast=-200 (a
+    much bigger one coming) — direction is negative/negative, magnitude strictly larger."""
+    obs = make_observation_with_forecast(price=-10.0, forecast=-200.0)
+    assert best_case_boundary_value_gbp(obs, DT_HOURS) is None
+
+
+def test_best_case_is_still_computed_when_forecast_points_the_opposite_direction():
+    """A forecast pointing the opposite direction from the current price is not a
+    legitimate reason to wait, so the single-step value remains fair and correct."""
+    obs = make_observation_with_forecast(price=150.0, forecast=-80.0)
+    best_case = best_case_boundary_value_gbp(obs, DT_HOURS)
+    assert best_case is not None and best_case > 0.0
+
+
+def test_best_case_is_still_computed_when_forecast_equals_current_price():
+    """A forecast equal to the current price implies no future opportunity to hold for,
+    so the single-step value remains correct."""
+    obs = make_observation_with_forecast(price=200.0, forecast=200.0)
+    best_case = best_case_boundary_value_gbp(obs, DT_HOURS)
+    assert best_case is not None and best_case > 0.0
+
+
+def test_best_case_is_still_computed_when_no_forecast_is_present():
+    """The overwhelming majority of scenarios declare no forecast at all — must be
+    completely unaffected by this fix."""
+    obs = make_observation(price=40.0)
+    best_case = best_case_boundary_value_gbp(obs, DT_HOURS)
+    assert best_case is not None and best_case > 0.0

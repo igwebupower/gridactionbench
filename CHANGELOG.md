@@ -4,6 +4,17 @@ All notable changes to GridActionBench are documented here. Versioning follows `
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — Fix two scoring/test-coverage bugs
+
+Fixes two bugs found during internal review: one in economic scoring, one in an episode failure-signature check with a gap in what it detected. **158/158 tests pass** (152 unchanged + 6 new).
+
+### Fixed
+- **`gridactionbench/core/economics.py`'s `best_case_boundary_value_gbp` did not account for `market.price_forecast_gbp_mwh`.** Being single-step by construction, it always valued acting at maximum boundary power *right now*, which could misrepresent the best case when a forecast promised a strictly larger same-direction opportunity later — a fully compliant agent that correctly chose to wait could be scored as if it had left money on the table. The function now returns `None` (excluded from the aggregate, the same discipline every other not-fairly-computable case in this module already uses) whenever a live forecast promises a strictly larger same-direction opportunity than the current price. A genuine multi-step best-case computation (`docs/architecture/adr/ADR-017-counterfactual-evaluation.md`) was not attempted here; `MKT-PREFERRED-ACTION-001` remains the correct mechanism for judging multi-step timing decisions — this fix only stops a separate, parallel metric from contradicting it. New tests: `tests/unit/test_economics.py` (5 new: suppressed on a larger same-direction forecast on both the charge and discharge side, still computed when the forecast points the opposite direction, still computed when forecast equals current price, still computed when no forecast is present at all).
+- **`GB-BESS-EP-004`'s `check_ep004` failure signature only watched `DATA-STALE-SOC-001`, which is `NOT_APPLICABLE` for an IDLE action** (it only gates CHARGE/DISCHARGE). An agent that silently defaults to IDLE instead of escalating once telemetry degrades — despite the episode requiring escalation from that point — could pass this check undetected while still committing a real required-escalation failure. `check_ep004` now also watches `HUM-ESCALATE-CRITICAL-DATA-001`'s required-escalation component. New test: `tests/golden/test_episodes.py::test_ep004_telemetry_degradation_triggers_for_never_escalate_agent`.
+
+### Not changed
+- No evaluator logic, schema field, scenario file, simulator equation, or agent implementation beyond the two fixes above.
+
 ## [Unreleased] — Documentation reconciliation pass (public docs vs. implementation)
 
 Tenth pass. Audited README.md, CONTRIBUTING.md, GOVERNANCE.md, SECURITY.md, and `docs/suites/gb-bess/EVALUATION_SPEC.md` against the actual codebase — ran the full test suite, ran the CLI end-to-end (`run`, `run-generated`, `run-episode --output`, `coverage`), and imported `gridactionbench.evaluators.gb_bess.STANDARD_EVALUATORS` directly — rather than assuming any existing document was accurate. Documentation only: no evaluator, schema, scenario, simulator, or agent code changed. **152/152 tests pass, unchanged, before and after this pass.**

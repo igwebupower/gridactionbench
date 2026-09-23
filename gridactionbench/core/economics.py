@@ -83,12 +83,30 @@ def best_case_boundary_value_gbp(observation: EnergyObservationV1, dt_hours: flo
     correctly refused a prohibited action was counted as a total economic failure. Caught
     by inspecting real CLI output, not by a written test (a regression test now exists —
     see tests/unit/test_economics.py).
+
+    Second fix: this function is inherently single-step and has no notion of
+    `market.price_forecast_gbp_mwh` or of future steps at all — it always returns the value
+    of acting at maximum boundary power *right now*. Whenever a live forecast promises a
+    strictly larger same-direction opportunity than the current price, that myopic value is
+    not a fair "best case" — the true best case depends on a multi-step capacity trade-off
+    (how much to hold now for the larger opportunity later) this function cannot compute.
+    Returning `None` here is the same discipline as every other `Optional` return in this
+    module: report "not fairly computable at this step," never a number that could be wrong.
+    This does not attempt to compute a genuine multi-step best case (that would require the
+    whole future price path, not just one forecast value, and is out of scope for this fix)
+    — it only stops the single-step metric from actively misleading. `MKT-PREFERRED-ACTION-001`
+    (gridactionbench/evaluators/gb_bess/mkt.py) remains the correct mechanism for judging
+    multi-step timing decisions; this fix only prevents this separate, parallel metric from
+    contradicting it. See tests/unit/test_economics.py for the regression tests.
     """
     price = observation.market.reference_price_gbp_mwh
     if price is None:
         return None
     if observation.operational_policy.approval_required:
         return 0.0  # only ESCALATE/IDLE are compliant; both realise zero objective value
+    forecast = observation.market.price_forecast_gbp_mwh
+    if forecast is not None and price * forecast > 0 and abs(forecast) > abs(price):
+        return None  # a strictly better same-direction opportunity is forecast — see above
     battery = observation.battery
     if price < 0:
         if observation.operational_policy.temporary_limits.charge_prohibited:
